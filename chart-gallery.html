@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D3 Chart Gallery</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: white;
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+  }
+  
+  .chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .chart-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+  
+  .chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+  }
+  
+  .chart-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .chart-iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+    border-radius: 8px;
+    background: #f8f9fa;
+  }
+  
+  .chart-info {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .config-section {
+    margin-bottom: 15px;
+  }
+  
+  .config-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .config-content {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  
+  .data-structure {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+  }
+  
+  .chart-count {
+    text-align: center;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    opacity: 0.9;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📊 D3 Chart Gallery</h1>
+  <div class="chart-count" id="chart-count">Loading charts...</div>
+  <div class="gallery" id="gallery">
+    <div class="loading">Loading chart gallery...</div>
+  </div>
+</div>
+
+<script>
+(async function() {
+  const gallery = document.getElementById('gallery');
+  const chartCount = document.getElementById('chart-count');
+  
+  // Chart configurations with their data
+  const charts = [
+    {
+      name: "Area Chart",
+      file: "area-chart.html",
+      config: "area-chart.json",
+      dataStructure: "area-chart_data_structure.txt"
+    },
+    {
+      name: "Arc Diagram", 
+      file: "arc-diagram.html",
+      config: "arc-diagram.json",
+      dataStructure: "arc-diagram_data_structure.txt"
+    },
+    {
+      name: "Bar Chart",
+      file: "bar-chart.html", 
+      config: "bar-chart.json",
+      dataStructure: "bar-chart_data_structure.txt"
+    },
+    {
+      name: "Beeswarm Plot",
+      file: "beeswarm.html",
+      config: "beeswarm.json", 
+      dataStructure: "beeswarm_data_structure.txt"
+    },
+    {
+      name: "Bollinger Bands",
+      file: "bollinger-bands.html",
+      config: "bollinger-bands.json",
+      dataStructure: "bollinger-bands_data_structure.txt"
+    },
+    {
+      name: "Box Plot",
+      file: "box-plot.html",
+      config: "box-plot.json",
+      dataStructure: "box-plot_data_structure.txt"
+    },
+    {
+      name: "Bubble Chart", 
+      file: "bubble-chart.html",
+      config: "bubble-chart.json",
+      dataStructure: "bubble-chart_data_structure.txt"
+    },
+    {
+      name: "Bubble Map",
+      file: "bubble-map.html",
+      config: "bubble-map.json", 
+      dataStructure: "bubble-map_data_structure.txt"
+    },
+    {
+      name: "Calendar Heatmap",
+      file: "calendar.html",
+      config: "calendar.json",
+      dataStructure: "calendar_data_structure.txt"
+    },
+    {
+      name: "Candlestick Chart",
+      file: "candlestick-chart.html",
+      config: "candlestick-chart.json",
+      dataStructure: "candlestick-chart_data_structure.txt"
+    },
+    {
+      name: "Cartogram",
+      file: "cartogram.html", 
+      config: "cartogram.json",
+      dataStructure: "cartogram_data_structure.txt"
+    },
+    {
+      name: "Chord Diagram",
+      file: "chord-diagram.html",
+      config: "chord-diagram.json",
+      dataStructure: "chord-diagram_data_structure.txt"
+    },
+    {
+      name: "Choropleth Map",
+      file: "choropleth.html",
+      config: "choropleth.json",
+      dataStructure: "choropleth_data_structure.txt"
+    },
+    {
+      name: "Cluster Dendrogram", 
+      file: "cluster.html",
+      config: "cluster.json",
+      dataStructure: "cluster_data_structure.txt"
+    },
+    {
+      name: "Density Contour",
+      file: "density-contour.html",
+      config: "density-contour.json",
+      dataStructure: "density-contour_data_structure.txt"
+    },
+    {
+      name: "Difference Chart",
+      file: "difference-chart.html",
+      config: "difference-chart.json", 
+      dataStructure: "difference-chart_data_structure.txt"
+    },
+    {
+      name: "Diverging Bar Chart",
+      file: "diverging-bar-chart.html",
+      config: "diverging-bar-chart.json",
+      dataStructure: "diverging-bar-chart_data_structure.txt"
+    },
+    {
+      name: "Donut Chart",
+      file: "donut-chart.html",
+      config: "donut-chart.json",
+      dataStructure: "donut-chart_data_structure.txt"
+    },
+    {
+      name: "Dot Plot",
+      file: "dot-plot.html",
+      config: "dot-plot.json",
+      dataStructure: "dot-plot_data_structure.txt"
+    },
+    {
+      name: "Force-Directed Graph",
+      file: "force-directed-graph.html",
+      config: "force-directed-graph.json",
+      dataStructure: "force-directed-graph_data_structure.txt"
+    },
+    {
+      name: "Gantt Chart",
+      file: "gantt.html",
+      config: "gantt.json",
+      dataStructure: "gantt_data_structure.txt"
+    },
+    {
+      name: "Grouped Bar Chart",
+      file: "grouped-bar-chart.html",
+      config: "grouped-bar-chart.json", 
+      dataStructure: "grouped-bar-chart_data_structure.txt"
+    },
+    {
+      name: "Heatmap",
+      file: "heatmap.html",
+      config: "heatmap.json",
+      dataStructure: "heatmap_data_structure.txt"
+    },
+    {
+      name: "Hexbin Plot",
+      file: "hexbin.html",
+      config: "hexbin.json",
+      dataStructure: "hexbin_data_structure.txt"
+    },
+    {
+      name: "Hierarchical Edge Bundling",
+      file: "hierarchical-edge-bundling.html",
+      config: "hierarchical-edge-bundling.json",
+      dataStructure: "hierarchical-edge-bundling_data_structure.txt"
+    },
+    {
+      name: "Histogram",
+      file: "histogram.html",
+      config: "histogram.json",
+      dataStructure: "histogram_data_structure.txt"
+    },
+    {
+      name: "Horizon Chart",
+      file: "horizon-chart.html",
+      config: "horizon-chart.json",
+      dataStructure: "horizon-chart_data_structure.txt"
+    },
+    {
+      name: "Horizontal Bar Chart",
+      file: "horizontal-bar-chart.html",
+      config: "horizontal-bar-chart.json",
+      dataStructure: "horizontal-bar-chart_data_structure.txt"
+    },
+    {
+      name: "Icicle Chart",
+      file: "icicle.html",
+      config: "icicle.json",
+      dataStructure: "icicle_data_structure.txt"
+    },
+    {
+      name: "Indented Tree",
+      file: "indented-tree.html",
+      config: "indented-tree.json",
+      dataStructure: "indented-tree_data_structure.txt"
+    },
+    {
+      name: "Line Chart",
+      file: "line-chart.html",
+      config: "line-chart.json",
+      dataStructure: "line-chart_data_structure.txt"
+    },
+    {
+      name: "Marimekko Chart",
+      file: "marimekko.html",
+      config: "marimekko.json",
+      dataStructure: "marimekko_data_structure.txt"
+    },
+    {
+      name: "Multi-Line Chart",
+      file: "multi-line-chart.html",
+      config: "multi-line-chart.json",
+      dataStructure: "multi-line-chart_data_structure.txt"
+    },
+    {
+      name: "Circle Packing",
+      file: "pack.html",
+      config: "pack.json",
+      dataStructure: "pack_data_structure.txt"
+    },
+    {
+      name: "Parallel Coordinates",
+      file: "parallel-coordinates.html",
+      config: "parallel-coordinates.json",
+      dataStructure: "parallel-coordinates_data_structure.txt"
+    },
+    {
+      name: "Pie Chart",
+      file: "pie-chart.html",
+      config: "pie-chart.json",
+      dataStructure: "pie-chart_data_structure.txt"
+    },
+    {
+      name: "Q-Q Plot",
+      file: "qq-plot.html",
+      config: "qq-plot.json",
+      dataStructure: "qq-plot_data_structure.txt"
+    },
+    {
+      name: "Radial Area Chart",
+      file: "radial-area-chart.html",
+      config: "radial-area-chart.json",
+      dataStructure: "radial-area-chart_data_structure.txt"
+    },
+    {
+      name: "Radial Bar Chart",
+      file: "radial-bar-chart.html",
+      config: "radial-bar-chart.json",
+      dataStructure: "radial-bar-chart_data_structure.txt"
+    },
+    {
+      name: "Radial Cluster",
+      file: "radial-cluster.html",
+      config: "radial-cluster.json",
+      dataStructure: "radial-cluster_data_structure.txt"
+    },
+    {
+      name: "Radial Tree",
+      file: "radial-tree.html",
+      config: "radial-tree.json",
+      dataStructure: "radial-tree_data_structure.txt"
+    },
+    {
+      name: "Ridgeline Plot",
+      file: "ridgeline-plot.html",
+      config: "ridgeline-plot.json",
+      dataStructure: "ridgeline-plot_data_structure.txt"
+    },
+    {
+      name: "Sankey Diagram",
+      file: "sankey.html",
+      config: "sankey.json",
+      dataStructure: "sankey_data_structure.txt"
+    },
+    {
+      name: "Scatter Plot",
+      file: "scatter-plot.html",
+      config: "scatter-plot.json",
+      dataStructure: "scatter-plot_data_structure.txt"
+    },
+    {
+      name: "Slope Chart",
+      file: "slope-chart.html",
+      config: "slope-chart.json",
+      dataStructure: "slope-chart_data_structure.txt"
+    },
+    {
+      name: "Spike Map",
+      file: "spike-map.html",
+      config: "spike-map.json",
+      dataStructure: "spike-map_data_structure.txt"
+    },
+    {
+      name: "Scatterplot Matrix",
+      file: "splom.html",
+      config: "splom.json",
+      dataStructure: "splom_data_structure.txt"
+    },
+    {
+      name: "Stacked Area Chart",
+      file: "stacked-area-chart.html",
+      config: "stacked-area-chart.json",
+      dataStructure: "stacked-area-chart_data_structure.txt"
+    },
+    {
+      name: "Stacked Bar Chart",
+      file: "stacked-bar-chart.html",
+      config: "stacked-bar-chart.json",
+      dataStructure: "stacked-bar-chart_data_structure.txt"
+    },
+    {
+      name: "Streamgraph",
+      file: "streamgraph.html",
+      config: "streamgraph.json",
+      dataStructure: "streamgraph_data_structure.txt"
+    },
+    {
+      name: "Sunburst Chart",
+      file: "sunburst.html",
+      config: "sunburst.json",
+      dataStructure: "sunburst_data_structure.txt"
+    },
+    {
+      name: "Timeline Chart",
+      file: "timeline.html",
+      config: "timeline.json",
+      dataStructure: "timeline_data_structure.txt"
+    },
+    {
+      name: "Tree Diagram",
+      file: "tree.html",
+      config: "tree.json",
+      dataStructure: "tree_data_structure.txt"
+    },
+    {
+      name: "Treemap",
+      file: "treemap.html",
+      config: "treemap.json",
+      dataStructure: "treemap_data_structure.txt"
+    },
+    {
+      name: "Violin Plot",
+      file: "violin-plot.html",
+      config: "violin-plot.json",
+      dataStructure: "violin-plot_data_structure.txt"
+    }
+  ];
+
+  // Load file content
+  async function loadFile(filename) {
+    try {
+      const response = await fetch(filename);
+      if (!response.ok) throw new Error(`Failed to load ${filename}`);
+      return await response.text();
+    } catch (error) {
+      console.error(`Error loading ${filename}:`, error);
+      return null;
+    }
+  }
+
+  // Create chart card
+  function createChartCard(chart) {
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    
+    card.innerHTML = `
+      <div class="chart-title">${chart.name}</div>
+      <iframe class="chart-iframe" src="${chart.file}" title="${chart.name}"></iframe>
+      <div class="chart-info">
+        <div class="config-section">
+          <span class="config-label">📋 Configuration</span>
+          <div class="config-content" id="config-${chart.config}">Loading...</div>
+        </div>
+        <div class="config-section">
+          <span class="config-label">📊 Data Structure</span>
+          <div class="config-content data-structure" id="structure-${chart.dataStructure}">Loading...</div>
+        </div>
+      </div>
+    `;
+    
+    return card;
+  }
+
+  // Load and display all charts
+  async function loadGallery() {
+    gallery.innerHTML = '';
+    chartCount.textContent = `Displaying ${charts.length} chart types`;
+    
+    for (const chart of charts) {
+      const card = createChartCard(chart);
+      gallery.appendChild(card);
+      
+      // Load configuration
+      const configContent = await loadFile(chart.config);
+      if (configContent) {
+        const configElement = document.getElementById(`config-${chart.config}`);
+        try {
+          const formatted = JSON.stringify(JSON.parse(configContent), null, 2);
+          configElement.textContent = formatted;
+        } catch (e) {
+          configElement.textContent = configContent;
+        }
+      }
+      
+      // Load data structure
+      const structureContent = await loadFile(chart.dataStructure);
+      if (structureContent) {
+        const structureElement = document.getElementById(`structure-${chart.dataStructure}`);
+        structureElement.textContent = structureContent;
+      }
+    }
+  }
+
+  // Initialize gallery
+  loadGallery();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Universal D3 Chart Renderer</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-hexbin@0.2.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<style>
+  body { 
+    font-family: Arial, sans-serif; 
+    margin: 20px; 
+    background: #f8f9fa;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .input-section {
+    margin-bottom: 30px;
+  }
+  textarea { 
+    width: 100%; 
+    height: 300px; 
+    font-family: 'Courier New', monospace; 
+    font-size: 12px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    padding: 15px;
+    resize: vertical;
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 15px;
+  }
+  button { 
+    padding: 10px 20px; 
+    font-size: 16px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #2980b9;
+  }
+  select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    background: white;
+  }
+  .chart-container {
+    text-align: center;
+    margin-top: 30px;
+  }
+  svg { 
+    border: 2px solid #e1e8ed; 
+    border-radius: 6px;
+    background: white;
+    display: block;
+    margin: 0 auto;
+  }
+  .error {
+    color: #e74c3c;
+    background: #fdf2f2;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+    margin-top: 15px;
+  }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+  .tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    pointer-events: none;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎨 Universal D3 Chart Renderer</h1>
+  
+  <div class="input-section">
+    <p><strong>Select a chart type or paste your own configuration:</strong></p>
+    
+    <div class="controls">
+      <select id="chart-selector">
+        <option value="">Select a chart type...</option>
+        <option value="area-chart">Area Chart</option>
+        <option value="arc-diagram">Arc Diagram</option>
+        <option value="bar-chart">Bar Chart</option>
+        <option value="beeswarm">Beeswarm Plot</option>
+        <option value="bollinger-bands">Bollinger Bands</option>
+        <option value="box-plot">Box Plot</option>
+        <option value="bubble-chart">Bubble Chart</option>
+        <option value="bubble-map">Bubble Map</option>
+        <option value="calendar">Calendar Heatmap</option>
+        <option value="candlestick-chart">Candlestick Chart</option>
+        <option value="cartogram">Cartogram</option>
+        <option value="chord-diagram">Chord Diagram</option>
+        <option value="choropleth">Choropleth Map</option>
+        <option value="cluster">Cluster Dendrogram</option>
+        <option value="density-contour">Density Contour</option>
+        <option value="difference-chart">Difference Chart</option>
+        <option value="diverging-bar-chart">Diverging Bar Chart</option>
+        <option value="donut-chart">Donut Chart</option>
+        <option value="dot-plot">Dot Plot</option>
+        <option value="force-directed-graph">Force-Directed Graph</option>
+        <option value="gantt">Gantt Chart</option>
+        <option value="grouped-bar-chart">Grouped Bar Chart</option>
+        <option value="heatmap">Heatmap</option>
+        <option value="hexbin">Hexbin Plot</option>
+        <option value="hierarchical-edge-bundling">Hierarchical Edge Bundling</option>
+        <option value="histogram">Histogram</option>
+        <option value="horizon-chart">Horizon Chart</option>
+        <option value="horizontal-bar-chart">Horizontal Bar Chart</option>
+        <option value="icicle">Icicle Chart</option>
+        <option value="indented-tree">Indented Tree</option>
+        <option value="line-chart">Line Chart</option>
+        <option value="marimekko">Marimekko Chart</option>
+        <option value="multi-line-chart">Multi-Line Chart</option>
+        <option value="pack">Circle Packing</option>
+        <option value="parallel-coordinates">Parallel Coordinates</option>
+        <option value="pie-chart">Pie Chart</option>
+        <option value="qq-plot">Q-Q Plot</option>
+        <option value="radial-area-chart">Radial Area Chart</option>
+        <option value="radial-bar-chart">Radial Bar Chart</option>
+        <option value="radial-cluster">Radial Cluster</option>
+        <option value="radial-tree">Radial Tree</option>
+        <option value="ridgeline-plot">Ridgeline Plot</option>
+        <option value="sankey">Sankey Diagram</option>
+        <option value="scatter-plot">Scatter Plot</option>
+        <option value="slope-chart">Slope Chart</option>
+        <option value="spike-map">Spike Map</option>
+        <option value="splom">Scatterplot Matrix</option>
+        <option value="stacked-area-chart">Stacked Area Chart</option>
+        <option value="stacked-bar-chart">Stacked Bar Chart</option>
+        <option value="streamgraph">Streamgraph</option>
+        <option value="sunburst">Sunburst Chart</option>
+        <option value="timeline">Timeline Chart</option>
+        <option value="tree">Tree Diagram</option>
+        <option value="treemap">Treemap</option>
+        <option value="violin-plot">Violin Plot</option>
+      </select>
+      <button id="load-example">Load Example</button>
+      <button id="render-btn">Render Chart</button>
+    </div>
+    
+    <textarea id="config-input" placeholder="Paste your chart configuration JSON here..."></textarea>
+    
+    <div id="error-display"></div>
+  </div>
+
+  <div class="chart-container">
+    <svg id="chart-svg" width="800" height="400"></svg>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+(function() {
+  const svg = d3.select('#chart-svg');
+  const tooltip = d3.select('#tooltip');
+  const margin = {top: 60, right: 60, bottom: 60, left: 60};
+
+  // Chart configurations (embedded)
+  const chartConfigs = {
+    "area-chart": {"id":"area-chart","title":"Area Chart","data":{"source":{"type":"inline","data":[{"date":"2019-12-31T18:30:00.000Z","value":45.2,"category":"Series 1"},{"date":"2020-01-01T18:30:00.000Z","value":52.8,"category":"Series 1"},{"date":"2020-01-02T18:30:00.000Z","value":48.1,"category":"Series 1"},{"date":"2020-01-03T18:30:00.000Z","value":61.5,"category":"Series 1"},{"date":"2020-01-04T18:30:00.000Z","value":58.9,"category":"Series 1"},{"date":"2020-01-05T18:30:00.000Z","value":67.3,"category":"Series 1"},{"date":"2020-01-06T18:30:00.000Z","value":72.1,"category":"Series 1"},{"date":"2020-01-07T18:30:00.000Z","value":69.8,"category":"Series 1"},{"date":"2020-01-08T18:30:00.000Z","value":75.4,"category":"Series 1"},{"date":"2020-01-09T18:30:00.000Z","value":78.2,"category":"Series 1"}]},"fields":[{"name":"date","type":"temporal","accessor":"date"},{"name":"value","type":"quantitative","accessor":"value"}]},"space":{"width":800,"height":400},"scales":{"x":{"type":"time","domainFrom":{"data":"main","field":"date","method":"extent"},"range":[50,750]},"y":{"type":"linear","domainFrom":{"data":"main","field":"value","method":"max"},"range":[350,50],"nice":true}},"layers":[{"id":"area","mark":{"type":"area","generator":{"type":"area","curve":"curveMonotoneX"}},"encoding":{"x":{"field":"date","scale":"x"},"y":{"field":"value","scale":"y"},"fill":{"value":"steelblue"},"opacity":{"value":0.7}}}]},
+    "arc-diagram": {"id":"arc-diagram","title":"Arc Diagram","data":{"source":{"type":"inline","data":{"nodes":[{"id":"node-0","group":1,"index":0},{"id":"node-1","group":1,"index":1},{"id":"node-2","group":2,"index":2},{"id":"node-3","group":2,"index":3},{"id":"node-4","group":3,"index":4},{"id":"node-5","group":3,"index":5},{"id":"node-6","group":4,"index":6},{"id":"node-7","group":4,"index":7},{"id":"node-8","group":5,"index":8},{"id":"node-9","group":5,"index":9}],"links":[{"source":"node-0","target":"node-3","arcPath":"M100,350 Q200,200 300,350"},{"source":"node-1","target":"node-5","arcPath":"M150,350 Q275,180 400,350"},{"source":"node-2","target":"node-7","arcPath":"M200,350 Q350,160 500,350"},{"source":"node-4","target":"node-8","arcPath":"M350,350 Q475,140 600,350"},{"source":"node-6","target":"node-9","arcPath":"M450,350 Q525,120 600,350"}]}},"fields":[{"name":"id","type":"nominal","accessor":"id"},{"name":"group","type":"nominal","accessor":"group"},{"name":"index","type":"quantitative","accessor":"index"}]},"space":{"width":800,"height":400},"scales":{"x":{"type":"point","domainFrom":{"data":"nodes","field":"id","method":"values"},"range":[50,750]},"color":{"type":"ordinal","scheme":"Category10"}},"layers":[{"id":"arcs","data":"links","mark":{"type":"path"},"encoding":{"d":{"field":"arcPath"},"stroke":{"value":"steelblue"},"fill":{"value":"none"}}},{"id":"nodes","data":"nodes","mark":{"type":"circle"},"encoding":{"x":{"field":"id","scale":"x"},"y":{"value":350},"r":{"value":4},"fill":{"field":"group","scale":"color"}}}]},
+    "bar-chart": {"id":"bar-chart","title":"Bar Chart","data":{"source":{"type":"inline","data":[{"category":"A","value":45.2,"count":234},{"category":"B","value":67.8,"count":456},{"category":"C","value":23.1,"count":123},{"category":"D","value":89.4,"count":789},{"category":"E","value":34.7,"count":345},{"category":"F","value":56.3,"count":567}]},"fields":[{"name":"category","type":"nominal","accessor":"category"},{"name":"value","type":"quantitative","accessor":"value"}]},"space":{"width":800,"height":400},"scales":{"x":{"type":"band","domainFrom":{"data":"main","field":"category","method":"values"},"range":[50,750],"params":{"padding":0.1}},"y":{"type":"linear","domainFrom":{"data":"main","field":"value","method":"max"},"range":[350,50],"nice":true},"color":{"type":"ordinal","scheme":"Category10"}},"layers":[{"id":"bars","mark":{"type":"rect"},"encoding":{"x":{"field":"category","scale":"x"},"y":{"field":"value","scale":"y"},"color":{"field":"category","scale":"color"}}}]}
+  };
+
+  // Utility functions
+  function getLayerData(config, layer) {
+    if (!layer.data) {
+      return config.data.source.data || [];
+    }
+    if (typeof layer.data === 'string') {
+      return config.data.source.data[layer.data] || [];
+    }
+    if (layer.data.source) {
+      return layer.data.source.data || [];
+    }
+    return [];
+  }
+
+  function createScale(scaleCfg, data, fields) {
+    let domain = null;
+
+    if (scaleCfg.domainFrom && scaleCfg.domainFrom.field) {
+      const fieldName = scaleCfg.domainFrom.field;
+      const method = scaleCfg.domainFrom.method || "values";
+      const fieldDef = fields.find(f => f.name === fieldName);
+      const fieldType = fieldDef ? fieldDef.type : null;
+
+      const values = data.map(d => d[fieldName]).filter(v => v != null);
+      
+      if (method === "extent") {
+        if (fieldType === "temporal") {
+          domain = d3.extent(values, v => v instanceof Date ? v : new Date(v));
+        } else {
+          domain = d3.extent(values);
+        }
+      } else if (method === "max") {
+        domain = [0, d3.max(values)];
+      } else if (method === "values") {
+        domain = Array.from(new Set(values));
+      }
+    }
+
+    let scale;
+    switch (scaleCfg.type) {
+      case "linear": scale = d3.scaleLinear(); break;
+      case "time": scale = d3.scaleTime(); break;
+      case "point": scale = d3.scalePoint(); break;
+      case "band": 
+        scale = d3.scaleBand();
+        if (scaleCfg.params?.padding) scale.padding(scaleCfg.params.padding);
+        break;
+      case "ordinal": 
+        const scheme = scaleCfg.scheme || "Category10";
+        scale = d3.scaleOrdinal(d3[`scheme${scheme}`] || d3.schemeCategory10);
+        break;
+      case "sequential":
+        const seqScheme = scaleCfg.scheme || "Blues";
+        scale = d3.scaleSequential(d3[`interpolate${seqScheme}`] || d3.interpolateBlues);
+        break;
+      case "sqrt": scale = d3.scaleSqrt(); break;
+      case "threshold": scale = d3.scaleThreshold(); break;
+      default: scale = d3.scaleLinear(); break;
+    }
+
+    if (domain) scale.domain(domain);
+    if (scaleCfg.nice) scale.nice();
+    if (scaleCfg.range) scale.range(scaleCfg.range);
+    if (scaleCfg.domain) scale.domain(scaleCfg.domain);
+
+    return scale;
+  }
+
+  function preprocessData(data, fields) {
+    if (!Array.isArray(data)) return data;
+    
+    return data.map(d => {
+      const processed = {...d};
+      for (const field of fields) {
+        if (field.type === "temporal" && processed[field.accessor]) {
+          if (!(processed[field.accessor] instanceof Date)) {
+            processed[field.accessor] = new Date(processed[field.accessor]);
+          }
+        }
+      }
+      return processed;
+    });
+  }
+
+  function renderChart(config) {
+    try {
+      // Clear previous chart and errors
+      svg.selectAll("*").remove();
+      d3.select('#error-display').html('');
+
+      const width = config.space.width || 800;
+      const height = config.space.height || 400;
+      
+      svg.attr('width', width).attr('height', height);
+
+      // Prepare data
+      let mainData = config.data.source.data || [];
+      
+      // Handle different data structures
+      if (mainData.nodes && mainData.links) {
+        // Graph data structure
+        mainData.nodes = preprocessData(mainData.nodes, config.data.fields || []);
+        mainData.links = preprocessData(mainData.links, config.data.fields || []);
+      } else if (Array.isArray(mainData)) {
+        // Regular array data
+        mainData = preprocessData(mainData, config.data.fields || []);
+      } else if (typeof mainData === 'object' && mainData.name) {
+        // Hierarchical data - no preprocessing needed
+      }
+
+      // Build scales
+      const scales = {};
+      for (const scaleKey in config.scales) {
+        const scaleCfg = config.scales[scaleKey];
+        let scaleData = [];
+
+        if (scaleCfg.domainFrom?.field) {
+          // Collect data from all layers that use this scale
+          for (const layer of config.layers) {
+            if (!layer.encoding) continue;
+            const encodings = Object.values(layer.encoding);
+            const usesScale = encodings.some(enc => enc.scale === scaleKey);
+            if (usesScale) {
+              const layerData = getLayerData(config, layer);
+              scaleData = scaleData.concat(Array.isArray(layerData) ? layerData : []);
+            }
+          }
+        }
+
+        scales[scaleKey] = createScale(
+          scaleCfg,
+          scaleData.length ? scaleData : (Array.isArray(mainData) ? mainData : []),
+          config.data.fields || []
+        );
+      }
+
+      // Draw title
+      if (config.title) {
+        svg.append('text')
+          .attr('x', width/2)
+          .attr('y', 30)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '20px')
+          .style('font-weight', 'bold')
+          .text(config.title);
+      }
+
+      // Render layers
+      for (const layer of config.layers) {
+        renderLayer(config, layer, scales, mainData);
+      }
+
+    } catch (error) {
+      showError('Rendering Error: ' + error.message);
+      console.error('Rendering error:', error);
+    }
+  }
+
+  function renderLayer(config, layer, scales, mainData) {
+    const layerData = getLayerData(config, layer);
+    const markType = layer.mark.type;
+    const encoding = layer.encoding || {};
+
+    // Helper function to get encoded value
+    function getEncodedValue(enc, d, defaultValue) {
+      if (enc?.value !== undefined) return enc.value;
+      if (enc?.field && scales[enc.scale]) {
+        return scales[enc.scale](d[enc.field]);
+      }
+      return defaultValue;
+    }
+
+    // Render based on mark type
+    if (markType === "area") {
+      renderArea(layerData, encoding, scales, layer.mark);
+    } else if (markType === "rect") {
+      renderRect(layerData, encoding, scales);
+    } else if (markType === "circle") {
+      renderCircle(layerData, encoding, scales);
+    } else if (markType === "path") {
+      renderPath(layerData, encoding, scales);
+    } else if (markType === "line") {
+      renderLine(layerData, encoding, scales, layer.mark);
+    } else if (markType === "arc") {
+      renderArc(layerData, encoding, scales, layer.mark);
+    } else if (markType === "text") {
+      renderText(layerData, encoding, scales);
+    } else if (markType === "geoshape") {
+      renderGeoshape(layerData, encoding, scales);
+    }
+
+    // Add axes if this layer has x/y encodings
+    if (encoding.x?.scale && encoding.y?.scale && markType !== "geoshape") {
+      addAxes(encoding, scales);
+    }
+  }
+
+  function renderArea(data, encoding, scales, mark) {
+    const curve = mark.generator?.curve || "curveLinear";
+    const curveFn = d3[curve] || d3.curveLinear;
+    
+    const areaGen = d3.area().curve(curveFn);
+
+    if (encoding.x) {
+      areaGen.x(d => scales[encoding.x.scale](d[encoding.x.field]));
+    }
+    
+    if (encoding.y) {
+      const yScale = scales[encoding.y.scale];
+      if (encoding.y0) {
+        areaGen.y0(d => yScale(d[encoding.y0.field]));
+      } else {
+        areaGen.y0(yScale(0));
+      }
+      areaGen.y1(d => yScale(d[encoding.y.field]));
+    }
+
+    svg.append('path')
+      .datum(data)
+      .attr('fill', encoding.fill?.value || 'steelblue')
+      .attr('opacity', encoding.opacity?.value ?? 0.7)
+      .attr('d', areaGen);
+  }
+
+  function renderRect(data, encoding, scales) {
+    const rects = svg.selectAll(`rect.${encoding.x?.field || 'rect'}`)
+      .data(data)
+      .join('rect');
+
+    rects
+      .attr('x', d => {
+        if (encoding.x?.value !== undefined) return encoding.x.value;
+        const scale = scales[encoding.x?.scale];
+        return scale ? scale(d[encoding.x.field]) : 0;
+      })
+      .attr('y', d => {
+        if (encoding.y?.value !== undefined) return encoding.y.value;
+        const scale = scales[encoding.y?.scale];
+        return scale ? scale(d[encoding.y.field]) : 0;
+      })
+      .attr('width', d => {
+        if (encoding.width?.value !== undefined) return encoding.width.value;
+        const scale = scales[encoding.x?.scale];
+        return scale?.bandwidth ? scale.bandwidth() : 20;
+      })
+      .attr('height', d => {
+        if (encoding.height?.value !== undefined) return encoding.height.value;
+        const yScale = scales[encoding.y?.scale];
+        if (yScale) {
+          const yRange = yScale.range();
+          return Math.abs(yRange[0] - yScale(d[encoding.y.field]));
+        }
+        return 20;
+      })
+      .attr('fill', d => {
+        if (encoding.fill?.value) return encoding.fill.value;
+        if (encoding.color?.value) return encoding.color.value;
+        if (encoding.color?.field) return scales[encoding.color.scale](d[encoding.color.field]);
+        return 'steelblue';
+      })
+      .attr('opacity', encoding.opacity?.value ?? 1);
+  }
+
+  function renderCircle(data, encoding, scales) {
+    const circles = svg.selectAll(`circle.${encoding.x?.field || 'circle'}`)
+      .data(data)
+      .join('circle');
+
+    circles
+      .attr('cx', d => {
+        if (encoding.x?.value !== undefined) return encoding.x.value;
+        return scales[encoding.x?.scale](d[encoding.x.field]);
+      })
+      .attr('cy', d => {
+        if (encoding.y?.value !== undefined) return encoding.y.value;
+        return scales[encoding.y?.scale] ? scales[encoding.y?.scale](d[encoding.y.field]) : 200;
+      })
+      .attr('r', d => {
+        if (encoding.r?.value !== undefined) return encoding.r.value;
+        if (encoding.size?.value !== undefined) return encoding.size.value;
+        return scales[encoding.r?.scale] ? scales[encoding.r.scale](d[encoding.r.field]) : 4;
+      })
+      .attr('fill', d => {
+        if (encoding.fill?.value) return encoding.fill.value;
+        if (encoding.color?.value) return encoding.color.value;
+        if (encoding.fill?.field) return scales[encoding.fill.scale](d[encoding.fill.field]);
+        if (encoding.color?.field) return scales[encoding.color.scale](d[encoding.color.field]);
+        return 'steelblue';
+      })
+      .attr('opacity', encoding.opacity?.value ?? 1);
+  }
+
+  function renderPath(data, encoding, scales) {
+    svg.selectAll(`path.${data.length ? 'path-layer' : 'empty'}`)
+      .data(data)
+      .join('path')
+      .attr('d', d => d[encoding.d?.field] || '')
+      .attr('stroke', encoding.stroke?.value || 'steelblue')
+      .attr('fill', encoding.fill?.value || 'none')
+      .attr('stroke-width', encoding.strokeWidth?.value || 1.5)
+      .attr('opacity', encoding.opacity?.value ?? 1);
+  }
+
+  function renderLine(data, encoding, scales, mark) {
+    if (mark.groupBy) {
+      // Multi-line chart
+      const groupField = mark.groupBy[0];
+      const grouped = d3.group(data, d => d[groupField]);
+      
+      const curve = mark.generator?.curve || "curveLinear";
+      const curveFn = d3[curve] || d3.curveLinear;
+      
+      const lineGen = d3.line()
+        .curve(curveFn)
+        .x(d => scales[encoding.x.scale](d[encoding.x.field]))
+        .y(d => scales[encoding.y.scale](d[encoding.y.field]));
+
+      svg.selectAll('.line-group')
+        .data(Array.from(grouped.entries()))
+        .join('path')
+        .attr('class', 'line-group')
+        .attr('d', d => lineGen(d[1]))
+        .attr('fill', 'none')
+        .attr('stroke', d => scales[encoding.stroke?.scale] ? scales[encoding.stroke.scale](d[0]) : encoding.stroke?.value || 'steelblue')
+        .attr('stroke-width', encoding.strokeWidth?.value || 2);
+    } else {
+      // Single line or links
+      svg.selectAll('.line-element')
+        .data(data)
+        .join('line')
+        .attr('class', 'line-element')
+        .attr('x1', d => {
+          if (encoding.x?.field) return scales[encoding.x.scale](d[encoding.x.field]);
+          return 0;
+        })
+        .attr('y1', d => {
+          if (encoding.y?.field) return scales[encoding.y.scale](d[encoding.y.field]);
+          return 0;
+        })
+        .attr('x2', d => {
+          if (encoding.x2?.field) return scales[encoding.x2.scale || encoding.x.scale](d[encoding.x2.field]);
+          return 0;
+        })
+        .attr('y2', d => {
+          if (encoding.y2?.field) return scales[encoding.y2.scale || encoding.y.scale](d[encoding.y2.field]);
+          return 0;
+        })
+        .attr('stroke', encoding.stroke?.value || '#999')
+        .attr('stroke-width', encoding.strokeWidth?.value || 1);
+    }
+  }
+
+  function renderArc(data, encoding, scales, mark) {
+    const innerRadius = mark.generator?.params?.innerRadius || 0;
+    const outerRadius = mark.generator?.params?.outerRadius || 100;
+    
+    const arcGen = d3.arc()
+      .innerRadius(innerRadius)
+      .outerRadius(outerRadius);
+
+    svg.selectAll('.arc-element')
+      .data(data)
+      .join('path')
+      .attr('class', 'arc-element')
+      .attr('d', d => arcGen({
+        startAngle: d[encoding.startAngle?.field] || 0,
+        endAngle: d[encoding.endAngle?.field] || Math.PI
+      }))
+      .attr('fill', d => {
+        if (encoding.color?.field) return scales[encoding.color.scale](d[encoding.color.field]);
+        return encoding.fill?.value || 'steelblue';
+      })
+      .attr('stroke', encoding.stroke?.value || 'white')
+      .attr('stroke-width', encoding.strokeWidth?.value || 1)
+      .attr('transform', `translate(${config.space.width/2},${config.space.height/2})`);
+  }
+
+  function renderText(data, encoding, scales) {
+    svg.selectAll('.text-element')
+      .data(data)
+      .join('text')
+      .attr('class', 'text-element')
+      .attr('x', d => {
+        if (encoding.x?.value !== undefined) return encoding.x.value;
+        return scales[encoding.x?.scale] ? scales[encoding.x.scale](d[encoding.x.field]) : 0;
+      })
+      .attr('y', d => {
+        if (encoding.y?.value !== undefined) return encoding.y.value;
+        return scales[encoding.y?.scale] ? scales[encoding.y.scale](d[encoding.y.field]) : 0;
+      })
+      .text(d => d[encoding.text?.field] || d.name || '')
+      .attr('fill', encoding.fill?.value || 'black')
+      .attr('font-size', encoding.fontSize?.value || '12px')
+      .attr('text-anchor', encoding.textAnchor?.value || 'start');
+  }
+
+  function renderGeoshape(data, encoding, scales) {
+    // Basic geographic shape rendering
+    const projection = d3.geoAlbersUsa()
+      .scale(1000)
+      .translate([config.space.width/2, config.space.height/2]);
+    
+    const path = d3.geoPath().projection(projection);
+
+    svg.selectAll('.geo-shape')
+      .data(data)
+      .join('path')
+      .attr('class', 'geo-shape')
+      .attr('d', path)
+      .attr('fill', d => {
+        if (encoding.fill?.field) return scales[encoding.fill.scale](d[encoding.fill.field]);
+        return encoding.fill?.value || '#ccc';
+      })
+      .attr('stroke', encoding.stroke?.value || 'white')
+      .attr('stroke-width', encoding.strokeWidth?.value || 0.5);
+  }
+
+  function addAxes(encoding, scales) {
+    if (encoding.x?.scale && scales[encoding.x.scale]) {
+      const xScale = scales[encoding.x.scale];
+      const xRange = xScale.range();
+      const yRange = scales[encoding.y.scale]?.range() || [350, 50];
+      
+      svg.append('g')
+        .attr('class', 'axis x-axis')
+        .attr('transform', `translate(0,${yRange[0]})`)
+        .call(d3.axisBottom(xScale));
+    }
+
+    if (encoding.y?.scale && scales[encoding.y.scale]) {
+      const yScale = scales[encoding.y.scale];
+      const xRange = scales[encoding.x.scale]?.range() || [50, 750];
+      
+      svg.append('g')
+        .attr('class', 'axis y-axis')
+        .attr('transform', `translate(${xRange[0]},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  }
+
+  function showError(message) {
+    d3.select('#error-display')
+      .html(`<div class="error">${message}</div>`);
+  }
+
+  // Event handlers
+  document.getElementById('chart-selector').addEventListener('change', function() {
+    const selectedChart = this.value;
+    if (selectedChart && chartConfigs[selectedChart]) {
+      document.getElementById('config-input').value = JSON.stringify(chartConfigs[selectedChart], null, 2);
+    }
+  });
+
+  document.getElementById('load-example').addEventListener('click', function() {
+    const selector = document.getElementById('chart-selector');
+    const selectedChart = selector.value;
+    if (selectedChart && chartConfigs[selectedChart]) {
+      document.getElementById('config-input').value = JSON.stringify(chartConfigs[selectedChart], null, 2);
+    } else {
+      alert('Please select a chart type first');
+    }
+  });
+
+  document.getElementById('render-btn').addEventListener('click', function() {
+    const configText = document.getElementById('config-input').value.trim();
+    if (!configText) {
+      showError('Please enter a chart configuration');
+      return;
+    }
+
+    let config;
+    try {
+      config = JSON.parse(configText);
+    } catch (e) {
+      showError('Invalid JSON: ' + e.message);
+      return;
+    }
+
+    renderChart(config);
+  });
+
+  // Load default chart on page load
+  document.getElementById('chart-selector').value = 'area-chart';
+  document.getElementById('load-example').click();
+  document.getElementById('render-btn').click();
+
+})();
+</script>
+
+</body>
+</html>
