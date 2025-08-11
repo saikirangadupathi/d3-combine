@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Radial Cluster</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .title { text-align: center; font-size: 20px; margin-top: 10px; }
+  .link { fill: none; stroke: #555; stroke-width: 1.5px; }
+</style>
+</head>
+<body>
+<div class="title">Radial Cluster</div>
+<svg width="500" height="500"></svg>
+<script>
+// dimensions
+const width = 500, height = 500;
+const radius = 150; // radial extent as per config
+
+// create SVG
+const svg = d3.select("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .append("g")
+    .attr("transform", `translate(${width/2},${height/2})`); // polar origin
+
+// inline data
+const data = {
+  "name": "root",
+  "children": [
+    {
+      "name": "Cluster A",
+      "children": [
+        {"name":"Item 1"},
+        {"name":"Item 2"},
+        {"name":"Item 3"},
+        {"name":"Item 4"}
+      ]
+    },
+    {
+      "name": "Cluster B",
+      "children": [
+        {"name":"Item 5"},
+        {"name":"Item 6"},
+        {"name":"Item 7"},
+        {"name":"Item 8"}
+      ]
+    }
+  ]
+};
+
+// build hierarchy
+const root = d3.hierarchy(data)
+    .sum(d => 1)          // assign a value for the layout
+    .sort((a,b)=> d3.ascending(a.data.name, b.data.name));
+
+// cluster layout (polar)
+// size: [angle (radians), radius]
+const cluster = d3.cluster()
+    .size([2 * Math.PI, radius]);
+
+cluster(root);
+
+// color scale for depth
+const color = d3.scaleOrdinal(d3.schemeSet2);
+
+// links (edges)
+svg.append("g")
+  .attr("fill", "none")
+  .attr("stroke", "#555")
+  .selectAll("path")
+  .data(root.links())
+  .join("path")
+  .attr("class", "link")
+  .attr("d", d3.linkRadial()
+        .angle(d => d.x)
+        .radius(d => d.y));
+
+// nodes (circles)
+svg.append("g")
+  .selectAll("circle")
+  .data(root.descendants())
+  .join("circle")
+  .attr("r", 2.5)
+  .attr("fill", d => color(d.depth))
+  .attr("transform", d => {
+    const angle = d.x - Math.PI / 2; // rotate so 0 at top
+    const r = d.y;
+    const x = Math.cos(angle) * r;
+    const y = Math.sin(angle) * r;
+    return `translate(${x},${y})`;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+{
+  "id": "stacked-area-chart",
+  "title": "Stacked Area Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "date": "2019-12-31T18:30:00.000Z",
+          "series1": 35.2,
+          "series2": 28.4,
+          "series3": 18.7
+        },
+        {
+          "date": "2020-01-01T18:30:00.000Z",
+          "series1": 42.8,
+          "series2": 31.5,
+          "series3": 22.1
+        },
+        {
+          "date": "2020-01-02T18:30:00.000Z",
+          "series1": 38.1,
+          "series2": 35.9,
+          "series3": 19.8
+        },
+        {
+          "date": "2020-01-03T18:30:00.000Z",
+          "series1": 45.5,
+          "series2": 29.2,
+          "series3": 25.3
+        },
+        {
+          "date": "2020-01-04T18:30:00.000Z",
+          "series1": 41.9,
+          "series2": 33.8,
+          "series3": 21.4
+        },
+        {
+          "date": "2020-01-05T18:30:00.000Z",
+          "series1": 47.3,
+          "series2": 27.6,
+          "series3": 23.9
+        },
+        {
+          "date": "2020-01-06T18:30:00.000Z",
+          "series1": 39.1,
+          "series2": 36.4,
+          "series3": 20.2
+        },
+        {
+          "date": "2020-01-07T18:30:00.000Z",
+          "series1": 43.8,
+          "series2": 30.7,
+          "series3": 24.8
+        },
+        {
+          "date": "2020-01-08T18:30:00.000Z",
+          "series1": 46.4,
+          "series2": 32.1,
+          "series3": 22.6
+        },
+        {
+          "date": "2020-01-09T18:30:00.000Z",
+          "series1": 44.2,
+          "series2": 34.5,
+          "series3": 26.1
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "stack",
+        "params": {
+          "keys": [
+            "series1",
+            "series2",
+            "series3"
+          ]
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "series",
+        "type": "nominal",
+        "accessor": "series"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "areas",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "area",
+          "curve": "curveMonotoneX"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y0": {
+          "field": "y0",
+          "scale": "y"
+        },
+        "y1": {
+          "field": "y1",
+          "scale": "y"
+        },
+        "fill": {
+          "field": "series",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

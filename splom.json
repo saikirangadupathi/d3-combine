@@ -1,0 +1,138 @@
+{
+  "id": "splom",
+  "title": "Scatterplot Matrix (SPLOM)",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "metric1": 23.5,
+          "metric2": 67.2,
+          "metric3": 45.8,
+          "metric4": 78.9,
+          "category": "Group 1"
+        },
+        {
+          "metric1": 45.8,
+          "metric2": 34.9,
+          "metric3": 67.1,
+          "metric4": 56.3,
+          "category": "Group 2"
+        },
+        {
+          "metric1": 67.1,
+          "metric2": 89.4,
+          "metric3": 23.5,
+          "metric4": 89.7,
+          "category": "Group 3"
+        },
+        {
+          "metric1": 12.9,
+          "metric2": 45.6,
+          "metric3": 78.3,
+          "metric4": 34.2,
+          "category": "Group 1"
+        },
+        {
+          "metric1": 78.3,
+          "metric2": 23.1,
+          "metric3": 34.7,
+          "metric4": 67.8,
+          "category": "Group 2"
+        },
+        {
+          "metric1": 34.7,
+          "metric2": 78.9,
+          "metric3": 56.2,
+          "metric4": 45.1,
+          "category": "Group 3"
+        },
+        {
+          "metric1": 56.2,
+          "metric2": 56.7,
+          "metric3": 89.6,
+          "metric4": 23.6,
+          "category": "Group 1"
+        },
+        {
+          "metric1": 89.6,
+          "metric2": 12.4,
+          "metric3": 21.4,
+          "metric4": 78.4,
+          "category": "Group 2"
+        },
+        {
+          "metric1": 21.4,
+          "metric2": 91.8,
+          "metric3": 65.9,
+          "metric4": 56.9,
+          "category": "Group 3"
+        },
+        {
+          "metric1": 65.9,
+          "metric2": 38.2,
+          "metric3": 47.3,
+          "metric4": 91.2,
+          "category": "Group 1"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "metric1",
+        "type": "quantitative",
+        "accessor": "metric1"
+      },
+      {
+        "name": "metric2",
+        "type": "quantitative",
+        "accessor": "metric2"
+      },
+      {
+        "name": "metric3",
+        "type": "quantitative",
+        "accessor": "metric3"
+      },
+      {
+        "name": "metric4",
+        "type": "quantitative",
+        "accessor": "metric4"
+      },
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 600
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "matrix",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "color": {
+          "field": "category",
+          "scale": "color"
+        },
+        "size": {
+          "value": 3
+        },
+        "opacity": {
+          "value": 0.6
+        }
+      }
+    }
+  ]
+}

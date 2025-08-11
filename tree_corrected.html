@@ -1,0 +1,135 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tree Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .node { stroke: #fff; stroke-width: 1.5px; }
+  .link { fill: none; stroke: #999; }
+</style>
+</head>
+<body>
+<svg id="tree" width="800" height="400"></svg>
+
+<script>
+// ---------------------------------------------------
+// Configuration (kept for reference – not all fields are used
+// ---------------------------------------------------
+const config = {
+  "id": "tree",
+  "title": "Tree Diagram",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Branch A",
+              "children": [
+                {"name":"Leaf 1"},
+                {"name":"Leaf 2"}
+              ]
+            },
+            {
+              "name": "Branch B",
+              "children": [
+                {"name":"Leaf 3"},
+                {"name":"Leaf 4"}
+              ]
+            }
+          ]
+        }
+      },
+    "transforms": [
+      {"type":"hierarchy","params":{}},
+      {"type":"tree","params":{"size":[350,700]}}
+    ]
+  },
+  "space": {"width":800,"height":400},
+  "scales": {
+    "color": {"type":"ordinal","scheme":"Category10"}
+  },
+  "layers": [
+    {"id":"links","mark":{"type":"line"},"encoding":{"stroke":{"value":"#999"}}},
+    {"id":"nodes","mark":{"type":"circle"},"encoding":{"r":{"value":4},"fill":{"field":"depth","scale":"color"}}}
+  ]
+};
+
+// ---------------------------------------------------
+// SVG setup
+// ---------------------------------------------------
+const margin = {top: 40, right: 40, bottom: 40, left: 40};
+const width  = config.space.width  - margin.left - margin.right;
+const height = config.space.height - margin.top - margin.bottom;
+
+const svg = d3.select("#" + config.id)
+  .attr("width", config.space.width)
+  .attr("height", config.space.height)
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// ---------------------------------------------------
+// Data preparation
+// ---------------------------------------------------
+const rootData = config.data.source.data;
+const root = d3.hierarchy(rootData);
+const treeLayout = d3.tree()
+    .size([config.data.transforms[1].params.size[0], config.data.transforms[1].params.size[1]]);
+
+treeLayout(root);
+
+// ---------------------------------------------------
+// Color scale (using the scheme defined in config)
+// ---------------------------------------------------
+const schemeName = config.scales.color.scheme.toLowerCase(); // "category10"
+const color = d3.scaleOrdinal()
+    .domain(d3.range(root.height + 1))
+    .range(d3[`scheme${schemeName.charAt(0).toUpperCase() + schemeName.slice(1)}`]); // e.g., d3.schemeCategory10
+
+// ---------------------------------------------------
+// Draw links
+// ---------------------------------------------------
+svg.selectAll(".link")
+  .data(root.links())
+  .enter()
+  .append("line")
+  .attr("class", "link")
+  .attr("x1", d => d.source.y)
+  .attr("y1", d => d.source.x)
+  .attr("x2", d => d.target.y)
+  .attr("y2", d => d.target.x)
+  .attr("stroke", config.layers[0].encoding.stroke.value);
+
+// ---------------------------------------------------
+// Draw nodes
+// ---------------------------------------------------
+svg.selectAll(".node")
+  .data(root.descendants())
+  .enter()
+  .append("circle")
+  .attr("class", "node")
+  .attr("cx", d => d.y)
+  .attr("cy", d => d.x)
+  .attr("r", config.layers[1].encoding.r.value)
+  .attr("fill", d => color(d.depth));
+
+// ---------------------------------------------------
+// Optional reference axes
+// ---------------------------------------------------
+svg.append("line")
+   .attr("x1", 0).attr("y1", 0)
+   .attr("x2", width).attr("y2", 0)
+   .attr("stroke", "#000");
+
+svg.append("line")
+   .attr("x1", 0).attr("y1", 0)
+   .attr("x2", 0).attr("y2", height)
+   .attr("stroke", "#000");
+</script>
+</body>
+</html>
+```

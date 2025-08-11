@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Violin Plot</title>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .axis path,
+  .axis line {
+    stroke: #000;
+  }
+  .title {
+    text-anchor: middle;
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<svg width="600" height="400"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+// Data (inline)
+const data = [
+  {group:"Group A", value:25.3, density:0.045},
+  {group:"Group A", value:42.7, density:0.089},
+  {group:"Group A", value:58.9, density:0.067},
+  {group:"Group B", value:48.6, density:0.078},
+  {group:"Group B", value:65.2, density:0.092},
+  {group:"Group B", value:81.7, density:0.054},
+  {group:"Group C", value:67.9, density:0.063},
+  {group:"Group C", value:84.5, density:0.087},
+  {group:"Group C", value:98.2, density:0.041}
+];
+
+// Set dimensions
+const width = 600;
+const height = 400;
+const margin = {top: 50, right: 30, bottom: 50, left: 60};
+
+// Scales
+const groups = Array.from(new Set(data.map(d => d.group)));
+const xScale = d3.scaleBand()
+  .domain(groups)
+  .range([margin.left, width - margin.right])
+  .padding(0.2);
+
+const yExtent = d3.extent(data, d => d.value);
+const yScale = d3.scaleLinear()
+  .domain([0, d3.max(data, d => d.value)]) // nice will be set later
+  .range([height - margin.bottom, margin.top])
+  .nice();
+
+// Density to horizontal offset
+const maxDensity = d3.max(data, d => d.density);
+const offsetScale = d3.scaleLinear()
+  .domain([0, maxDensity])
+  .range([0, xScale.bandwidth() / 2]); // half of band width
+
+// SVG container
+const svg = d3.select('svg');
+
+// Title
+svg.append('text')
+  .attr('class','title')
+  .attr('x', width/2)
+  .attr('y', margin.top/2)
+  .text('Violin Plot');
+
+// X Axis
+svg.append('g')
+  .attr('class','axis')
+  .attr('transform', `translate(0,${height - margin.bottom})`)
+  .call(d3.axisBottom(xScale));
+
+// Y Axis
+svg.append('g')
+  .attr('class','axis')
+  .attr('transform', `translate(${margin.left},0)`)
+  .call(d3.axisLeft(yScale));
+
+// Plot violins per group
+groups.forEach(g => {
+  const groupData = data.filter(d => d.group === g)
+    .sort((a,b)=>a.value-b.value); // ensure ordering
+
+  const xCenter = xScale(g) + xScale.bandwidth() / 2;
+
+  const area = d3.area()
+    .x0(d => xCenter - offsetScale(d.density))
+    .x1(d => xCenter + offsetScale(d.density))
+    .y(d => yScale(d.value))
+    .curve(d3.curveBasis);
+
+  svg.append('path')
+    .datum(groupData)
+    .attr('fill','lightblue')
+    .attr('stroke','steelblue')
+    .attr('opacity',0.7)
+    .attr('d', area);
+});
+
+// Axis labels
+svg.append('text')
+  .attr('x', (margin.left + width - margin.right) / 2)
+  .attr('y', height - 10)
+  .attr('text-anchor','middle')
+  .text('Group');
+
+svg.append('text')
+  .attr('transform','rotate(-90)')
+  .attr('x', - (margin.top + height - margin.bottom) / 2)
+  .attr('y', 15)
+  .attr('text-anchor','middle')
+  .text('Value');
+</script>
+</body>
+</html>

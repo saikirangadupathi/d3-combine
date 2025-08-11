@@ -1,0 +1,18 @@
+DATA
+│
+└── data: [                               <-- array of city objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │   city: string (nominal, city identifier)                         │
+      │   lat: number (quantitative, latitude in decimal degrees)      │
+      │   lon: number (quantitative, longitude in decimal degrees) │
+      │   population: number (quantitative, city population count) │
+      └───────────────────────────────────────────────────────────────────────┘
+
+Explanation of fields  
+- city – a nominal (categorical) string that identifies the city.  
+- lat – a quantitative numeric value representing the latitude coordinate of the city (used for geographic projection).  
+- lon – a quantitative numeric value representing the longitude coordinate of the city (used for geographic projection).  
+- population – a quantitative numeric value representing the total population of the city; used to scale spike height and color.  
+
+The data consists of a flat array; there are no nested arrays (e.g., no separate nodes or links structures).

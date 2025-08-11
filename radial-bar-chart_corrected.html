@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Radial Bar Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body {font-family: sans-serif; background: #f9f9f9;}
+  .title {text-anchor: middle; font-size: 20px; font-weight: bold;}
+  .label {fill: #333;}
+</style>
+</head>
+<body>
+<svg width="500" height="500"></svg>
+
+<script>
+// --------------------
+// Data
+// --------------------
+const data = [
+  {"category":"Jan","value":78.5,"count":785},
+  {"category":"Feb","value":45.2,"count":452},
+  {"category":"Mar","value":92.1,"count":921},
+  {"category":"Apr","value":34.8,"count":348},
+  {"category":"May","value":67.3,"count":673},
+  {"category":"Jun","value":56.9,"count":569},
+  {"category":"Jul","value":83.7","count":837},
+  {"category":"Aug","value":29.4,"count":294},
+  {"category":"Sep","value":71.8,"count":718},
+  {"category":"Oct","value":48.6,"count":486},
+  {"category":"Nov","value":65.2,"count":652},
+  {"category":"Dec","value":87.9","count":879}
+];
+
+// --------------------
+// SVG & dimensions
+// --------------------
+const width = 500,
+      height = 500,
+      innerRadius = 50,
+      outerRadius = 200,
+      origin = [width / 2, height / 2];
+
+const svg = d3.select("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// --------------------
+// Title
+// --------------------
+svg.append("text")
+    .attr("class", "title")
+    .attr("x", width / 2)
+    .attr("y", 30)
+    .text("Radial Bar Chart");
+
+// --------------------
+// Scales
+// --------------------
+const angleScale = d3.scaleBand()
+    .domain(data.map(d => d.category))
+    .range([0, 2 * Math.PI])
+    .padding(0.1); // small padding
+
+const maxValue = d3.max(data, d => d.value);
+
+const radiusScale = d3.scaleLinear()
+    .domain([0, maxValue])
+    .range([innerRadius, outerRadius]);
+
+const colorScale = d3.scaleOrdinal()
+    .domain(data.map(d => d.category))
+    .range(d3.schemeCategory10);
+
+// --------------------
+// Arc generator
+// --------------------
+const arc = d3.arc()
+    .innerRadius(innerRadius)
+    .outerRadius(d => radiusScale(d.value))
+    .startAngle(d => angleScale(d.category))
+    .endAngle(d => angleScale(d.category) + angleScale.bandwidth() * 0.8);
+
+// --------------------
+// Draw arcs
+// --------------------
+const g = svg.append("g")
+    .attr("transform", `translate(${origin[0]},${origin[1]})`);
+
+g.selectAll("path")
+  .data(data)
+  .enter()
+  .append("path")
+    .attr("d", arc)
+    .attr("fill", d => colorScale(d.category))
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 1);
+
+// --------------------
+// Radial axis (reference circles)
+// --------------------
+const radialAxis = d3.scaleLinear()
+    .domain([0, maxValue])
+    .range([innerRadius, outerRadius]);
+
+radialAxis.ticks(5).forEach(t => {
+  g.append("circle")
+      .attr("r", radialAxis(t))
+      .attr("fill", "none")
+      .attr("stroke", "#ddd")
+      .attr("stroke-dasharray", "2,2");
+});
+
+// --------------------
+// Labels (categories)
+// --------------------
+const labelRadius = outerRadius + 20;
+
+// Helper: middle angle of a band
+function angleMid(d) {
+  const start = angleScale(d.category);
+  const bw = angleScale.bandwidth();
+  return start + bw / 2;
+}
+
+g.selectAll("text.label")
+  .data(data)
+  .enter()
+  .append("text")
+    .attr("class", "label")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "10px")
+    .attr("dy", "0.35em")
+    .attr("transform", d => {
+      const angle = angleMid(d) - Math.PI / 2; // rotate so text is upright
+      const x = Math.cos(angle) * labelRadius;
+      const y = Math.sin(angle) * labelRadius;
+      const rot = (angle * 180 / Math.PI) + 90; // rotate to follow radial direction
+      return `translate(${x},${y}) rotate(${rot})`;
+    })
+    .text(d => d.category);
+
+// --------------------
+// End of script
+// --------------------
+</script>
+</body>
+</html>

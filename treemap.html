@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Treemap</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .node { cursor: pointer; }
+  .label { pointer-events: none; font-size: 10px; fill: #fff; text-anchor: middle; }
+</style>
+</head>
+<body>
+<h2>Treemap</h2>
+<div id="treemap"></div>
+<script>
+// Inline data
+const data = {
+  "name": "root",
+  "children": [
+    {
+      "name": "Category A",
+      "children": [
+        { "name": "Item 1", "value": 234 },
+        { "name": "Item 2", "value": 456 },
+        { "name": "Item 3", "value": 123 }
+      ]
+    },
+    {
+      "name": "Category B",
+      "children": [
+        { "name": "Item 4", "value": 789 },
+        { "name": "Item 5", "value": 345 },
+        { "name": "Item 6", "value": 567 }
+      ]
+    }
+  ]
+};
+
+// Dimensions from config
+const width = 800;
+const height = 400;
+const treemapSize = [700, 350];
+const margin = {top: 20, right: 20, bottom: 20, left: 20};
+
+// Create SVG container
+const svg = d3.select("#treemap")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height);
+
+// Group to hold the treemap with offset for margins
+const g = svg.append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Build hierarchy and compute treemap layout
+const root = d3.hierarchy(data)
+  .sum(d => d.value)
+  .sort((a,b)=>b.value - a.value);
+
+d3.treemap()
+  .size(treemapSize)
+  .padding(1)
+  (root);
+
+// Color scale (ordinal based on depth)
+const depths = root.descendants().map(d=>d.depth);
+const color = d3.scaleOrdinal()
+  .domain(d3.range(d3.max(depths)+1))
+  .range(d3.schemeCategory10);
+
+// Draw rectangles for all nodes
+const nodes = g.selectAll("g")
+  .data(root.descendants())
+  .enter()
+  .append("g")
+  .attr("class", "node")
+  .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+// Rectangle
+nodes.append("rect")
+  .attr("width", d => d.x1 - d.x0)
+  .attr("height", d => d.y1 - d.y0)
+  .attr("fill", d => color(d.depth))
+  .attr("stroke", "white");
+
+// Add labels for leaf nodes (depth === 2)
+nodes.filter(d => d.depth === 2)
+  .append("text")
+  .attr("class", "label")
+  .attr("x", d => (d.x1 - d.x0) / 2)
+  .attr("y", d => (d.y1 - d.y0) / 2)
+  .attr("dy", ".35em")
+  .text(d => d.data.name);
+</script>
+</body>
+</html>

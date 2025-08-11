@@ -1,0 +1,34 @@
+DATA
+│
+└── root: {                                 ← root object of the hierarchy
+    ┌───────────────────────────────────────────────────────────────────────┐
+    │ "name": "root" (string, identifier for the top‑level node)          │
+    │ "children": [                                                      │
+    │   {                                                                │
+    │     "name": "Cluster A" (string, name of the first cluster)    │
+    │     "children": [                                                │
+    │       { "name": "Item 1" }   ← leaf node, name only (string)   │
+    │       { "name": "Item 2" }   ← leaf node, name only (string)   │
+    │       { "name": "Item 3" }   ← leaf node, name only (string)   │
+    │       { "name": "Item 4" }   ← leaf node, name only (string)   │
+    │     ]                                                            │
+    │   },                                                               │
+    │   {                                                                │
+    │     "name": "Cluster B" (string, name of the second cluster)│
+    │     "children": [                                                │
+    │       { "name": "Item 5" }   ← leaf node, name only (string)   │
+    │       { "name": "Item 6" }   ← leaf node, name only (string)   │
+    │       { "name": "Item 7" }   ← leaf node, name only (string)   │
+    │       { "name": "Item 8" }   ← leaf node, name only (string)   │
+    │     ]                                                            │
+    │   }                                                                │
+    │ ]                                                                │
+    └───────────────────────────────────────────────────────────────────────┘
+
+After the hierarchy and cluster transforms each node (including the root, clusters, and items) will acquire additional fields:
+
+- x (quantitative): radial‑x coordinate computed by the cluster transform.  
+- y (quantitative): radial‑y coordinate computed by the cluster transform.  
+- depth (quantitative): hierarchical depth (0 for root, 1 for clusters, 2 for leaf items) used for color encoding.
+
+These generated fields are not present in the raw source but are added during data processing. The chart uses these fields to position nodes in a polar coordinate system and to color nodes by their depth.

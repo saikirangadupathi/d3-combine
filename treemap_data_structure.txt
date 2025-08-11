@@ -1,0 +1,26 @@
+DATA
+│
+└── root: [                               <-- array of top‑level nodes (the categories)
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     │
+      │   name: string,               // category identifier (e.g., "Category A") │
+      │   children: [               // array of child nodes (the items)      │
+      │     {                                                                 │
+      │       name: string,           // item identifier (e.g., "Item 1")      │
+      │       value: number          // quantitative value for the leaf   │
+      │                               // node used for sizing the treemap   │
+      │     },                                                            │
+      │     { … }                     // more items in the same category   │
+      │   ]                                                                   │
+      │ },                                                                     │
+      │ { … }                         // additional categories (e.g., "Category B") │
+      └───────────────────────────────────────────────────────────────────────┘
+
+*The hierarchy transform will add the following fields to each node (they are not present in the raw source but are generated for the chart):*
+
+- depth (quantitative): depth level in the hierarchy (root = 0, categories = 1, items = 2).  
+- x0, y0 (quantitative): top‑left coordinates of the rectangle after the treemap layout.  
+- x1, y1 (quantitative): bottom‑right coordinates of the rectangle after the treemap layout.  
+- value (quantitative): sum of the leaf values for each internal node (computed by the hierarchy transform).  
+
+These generated fields are used by the `rect` mark to position and size each cell in the treemap.

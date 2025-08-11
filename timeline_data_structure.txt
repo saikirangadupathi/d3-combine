@@ -1,0 +1,24 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │ event:   string (nominal) – name of the milestone or task, used as   │
+      │           an identifier and for positioning on the y‑axis (band)      │
+      │ date:    datetime (temporal) – start date/time of the event, used   │
+      │           for positioning on the x‑axis (time scale)               │
+      │ duration: number (quantitative) – length of the event in days;     │
+      │           transformed (scaled) to determine the bar width        │
+      │ category: string (nominal) – classification of the event (e.g.,   │
+      │           Planning, Design, etc.); mapped to an ordinal color     │
+      │ }                                                                     │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- event: identifier for each row, displayed as the y‑axis label.
+- date: start timestamp of the event, plotted on the time (x) axis.
+- duration: numeric length of the event; controls bar width after scaling.
+- category: categorical label used to assign a color from the “Category10” scheme. 
+
+No nested arrays (e.g., nodes/links) are present; the data is a flat list of event objects.

@@ -1,0 +1,21 @@
+DATA
+│
+└── main: [                               <-- array of data objects (the inline data source)
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │   category: string (e.g., "Jan") – nominal identifier for each   │
+      │            month or categorical segment of the radial chart.        │
+      │   value:    number (e.g., 78.5) – quantitative measure that   │
+      │            determines the length (outer radius) of each bar.   │
+      │   count:    number (e.g., 785) – additional quantitative field │
+      │            (not used in the current encoding) but could be │
+      │            useful for tool‑tips or future extensions. │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- category – categorical (nominal) field serving as the identifier for each slice (January‑December). Used for the angular position (startAngle/endAngle) and color encoding.
+- value – quantitative field representing the metric to be visualized; mapped through the radius scale to set each bar’s outer radius.
+- count – extra quantitative field not currently mapped; could be used for additional visual encodings (e.g., tooltip, size) if needed.
+
+The data array is flat (no nested arrays such as nodes/links). Each object contains the three fields shown above. No hierarchical or linked structures are present.

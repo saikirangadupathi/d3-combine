@@ -1,0 +1,21 @@
+DATA
+│
+└── data: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   country   : nominal (country name, serves as   │
+      │                categorical identifier for each   │
+      │                line in the slope chart)      │
+      │   year2010 : quantitative (value for the year 2010, │
+      │                numeric measurement)   │
+      │   year2020 : quantitative (value for the year 2020, │
+      │                numeric measurement)   │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- country – a nominal (categorical) field that uniquely identifies each line (e.g., USA, China). It is used for the stroke color encoding.
+- year2010 – a quantitative field representing the measurement in 2010; plotted on the y‑axis at the left‑hand x‑position (2010).
+- year2020 – a quantitative field representing the measurement in 2020; plotted on the y‑axis at the right‑hand x‑position (2020).
+
+The data consists solely of this flat array; there are no nested arrays such as nodes or links.

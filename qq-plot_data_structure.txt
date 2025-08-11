@@ -1,0 +1,30 @@
+DATA
+│
+└── data: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     │
+      │   sample1: quantitative – original value from    │
+      │            the first sample distribution.   │
+      │   sample2: quantitative – original value from    │
+      │            the second sample distribution.│
+      │   quantile: quantitative – the quantile level │
+      │            (e.g., 0.1, 0.2 … 1) used for the │
+      │            Q‑Q comparison.               │
+      │   q1: quantitative – computed quantile │
+      │       of sample1 (produced by the      │
+      │       “quantile” transform).        │
+      │   q2: quantitative – computed quantile │
+      │       of sample2 (produced by the      │
+      │       “quantile” transform).        │
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- sample1 – quantitative measurement from the first data set; used as input for the quantile transform.
+- sample2 – measurement from the second data set; also input for the quantile transform.
+- quantile – numeric representation of the percentile (0‑1) for each data point.
+- q1 – resulting quantile value for `sample1` after the transform; plotted on the x‑axis.
+- q2 – resulting quantile value for `sample2` after the transform; plotted on the y‑axis.
+
+The data does not contain nested arrays (no nodes/links). All fields are flat, quantitative values.

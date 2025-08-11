@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Slope Chart</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<svg width="400" height="300"></svg>
+<script>
+const width = 400, height = 300;
+const margin = {top: 40, right: 20, bottom: 40, left: 50};
+
+const svg = d3.select("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+const data = [
+  {"country":"USA","year2010":75,"year2020":82},
+  {"country":"China","year2010":45,"year2020":68},
+  {"country":"Japan","year2010":85,"year2020":88},
+  {"country":"Germany","year2010":78,"year2020":81},
+  {"country":"India","year2010":35,"year2020":55}
+];
+
+const allVals = data.flatMap(d => [d.year2010, d.year2020]);
+const yDomain = d3.extent(allVals);
+const yScale = d3.scaleLinear()
+    .domain(yDomain).nice()
+    .range([250, 50]);
+
+const xScale = d3.scalePoint()
+    .domain(['2010','2020'])
+    .range([50, 350]);
+
+const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+    .domain(data.map(d => d.country));
+
+const lineGen = d3.line()
+    .x(d => xScale(d.year))
+    .y(d => yScale(d.value));
+
+svg.append("g")
+   .attr("transform", `translate(0,${height - margin.bottom})`)
+   .call(d3.axisBottom(xScale).tickSize(0).tickPadding(5));
+
+svg.append("g")
+   .attr("transform", `translate(${margin.left},0)`)
+   .call(d3.axisLeft(yScale).ticks(5));
+
+svg.append("text")
+   .attr("x", width/2)
+   .attr("y", margin.top/2)
+   .attr("text-anchor", "middle")
+   .attr("font-size", "16px")
+   .text("Slope Chart");
+
+svg.selectAll(".slope")
+   .data(data)
+   .enter()
+   .append("path")
+   .attr("class","slope")
+   .attr("fill","none")
+   .attr("stroke", d => colorScale(d.country))
+   .attr("stroke-width", 2)
+   .attr("d", d => lineGen([
+        {year:"2010", value:d.year2010},
+        {year:"2020", value:d.year2020}
+   ]));
+
+svg.selectAll(".label-start")
+   .data(data)
+   .enter()
+   .append("text")
+   .attr("x", xScale("2010") - 5)
+   .attr("y", d => yScale(d.year2010))
+   .attr("dy", "0.35em")
+   .attr("text-anchor", "end")
+   .attr("font-size","10px")
+   .text(d => `${d.country}: ${d.year2010}`);
+
+svg.selectAll(".label-end")
+   .data(data)
+   .enter()
+   .append("text")
+   .attr("x", xScale("2020") + 5)
+   .attr("y", d => yScale(d.year2020))
+   .attr("dy", "0.35em")
+   .attr("text-anchor", "start")
+   .attr("font-size","10px")
+   .text(d => `${d.year2020}`);
+</script>
+</body>
+</html>

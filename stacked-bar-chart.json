@@ -1,0 +1,131 @@
+{
+  "id": "stacked-bar-chart",
+  "title": "Stacked Bar Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "A",
+          "series1": 20,
+          "series2": 30,
+          "series3": 15
+        },
+        {
+          "category": "B",
+          "series1": 35,
+          "series2": 25,
+          "series3": 20
+        },
+        {
+          "category": "C",
+          "series1": 15,
+          "series2": 40,
+          "series3": 25
+        },
+        {
+          "category": "D",
+          "series1": 30,
+          "series2": 20,
+          "series3": 30
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "stack",
+        "params": {
+          "keys": [
+            "series1",
+            "series2",
+            "series3"
+          ]
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "series",
+        "type": "nominal",
+        "accessor": "series"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "category",
+        "method": "values"
+      },
+      "range": [
+        50,
+        750
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "stacks",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "category",
+          "scale": "x"
+        },
+        "y": {
+          "field": "y1",
+          "scale": "y"
+        },
+        "height": {
+          "field": "y0",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "y1",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "color": {
+          "field": "series",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

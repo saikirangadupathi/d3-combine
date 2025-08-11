@@ -1,0 +1,38 @@
+DATA
+│
+└── main: [               <-- array of data objects (raw source)
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                         │
+      │   date:   string (ISO‑8601 timestamp) – temporal identifier for each │
+      │            point in time (e.g., "2020-01-03T18:30:00.000Z")               │
+      │   series1: number – quantitative value for the first series               │
+      │   series2: number – quantitative value for the second series              │
+      │   series3: number – quantitative value for the third series               │
+      │ }                                                                         │
+      └───────────────────────────────────────────────────────────────────────┘
+   ]
+
+After the stack transform each original record is expanded into three
+records (one per series) that the chart consumes.  The transformed
+records have the following fields:
+
+   ┌───────────────────────────────────────────────────────────────────────┐
+   │ {                                                                         │
+   │   date:   string (ISO‑8601 timestamp) – same temporal field as above   │
+   │   series: string – name of the series ("series1", "series2", "series3")│
+   │   value:  number – original quantitative value for that series      │
+   │   y0:     number – lower bound of the stacked area (cumulative sum)│
+   │   y1:     number – upper bound of the stacked area (cumulative sum)│
+   │ }                                                                         │
+   └───────────────────────────────────────────────────────────────────────┘
+
+Purpose of each field
+
+- date – identifier, temporal (used on the x‑axis).  
+- series – categorical (determines colour and which area is drawn).  
+- value – quantitative measurement for the series (used to compute y‑positions).  
+- y0 / y1 – numeric bounds produced by the stack transform; they
+  define the lower and upper edges of each stacked area segment.  
+
+No nested arrays (e.g., nodes/links) are present; the data is a flat
+array of objects that are later expanded by the stack transform.

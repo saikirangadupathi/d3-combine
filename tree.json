@@ -1,0 +1,129 @@
+{
+  "id": "tree",
+  "title": "Tree Diagram",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Branch A",
+            "children": [
+              {
+                "name": "Leaf 1"
+              },
+              {
+                "name": "Leaf 2"
+              }
+            ]
+          },
+          {
+            "name": "Branch B",
+            "children": [
+              {
+                "name": "Leaf 3"
+              },
+              {
+                "name": "Leaf 4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "hierarchy",
+        "params": {}
+      },
+      {
+        "type": "tree",
+        "params": {
+          "size": [
+            350,
+            700
+          ]
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "type": "nominal",
+        "accessor": "data.name"
+      },
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      },
+      {
+        "name": "depth",
+        "type": "quantitative",
+        "accessor": "depth"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "links",
+      "mark": {
+        "type": "line"
+      },
+      "encoding": {
+        "x": {
+          "field": "source.y"
+        },
+        "y": {
+          "field": "source.x"
+        },
+        "x2": {
+          "field": "target.y"
+        },
+        "y2": {
+          "field": "target.x"
+        },
+        "stroke": {
+          "value": "#999"
+        }
+      }
+    },
+    {
+      "id": "nodes",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "x": {
+          "field": "y"
+        },
+        "y": {
+          "field": "x"
+        },
+        "r": {
+          "value": 4
+        },
+        "fill": {
+          "field": "depth",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

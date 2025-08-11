@@ -1,0 +1,20 @@
+DATA
+│
+└── data: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │ id: integer, unique identifier for each record.    │
+      │ metric1: quantitative (numeric), first metric value. │
+      │ metric2: quantitative (numeric), second metric value.│
+      │ metric3: quantitative (numeric), third metric value.│
+      │ metric4: quantitative (numeric), fourth metric value.│
+      │ category: nominal (string), categorical label (e.g., "Type 1", "Type 2", "Type 3") used for color encoding. │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- id: a unique integer identifier for each data point (used for reference, not visualized directly).
+- metric1‑metric4: quantitative fields representing measured values; they will be mapped to four parallel axes using linear scales.
+- category: a nominal (categorical) field that determines the line color via the ordinal “color” scale (Category10 scheme). 
+
+The data array is flat; there are no nested arrays such as nodes or links. Each object in the array contains the five fields listed above.

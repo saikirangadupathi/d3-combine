@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Radial Area Chart</title>
+<style>
+  body { font-family: sans-serif; }
+  .axis line, .axis path { stroke: #999; }
+  .label { font-size: 10px; text-anchor: middle; }
+  .title { text-anchor: middle; font-size: 16px; font-weight: bold; }
+</style>
+</head>
+<body>
+<svg id="radial-area-chart" width="400" height="400"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// Data (inline)
+const data = [
+  {"hour":0,"value":35.2},{"hour":1,"value":28.4},{"hour":2,"value":42.7},{"hour":3,"value":38.9},{"hour":4,"value":51.3},{"hour":5,"value":46.8},
+  {"hour":6,"value":59.7},{"hour":7,"value":54.2},{"hour":8,"value":67.1},{"hour":9,"value":62.5},{"hour":10,"value":74.8},{"hour":11,"value":69.3},
+  {"hour":12,"value":82.6},{"hour":13,"value":77.9},{"hour":14,"value":85.4},{"hour":15,"value":80.1},{"hour":16,"value":73.7},{"hour":17,"value":68.2},
+  {"hour":18,"value":61.9},{"hour":19,"value":56.4},{"hour":20,"value":49.8},{"hour":21,"value":44.3},{"hour":22,"value":39.6},{"hour":23,"value":34.1}
+];
+
+// Dimensions
+const width = 400, height = 400;
+const svg = d3.select("#radial-area-chart")
+    .attr("viewBox", `0 0 ${width} ${height}`);
+
+// Center of polar coordinates
+const origin = [200,200];
+
+// Scales
+const angleScale = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.hour))   // [0,23]
+    .range([0, 2 * Math.PI]);
+
+const radiusScale = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.value)) // [min, max]
+    .range([20, 150]);
+
+// Area generator (radial)
+const area = d3.areaRadial()
+    .angle(d => angleScale(d.hour))
+    .innerRadius(20)
+    .outerRadius(d => radiusScale(d.value))
+    .curve(d3.curveCardinalClosed);
+
+// Draw the radial area
+svg.append("g")
+    .attr("transform", `translate(${origin[0]},${origin[1]})`)
+  .append("path")
+    .datum(data)
+    .attr("fill", "steelblue")
+    .attr("opacity", 0.7)
+    .attr("d", area);
+
+// Draw circular grid lines (5 circles)
+const grid = svg.append("g")
+    .attr("transform", `translate(${origin[0]},${origin[1]})`);
+
+const radiusTicks = d3.ticks(radiusScale.domain()[0], radiusScale.domain()[1], 4);
+radiusTicks.forEach(t => {
+  grid.append("circle")
+    .attr("class", "axis")
+    .attr("r", radiusScale(t))
+    .attr("fill", "none")
+    .attr("stroke", "#ccc")
+    .attr("stroke-dasharray", "2,2");
+});
+
+// Draw radial lines for each hour (24 lines)
+const angles = d3.range(0, 24);
+angles.forEach(h => {
+  const angle = angleScale(h);
+  const x = Math.cos(angle) * 150;
+  const y = Math.sin(angle) * 150;
+  grid.append("line")
+      .attr("class", "axis")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", x)
+      .attr("y2", y)
+      .attr("stroke", "#ccc");
+  
+  // Hour labels
+  const labelRadius = 165;
+  const lx = Math.cos(angle) * labelRadius;
+  const ly = Math.sin(angle) * labelRadius;
+  svg.append("text")
+      .attr("class", "label")
+      .attr("x", origin[0] + lx)
+      .attr("y", origin[1] + ly + 4) // adjust vertical
+      .text(h);
+});
+
+// Title
+svg.append("text")
+    .attr("class", "title")
+    .attr("x", width/2)
+    .attr("y", 30)
+    .text("Radial Area Chart");
+</script>
+</body>
+</html>

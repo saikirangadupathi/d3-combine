@@ -1,0 +1,131 @@
+{
+  "id": "timeline",
+  "title": "Timeline Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "event": "Project Start",
+          "date": "2022-12-31T18:30:00.000Z",
+          "duration": 30,
+          "category": "Planning"
+        },
+        {
+          "event": "Design Phase",
+          "date": "2023-01-31T18:30:00.000Z",
+          "duration": 45,
+          "category": "Design"
+        },
+        {
+          "event": "Development",
+          "date": "2023-03-14T18:30:00.000Z",
+          "duration": 90,
+          "category": "Development"
+        },
+        {
+          "event": "Testing",
+          "date": "2023-05-31T18:30:00.000Z",
+          "duration": 30,
+          "category": "Testing"
+        },
+        {
+          "event": "Deployment",
+          "date": "2023-06-30T18:30:00.000Z",
+          "duration": 15,
+          "category": "Deployment"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "event",
+        "type": "nominal",
+        "accessor": "event"
+      },
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "duration",
+        "type": "quantitative",
+        "accessor": "duration"
+      },
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 300
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "event",
+        "method": "values"
+      },
+      "range": [
+        50,
+        250
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "event",
+          "scale": "y"
+        },
+        "width": {
+          "field": "duration",
+          "transform": [
+            {
+              "type": "scale",
+              "params": {
+                "factor": 2
+              }
+            }
+          ]
+        },
+        "height": {
+          "value": 20
+        },
+        "fill": {
+          "field": "category",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

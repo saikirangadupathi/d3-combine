@@ -1,0 +1,29 @@
+DATA
+│
+└── data: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     │
+      │   metric1: quantitative – first metric value,      │
+      │            numeric measurement used for      │
+      │            scatter‑plot axes.                │
+      │   metric2: quantitative – second metric value, │
+      │            numeric measurement for a   │
+      │            second dimension.          │
+      │   metric3: quantitative – third metric value, │
+      │            numeric measurement for a   │
+      │            third dimension.        │
+      │   metric4: quantitative – fourth metric value,│
+      │            numeric measurement for a   │
+      │            fourth dimension.   │
+      │   category: nominal – categorical label │
+      │            indicating group membership │
+      │            (e.g., “Group 1”, “Group 2”, “Group 3”). │
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- metric1‑metric4: quantitative (numeric) fields used as the axes of the scatter‑plot matrix; each row provides a value for the corresponding metric.
+- category: nominal (categorical) field used to color‑code points by group; it is the identifier for the series (Group 1‑3).
+
+The data is a flat array; there are no nested arrays such as nodes or links.

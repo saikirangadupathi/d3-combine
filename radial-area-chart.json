@@ -1,0 +1,189 @@
+{
+  "id": "radial-area-chart",
+  "title": "Radial Area Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "hour": 0,
+          "value": 35.2
+        },
+        {
+          "hour": 1,
+          "value": 28.4
+        },
+        {
+          "hour": 2,
+          "value": 42.7
+        },
+        {
+          "hour": 3,
+          "value": 38.9
+        },
+        {
+          "hour": 4,
+          "value": 51.3
+        },
+        {
+          "hour": 5,
+          "value": 46.8
+        },
+        {
+          "hour": 6,
+          "value": 59.7
+        },
+        {
+          "hour": 7,
+          "value": 54.2
+        },
+        {
+          "hour": 8,
+          "value": 67.1
+        },
+        {
+          "hour": 9,
+          "value": 62.5
+        },
+        {
+          "hour": 10,
+          "value": 74.8
+        },
+        {
+          "hour": 11,
+          "value": 69.3
+        },
+        {
+          "hour": 12,
+          "value": 82.6
+        },
+        {
+          "hour": 13,
+          "value": 77.9
+        },
+        {
+          "hour": 14,
+          "value": 85.4
+        },
+        {
+          "hour": 15,
+          "value": 80.1
+        },
+        {
+          "hour": 16,
+          "value": 73.7
+        },
+        {
+          "hour": 17,
+          "value": 68.2
+        },
+        {
+          "hour": 18,
+          "value": 61.9
+        },
+        {
+          "hour": 19,
+          "value": 56.4
+        },
+        {
+          "hour": 20,
+          "value": 49.8
+        },
+        {
+          "hour": 21,
+          "value": 44.3
+        },
+        {
+          "hour": 22,
+          "value": 39.6
+        },
+        {
+          "hour": 23,
+          "value": 34.1
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "hour",
+        "type": "ordinal",
+        "accessor": "hour"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 400,
+    "height": 400,
+    "coordinates": [
+      {
+        "id": "polar",
+        "type": "polar",
+        "origin": [
+          200,
+          200
+        ]
+      }
+    ]
+  },
+  "scales": {
+    "angle": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "hour",
+        "method": "extent"
+      },
+      "range": [
+        0,
+        6.283185307179586
+      ]
+    },
+    "radius": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "extent"
+      },
+      "range": [
+        20,
+        150
+      ]
+    }
+  },
+  "layers": [
+    {
+      "id": "area",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "areaRadial"
+        }
+      },
+      "encoding": {
+        "angle": {
+          "field": "hour",
+          "scale": "angle"
+        },
+        "innerRadius": {
+          "value": 20
+        },
+        "outerRadius": {
+          "field": "value",
+          "scale": "radius"
+        },
+        "fill": {
+          "value": "steelblue"
+        },
+        "opacity": {
+          "value": 0.7
+        }
+      }
+    }
+  ]
+}

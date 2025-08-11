@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Streamgraph</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<svg width="800" height="400"></svg>
+<script>
+// Configuration
+const config = {
+  "space": { "width": 800, "height": 400 },
+  "scales": {
+    "x": { "range": [50, 750] },
+    "y": { "range": [350, 50] },
+    "color": { "scheme": d3.schemeCategory10 }
+  },
+  "layers": [{
+    "encoding": {
+      "x": { "field": "date" },
+      "y0": { "field": "y0" },
+      "y1": { "field": "y1" },
+      "fill": { "field": "category" }
+    }
+  }]
+};
+
+// Inline data
+const rawData = [
+  {"date":"2019-12-31T18:30:00.000Z","music":25.3,"movies":32.1,"books":18.7,"games":28.9},
+  {"date":"2020-01-01T18:30:00.000Z","music":28.7,"movies":29.4,"books":21.2,"games":31.5},
+  {"date":"2020-01-02T18:30:00.000Z","music":31.2,"movies":35.8,"books":19.6,"games":27.3},
+  {"date":"2020-01-03T18:30:00.000Z","music":26.9,"movies":28.3,"books":22.8,"games":33.7},
+  {"date":"2020-01-04T18:30:00.000Z","music":29.5,"movies":31.7,"books":20.4,"games":29.8},
+  {"date":"2020-01-05T18:30:00.000Z","music":33.1,"movies":27.9,"books":23.5,"games":35.2},
+  {"date":"2020-01-06T18:30:00.000Z","music":27.8,"movies":34.2,"books":18.9,"games":30.6},
+  {"date":"2020-01-07T18:30:00.000Z","music":30.4,"movies":30.6,"books":21.7,"games":32.4},
+  {"date":"2020-01-08T18:30:00.000Z","music":32.6,"movies":26.8,"books":24.1,"games":28.7},
+  {"date":"2020-01-09T18:30:00.000Z","music":28.2,"movies":33.5,"books":19.3,"games":34.9}
+];
+
+// Parse dates
+const parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ");
+const data = rawData.map(d => ({
+  date: new Date(d.date),
+  music: d.music,
+  movies: d.movies,
+  books: d.books,
+  games: d.games
+}));
+
+// Stack transformation (wiggle offset)
+const keys = ["music","movies","books","games"];
+const stack = d3.stack()
+  .keys(keys)
+  .offset(d3.stackOffsetWiggle)
+  .value((d, key) => d[key]);
+
+const series = stack(data);
+// Attach category to each series
+series.forEach(s => {
+  s.forEach(d => {
+    d.data = d.data; // preserve original row
+  });
+});
+
+// Scales
+const width = config.space.width;
+const height = config.space.height;
+
+const xScale = d3.scaleTime()
+  .domain(d3.extent(data, d => d.date))
+  .range(config.scales.x.range);
+
+const yExtent = [
+  d3.min(series, s => d3.min(s, d => d[0])),
+  d3.max(series, s => d3.max(s, d => d[1]))
+];
+const yScale = d3.scaleLinear()
+  .domain(yExtent)
+  .range(config.scales.y.range);
+
+const colorScale = d3.scaleOrdinal()
+  .domain(keys)
+  .range(config.scales.color.scheme);
+
+// Area generator
+const area = d3.area()
+  .curve(d3.curveBasis)
+  .x(d => xScale(d.data.date))
+  .y0(d => yScale(d[0]))
+  .y1(d => yScale(d[1]));
+
+// SVG container
+const svg = d3.select("svg")
+  .attr("width", width)
+  .attr("height", height);
+
+// Draw streams
+svg.selectAll(".stream")
+  .data(series)
+  .enter()
+  .append("path")
+  .attr("class", "stream")
+  .attr("d", d => area(d))
+  .attr("fill", d => colorScale(d.key));
+
+// Axes
+const xAxis = d3.axisBottom(xScale)
+  .ticks(10)
+  .tickSizeOuter(0);
+const yAxis = d3.axisLeft(yScale)
+  .ticks(5)
+  .tickSizeOuter(0);
+
+// Render axes
+svg.append("g")
+  .attr("class", "axis x")
+  .attr("transform", `translate(0,${config.scales.y.range[0]})`)
+  .call(xAxis);
+
+svg.append("g")
+  .attr("class", "axis y")
+  .attr("transform", `translate(${config.scales.x.range[0]},0)`)
+  .call(yAxis);
+
+// Title
+svg.append("text")
+  .attr("x", width / 2)
+  .attr("y", 30)
+  .attr("text-anchor", "middle")
+  .style("font-size", "20px")
+  .text("Streamgraph");
+</script>
+</body>
+</html>

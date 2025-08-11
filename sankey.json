@@ -1,0 +1,209 @@
+{
+  "id": "sankey",
+  "title": "Sankey Diagram",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "nodes": [
+          {
+            "id": "Source A",
+            "x0": 50,
+            "y0": 100,
+            "x1": 65,
+            "y1": 150
+          },
+          {
+            "id": "Source B",
+            "x0": 50,
+            "y0": 200,
+            "x1": 65,
+            "y1": 250
+          },
+          {
+            "id": "Source C",
+            "x0": 50,
+            "y0": 300,
+            "x1": 65,
+            "y1": 350
+          },
+          {
+            "id": "Target X",
+            "x0": 735,
+            "y0": 80,
+            "x1": 750,
+            "y1": 180
+          },
+          {
+            "id": "Target Y",
+            "x0": 735,
+            "y0": 200,
+            "x1": 750,
+            "y1": 280
+          },
+          {
+            "id": "Target Z",
+            "x0": 735,
+            "y0": 300,
+            "x1": 750,
+            "y1": 370
+          }
+        ],
+        "links": [
+          {
+            "source": "Source A",
+            "target": "Target X",
+            "value": 50,
+            "path": "M65,125 Q400,125 735,130",
+            "width": 25
+          },
+          {
+            "source": "Source A",
+            "target": "Target Y",
+            "value": 30,
+            "path": "M65,125 Q400,125 735,240",
+            "width": 15
+          },
+          {
+            "source": "Source B",
+            "target": "Target Y",
+            "value": 40,
+            "path": "M65,225 Q400,225 735,240",
+            "width": 20
+          },
+          {
+            "source": "Source B",
+            "target": "Target Z",
+            "value": 35,
+            "path": "M65,225 Q400,225 735,335",
+            "width": 17.5
+          },
+          {
+            "source": "Source C",
+            "target": "Target Z",
+            "value": 25,
+            "path": "M65,325 Q400,325 735,335",
+            "width": 12.5
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "sankey",
+        "params": {
+          "nodeWidth": 15,
+          "nodePadding": 10
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "id",
+        "type": "nominal",
+        "accessor": "id"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "x0",
+        "type": "quantitative",
+        "accessor": "x0"
+      },
+      {
+        "name": "y0",
+        "type": "quantitative",
+        "accessor": "y0"
+      },
+      {
+        "name": "x1",
+        "type": "quantitative",
+        "accessor": "x1"
+      },
+      {
+        "name": "y1",
+        "type": "quantitative",
+        "accessor": "y1"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "links",
+      "data": "links",
+      "mark": {
+        "type": "path"
+      },
+      "encoding": {
+        "d": {
+          "field": "path"
+        },
+        "fill": {
+          "value": "none"
+        },
+        "stroke": {
+          "value": "#999"
+        },
+        "strokeWidth": {
+          "field": "width"
+        }
+      }
+    },
+    {
+      "id": "nodes",
+      "data": "nodes",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "x0"
+        },
+        "y": {
+          "field": "y0"
+        },
+        "width": {
+          "field": "x1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "x0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "height": {
+          "field": "y1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "y0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "fill": {
+          "field": "category",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

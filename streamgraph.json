@@ -1,0 +1,171 @@
+{
+  "id": "streamgraph",
+  "title": "Streamgraph",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "date": "2019-12-31T18:30:00.000Z",
+          "music": 25.3,
+          "movies": 32.1,
+          "books": 18.7,
+          "games": 28.9
+        },
+        {
+          "date": "2020-01-01T18:30:00.000Z",
+          "music": 28.7,
+          "movies": 29.4,
+          "books": 21.2,
+          "games": 31.5
+        },
+        {
+          "date": "2020-01-02T18:30:00.000Z",
+          "music": 31.2,
+          "movies": 35.8,
+          "books": 19.6,
+          "games": 27.3
+        },
+        {
+          "date": "2020-01-03T18:30:00.000Z",
+          "music": 26.9,
+          "movies": 28.3,
+          "books": 22.8,
+          "games": 33.7
+        },
+        {
+          "date": "2020-01-04T18:30:00.000Z",
+          "music": 29.5,
+          "movies": 31.7,
+          "books": 20.4,
+          "games": 29.8
+        },
+        {
+          "date": "2020-01-05T18:30:00.000Z",
+          "music": 33.1,
+          "movies": 27.9,
+          "books": 23.5,
+          "games": 35.2
+        },
+        {
+          "date": "2020-01-06T18:30:00.000Z",
+          "music": 27.8,
+          "movies": 34.2,
+          "books": 18.9,
+          "games": 30.6
+        },
+        {
+          "date": "2020-01-07T18:30:00.000Z",
+          "music": 30.4,
+          "movies": 30.6,
+          "books": 21.7,
+          "games": 32.4
+        },
+        {
+          "date": "2020-01-08T18:30:00.000Z",
+          "music": 32.6,
+          "movies": 26.8,
+          "books": 24.1,
+          "games": 28.7
+        },
+        {
+          "date": "2020-01-09T18:30:00.000Z",
+          "music": 28.2,
+          "movies": 33.5,
+          "books": 19.3,
+          "games": 34.9
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "stack",
+        "params": {
+          "keys": [
+            "music",
+            "movies",
+            "books",
+            "games"
+          ],
+          "offset": "wiggle"
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        350,
+        50
+      ]
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "streams",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "area",
+          "curve": "curveBasis"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y0": {
+          "field": "y0",
+          "scale": "y"
+        },
+        "y1": {
+          "field": "y1",
+          "scale": "y"
+        },
+        "fill": {
+          "field": "category",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

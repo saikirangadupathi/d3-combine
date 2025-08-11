@@ -1,0 +1,151 @@
+{
+  "id": "ridgeline-plot",
+  "title": "Ridgeline Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "group": "Group A",
+          "value": 25.3,
+          "density": 0.045
+        },
+        {
+          "group": "Group A",
+          "value": 42.7,
+          "density": 0.089
+        },
+        {
+          "group": "Group A",
+          "value": 58.9,
+          "density": 0.067
+        },
+        {
+          "group": "Group B",
+          "value": 48.6,
+          "density": 0.078
+        },
+        {
+          "group": "Group B",
+          "value": 65.2,
+          "density": 0.092
+        },
+        {
+          "group": "Group B",
+          "value": 81.7,
+          "density": 0.054
+        },
+        {
+          "group": "Group C",
+          "value": 67.9,
+          "density": 0.063
+        },
+        {
+          "group": "Group C",
+          "value": 84.5,
+          "density": 0.087
+        },
+        {
+          "group": "Group C",
+          "value": 98.2,
+          "density": 0.041
+        },
+        {
+          "group": "Group D",
+          "value": 34.8,
+          "density": 0.076
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "group",
+        "params": {
+          "by": "group"
+        }
+      },
+      {
+        "type": "density",
+        "params": {
+          "value": "value",
+          "bandwidth": 5
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "group",
+        "type": "nominal",
+        "accessor": "group"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "density",
+        "type": "quantitative",
+        "accessor": "density"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 500
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "point",
+      "domainFrom": {
+        "data": "main",
+        "field": "group",
+        "method": "values"
+      },
+      "range": [
+        50,
+        450
+      ]
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "ridges",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "area",
+          "curve": "curveBasis"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "value",
+          "scale": "x"
+        },
+        "y": {
+          "field": "group",
+          "scale": "y"
+        },
+        "fill": {
+          "field": "group",
+          "scale": "color"
+        },
+        "opacity": {
+          "value": 0.7
+        }
+      }
+    }
+  ]
+}

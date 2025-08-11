@@ -1,0 +1,102 @@
+{
+  "id": "pie-chart",
+  "title": "Pie Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "Mobile",
+          "value": 45,
+          "startAngle": 0,
+          "endAngle": 2.827
+        },
+        {
+          "category": "Desktop",
+          "value": 35,
+          "startAngle": 2.827,
+          "endAngle": 5.026
+        },
+        {
+          "category": "Tablet",
+          "value": 20,
+          "startAngle": 5.026,
+          "endAngle": 6.283
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "pie",
+        "params": {
+          "value": "value"
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "startAngle",
+        "type": "quantitative",
+        "accessor": "startAngle"
+      },
+      {
+        "name": "endAngle",
+        "type": "quantitative",
+        "accessor": "endAngle"
+      }
+    ]
+  },
+  "space": {
+    "width": 400,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Set3"
+    }
+  },
+  "layers": [
+    {
+      "id": "slices",
+      "mark": {
+        "type": "arc",
+        "generator": {
+          "type": "arc",
+          "params": {
+            "innerRadius": 0,
+            "outerRadius": 150
+          }
+        }
+      },
+      "encoding": {
+        "startAngle": {
+          "field": "startAngle"
+        },
+        "endAngle": {
+          "field": "endAngle"
+        },
+        "color": {
+          "field": "category",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        },
+        "strokeWidth": {
+          "value": 2
+        }
+      }
+    }
+  ]
+}

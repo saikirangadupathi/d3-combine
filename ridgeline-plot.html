@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ridgeline Plot</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    stroke: #333;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<h2 style="text-align:center;">Ridgeline Plot</h2>
+<script>
+const config = {
+  width: 800,
+  height: 500,
+  margin: {top: 30, right: 30, bottom: 40, left: 60}
+};
+
+// Inline data
+const data = [
+  {"group":"Group A","value":25.3,"density":0.045},
+  {"group":"Group A","value":42.7,"density":0.089},
+  {"group":"Group A","value":58.9,"density":0.067},
+  {"group":"Group B","value":48.6,"density":0.078},
+  {"group":"Group B","value":65.2,"density":0.092},
+  {"group":"Group B","value":81.7,"density":0.054},
+  {"group":"Group C","value":67.9,"density":0.063},
+  {"group":"Group C","value":84.5,"density":0.087},
+  {"group":"Group C","value":98.2,"density":0.041},
+  {"group":"Group D","value":34.8,"density":0.076}
+];
+
+// Extract unique groups in order of appearance
+const groups = Array.from(new Set(data.map(d => d.group)));
+
+// Scales
+const x = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.value))
+    .range([config.margin.left, config.width - config.margin.right]);
+
+const y = d3.scalePoint()
+    .domain(groups)
+    .range([config.margin.top, config.height - config.margin.bottom]);
+
+const color = d3.scaleOrdinal()
+    .domain(groups)
+    .range(d3.schemeCategory10);
+
+// Scale for density height (arbitrary multiplier for visual effect)
+const densityScale = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.density)])
+    .range([0, 80]); // 80px max height of a ridge
+
+// Group data by 'group'
+const nested = d3.groups(data, d => d.group);
+
+// SVG container
+const svg = d3.select("body")
+  .append("svg")
+  .attr("width", config.width)
+  .attr("height", config.height);
+
+// X Axis
+const xAxis = d3.axisBottom(x);
+svg.append("g")
+   .attr("transform", `translate(0,${config.height - config.margin.bottom})`)
+   .call(xAxis);
+
+// Y Axis (group labels)
+const yAxis = d3.axisLeft(y);
+svg.append("g")
+   .attr("transform", `translate(${config.margin.left},0)`)
+   .call(yAxis);
+
+// Area generator for ridgelines
+const area = d3.area()
+    .x(d => x(d.value))
+    .y0(d => y(d.group) - densityScale(0)) // baseline
+    .y1(d => y(d.group) - densityScale(d.density))
+    .curve(d3.curveBasis);
+
+// Draw ridges
+nested.forEach(([group, values]) => {
+  // Sort values by x to ensure proper area shape
+  const sorted = values.slice().sort((a, b) => d3.ascending(a.value, b.value));
+  svg.append("path")
+      .datum(sorted)
+      .attr("fill", color(group))
+      .attr("fill-opacity", 0.7)
+      .attr("stroke", "#333")
+      .attr("stroke-width", 0.5)
+      .attr("d", area)
+      .attr("transform", `translate(0,0)`);
+});
+</script>
+</body>
+</html>

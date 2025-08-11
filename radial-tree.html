@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Radial Tree</title>
+<style>
+  body {font-family: sans-serif;}
+  .link {stroke: #999; fill: none;}
+  .node {stroke: #fff; stroke-width: 1.5px;}
+  .title {font-size: 18px; text-anchor: middle;}
+</style>
+</head>
+<body>
+<svg width="500" height="500"></svg>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+// Set dimensions and origin
+const width = 500;
+const height = 500;
+const origin = [250, 250];
+
+// Create SVG container
+const svg = d3.select("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .append("g")
+    .attr("transform", `translate(${origin[0]},${origin[1]})`);
+
+// Inline data
+const data = {
+  "name": "root",
+  "children": [
+    {
+      "name": "Branch A",
+      "children": [
+        {"name": "Leaf 1"},
+        {"name": "Leaf 2"},
+        {"name": "Leaf 3"},
+        {"name": "Leaf 4"}
+      ]
+    },
+    {
+      "name": "Branch B",
+      "children": [
+        {"name": "Leaf 5"},
+        {"name": "Leaf 6"},
+        {"name": "Leaf 7"},
+        {"name": "Leaf 8"}
+      ]
+    }
+  ]
+};
+
+// Build hierarchy and compute radial tree layout
+const root = d3.hierarchy(data);
+const tree = d3.tree()
+    .size([2 * Math.PI, 150]); // [angle, radius]
+tree(root);
+
+// Color scale for depth
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+// Links (paths)
+svg.append("g")
+  .selectAll("path")
+  .data(root.links())
+  .join("path")
+    .attr("class", "link")
+    .attr("d", d3.linkRadial()
+        .angle(d => d.x)
+        .radius(d => d.y)
+        .curve(d3.curveBundle.beta(0.85)))
+    .attr("stroke", "#999");
+
+// Nodes (circles)
+svg.append("g")
+  .selectAll("circle")
+  .data(root.descendants())
+  .join("circle")
+    .attr("class", "node")
+    .attr("transform", d => {
+        const angle = d.x - Math.PI/2; // rotate to start at top
+        const r = d.y;
+        const x = r * Math.cos(d.x - Math.PI/2);
+        const y = r * Math.sin(d.x - Math.PI/2);
+        return `translate(${x},${y})`;
+    })
+    .attr("r", 3)
+    .attr("fill", d => color(d.depth));
+
+// Add title
+svg.append("text")
+   .attr("class", "title")
+   .attr("x", 0)
+   .attr("y", -210)
+   .text("Radial Tree");
+
+// Optional: draw outer radius circle for reference
+svg.append("circle")
+    .attr("r", 150)
+    .attr("fill", "none")
+    .attr("stroke", "#ccc")
+    .attr("stroke-dasharray", "2,2");
+
+// Add axes-like labels (optional)
+const angleScale = d3.scaleLinear()
+    .domain([0, 2 * Math.PI])
+    .range([0, 360]);
+
+const radialTicks = d3.range(0, 360, 45);
+svg.append("g")
+    .selectAll("text")
+    .data(radialTicks)
+    .join("text")
+    .attr("x", d => 160 * Math.cos((d - 90) * Math.PI / 180))
+    .attr("y", d => 160 * Math.sin((d - 90) * Math.PI / 180))
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .text(d => `${d}°`);
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Timeline Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <style>
+    body { font-family: sans-serif; }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #333;
+      shape-rendering: crispEdges;
+    }
+    .label {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Timeline Chart</h2>
+  <svg id="timeline" width="800" height="300"></svg>
+
+  <script>
+    // Inline data
+    const data = [
+      { "event": "Project Start", "date": "2022-12-31T18:30:00.000Z", "duration": 30, "category": "Planning" },
+      { "event": "Design Phase", "date": "2023-01-31T18:30:00.000Z", "duration": 45, "category": "Design" },
+      { "event": "Development",   "date": "2023-03-14T18:30:00.000Z", "duration": 90, "category": "Development" },
+      { "event": "Testing",      "date": "2023-05-31T18:30:00.000Z", "duration": 30, "category": "Testing" },
+      { "event": "Deployment",  "date": "2023-06-30T18:30:00.000Z", "duration": 15, "category": "Deployment" }
+    ];
+
+    // Parse dates
+    data.forEach(d => d.date = new Date(d.date));
+
+    // SVG dimensions
+    const width = 800;
+    const height = 300;
+
+    const svg = d3.select('#timeline');
+
+    // Scales
+    const xScale = d3.scaleTime()
+      .domain(d3.extent(data, d => d.date))
+      .range([50, 750]);
+
+    const yScale = d3.scaleBand()
+      .domain(data.map(d => d.event))
+      .range([50, 250])
+      .padding(0.1);
+
+    const categories = Array.from(new Set(data.map(d => d.category)));
+    const colorScale = d3.scaleOrdinal()
+      .domain(categories)
+      .range(d3.schemeCategory10);
+
+    // Axes
+    const xAxis = d3.axisBottom(xScale).ticks(5);
+    const yAxis = d3.axisLeft(yScale).tickSize(0);
+
+    svg.append('g')
+      .attr('class', 'axis')
+      .attr('transform', `translate(0,${250})`)
+      .call(xAxis);
+
+    svg.append('g')
+      .attr('class', 'axis')
+      .attr('transform', `translate(50,0)`)
+      .call(yAxis);
+
+    // Bars
+    svg.append('g')
+      .selectAll('rect')
+      .data(data)
+      .enter()
+      .append('rect')
+      .attr('x', d => xScale(d.date))
+      .attr('y', d => yScale(d.event))
+      .attr('width', d => d.duration * 2) // duration scaled by factor 2
+      .attr('height', 20) // fixed height
+      .attr('fill', d => colorScale(d.category));
+
+    // Labels (optional)
+    svg.append('g')
+      .selectAll('text.label')
+      .data(data)
+      .enter()
+      .append('text')
+      .attr('class', 'label')
+      .attr('x', d => xScale(d.date) + d.duration)
+      .attr('y', d => yScale(d.event) + 14)
+      .text(d => d.event)
+      .attr('fill', '#000');
+  </script>
+</body>
+</html>

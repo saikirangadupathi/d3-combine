@@ -1,0 +1,18 @@
+DATA
+│
+└── data: [                               <-- array of data objects (the main data source)
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     │
+      │   group:   string (nominal) – name of the group,    │  ← categorical identifier for each ridge (e.g., “Group A”) 
+      │   value:   number (quantitative) – the numeric value │  ← the measurement whose distribution is plotted 
+      │   density: number (quantitative) – density estimate│  ← computed density (or provided) for the value 
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- group: categorical (nominal) field used to group rows and to position each ridge on the vertical (y) axis; also drives color encoding.
+- value: quantitative field representing the numeric measurement whose distribution is visualized; mapped to the horizontal (x) axis.
+- density: quantitative field representing the estimated density for each value; used by the area generator to shape the ridge (area height). 
+
+The data is a flat array; there are no nested arrays such as nodes or links. The transforms will group by group and compute a density curve (bandwidth = 5) before rendering.

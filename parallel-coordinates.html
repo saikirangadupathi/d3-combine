@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Parallel Coordinates</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis line, .axis path { stroke: #666; }
+  .axis text { font-size: 12px; }
+</style>
+</head>
+<body>
+
+<svg id="parallel-coordinates"></svg>
+
+<script>
+// Configuration
+const config = {
+  "space": { "width": 800, "height": 400 },
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {"id":0,"metric1":23.5,"metric2":67.2,"metric3":45.8,"metric4":78.9,"category":"Type 1"},
+        {"id":1,"metric1":45.8,"metric2":34.9,"metric3":67.1,"metric4":56.3,"category":"Type 2"},
+        {"id":2,"metric1":67.1,"metric2":89.4,"metric3":23.5,"metric4":89.7,"category":"Type 3"},
+        {"id":3,"metric1":12.9,"metric2":45.6,"metric3":78.3,"metric4":34.2,"category":"Type 1"},
+        {"id":4,"metric1":78.3,"metric2":23.1,"metric3":34.7,"metric4":67.8,"category":"Type 2"},
+        {"id":5,"metric1":34.7,"metric2":78.9,"metric3":56.2,"metric4":45.1,"category":"Type 3"},
+        {"id":6,"metric1":56.2,"metric2":56.7,"metric3":89.6,"metric4":23.6,"category":"Type 1"},
+        {"id":7,"metric1":89.6,"metric2":12.4,"metric3":21.4,"metric4":78.4,"category":"Type 2"},
+        {"id":8,"metric1":21.4,"metric2":91.8,"metric3":65.9,"metric4":56.9,"category":"Type 3"},
+        {"id":9,"metric1":65.9,"metric2":38.2,"metric3":47.3,"metric4":91.2,"category":"Type 1"}
+      ]
+    },
+    "fields": [
+      {"name":"metric1","type":"quantitative","accessor":"metric1"},
+      {"name":"metric2","type":"quantitative","accessor":"metric2"},
+      {"name":"metric3","type":"quantitative","accessor":"metric3"},
+      {"name":"metric4","type":"quantitative","accessor":"metric4"},
+      {"name":"category","type":"nominal","accessor":"category"}
+    ]
+  },
+  "scales": {
+    "metric1": {"type":"linear","range":[50,350]},
+    "metric2": {"type":"linear","range":[50,350]},
+    "metric3": {"type":"linear","range":[50,350]},
+    "metric4": {"type":"linear","range":[50,350]},
+    "color": {"type":"ordinal","scheme":"Category10"}
+  },
+  "layers": [
+    {
+      "id":"lines",
+      "mark":{"type":"line"},
+      "encoding":{
+        "stroke":{"field":"category","scale":"color"},
+        "opacity":{"value":0.6}
+      }
+    }
+  ]
+};
+
+// Dimensions
+const margin = { top: 30, right: 30, bottom: 30, left: 30 };
+const width = config.space.width - margin.left - margin.right;
+const height = config.space.height - margin.top - margin.bottom;
+
+// Append SVG
+const svg = d3.select("#parallel-coordinates")
+  .attr("width", config.space.width)
+  .attr("height", config.space.height)
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Data
+const data = config.data.source.data;
+
+// Create scales for each metric
+const metrics = config.data.fields.filter(f => f.type === "quantitative").map(d => d.name);
+const yScales = {};
+metrics.forEach(m => {
+  const values = data.map(d => d[m]);
+  yScales[m] = d3.scaleLinear()
+    .domain(d3.extent(values))
+    .range(config.scales[m].range)
+    .nice();
+});
+
+// X position for each dimension (evenly spaced)
+const xScale = d3.scalePoint()
+  .domain(metrics)
+  .range([0, width])
+  .padding(0.5);
+
+// Color scale
+const categoryField = config.data.fields.find(f => f.type === "nominal");
+const categories = Array.from(new Set(data.map(d => d[categoryField.accessor])));
+const colorScale = d3.scaleOrdinal()
+  .domain(categories)
+  .range(d3[config.scales.color.scheme]);
+
+// Draw axes
+metrics.forEach(m => {
+  const axis = d3.axisLeft(yScales[m])
+    .ticks(5)
+    .tickSize(-width)
+    .tickPadding(10);
+  svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${xScale(m)},0)`)
+    .call(axis);
+  // Axis label
+  svg.append("text")
+    .attr("x", xScale(m))
+    .attr("y", -10)
+    .attr("text-anchor", "middle")
+    .text(m);
+});
+
+// Draw lines for each record
+svg.selectAll(".line")
+  .data(data)
+  .enter()
+  .append("path")
+  .attr("class", "line")
+  .attr("fill", "none")
+  .attr("stroke", d => colorScale(d[categoryField.accessor]))
+  .attr("stroke-opacity", config.layers[0].encoding.opacity.value)
+  .attr("stroke-width", 1.5)
+  .attr("d", d => {
+    const points = metrics.map(m => [xScale(m), yScales[m](d[m])]);
+    return d3.line()(points);
+  });
+
+// Add title
+svg.append("text")
+  .attr("x", width/2)
+  .attr("y", -margin.top/2)
+  .attr("text-anchor", "middle")
+  .attr("font-size", "16px")
+  .text("Parallel Coordinates");
+</script>
+</body>
+</html>

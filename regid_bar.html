@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ridgeline Plot with Bars</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  .annotation {
+    font-size: 12px;
+    fill: #333;
+  }
+</style>
+</head>
+<body>
+<svg id="ridgeline-bar-plot" width="800" height="500"></svg>
+<script>
+  // Configuration (as provided)
+  const config = {
+    "id": "ridgeline-bar-plot",
+    "title": "Ridgeline Plot with Bars",
+    "data": {
+      "source": {
+        "type": "inline",
+        "data": [
+          {"group":"Group A","x":0,"density":0.01},
+          {"group":"Group A","x":5,"density":0.03},
+          {"group":"Group A","x":10,"density":0.07},
+          {"group":"Group B","x":0,"density":0.02},
+          {"group":"Group B","x":5,"density":0.05},
+          {"group":"Group B","x":10,"density":0.1},
+          {"group":"Group C","x":0,"density":0.015},
+          {"group":"Group C","x":5,"density":0.04},
+          {"group":"Group C","x":10,"density":0.09},
+          {"group":"Group D","x":0,"density":0.025},
+          {"group":"Group D","x":5,"density":0.055},
+          {"group":"Group D","x":10,"density":0.12}
+        ]
+      },
+      "fields": [
+        {"name":"group","type":"nominal","accessor":"group"},
+        {"name":"x","type":"quantitative","accessor":"x"},
+        {"name":"density","type":"quantitative","accessor":"density"}
+      ]
+    },
+    "space": {"width":800,"height":500},
+    "scales": {
+      "x":{"type":"linear","domainFrom":{"data":"source","field":"x","method":"extent"},"range":[50,750]},
+      "yGroup":{"type":"point","domainFrom":{"data":"source","field":"group"},"range":[450,50],"padding":1},
+      "yDensity":{"type":"linear","domainFrom":{"data":"source","field":"density","method":"max"},"range":[0,40]},
+      "color":{"type":"ordinal","scheme":"Category10","domainFrom":{"data":"source","field":"group"}}
+    },
+    "layers":[
+      {"id":"bars","mark":{"type":"bar","width":5},"encoding":{"x":{"field":"x","scale":"x"},"y":{"expr":"yGroup(d.group) - yDensity(d.density)"},"y2":{"expr":"yGroup(d.group)"},"fill":{"field":"group","scale":"color"},"opacity":0.7}},
+      {"id":"y-axis","mark":{"type":"axis","orient":"left"},"encoding":{"position":{"scale":"yGroup","field":"group"}}},
+      {"id":"x-axis","mark":{"type":"axis","orient":"bottom"},"encoding":{"position":{"scale":"x"}}}
+    ],
+    "annotations":[
+      {"type":"text","text":"Value","x":400,"y":490,"textAnchor":"middle"},
+      {"type":"text","text":"Group","x":15,"y":250,"rotation":-90,"textAnchor":"middle"}
+    ]
+  };
+
+  const svg = d3.select('#' + config.id);
+  const width = config.space.width;
+  const height = config.space.height;
+  const margin = {left: 60, right: 50, top: 40, bottom: 60};
+
+  // Extract data
+  const data = config.data.source.data;
+
+  // Scales
+  const xScale = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.x))
+    .range(config.scales.x.range);
+
+  const groups = Array.from(new Set(data.map(d => d.group)));
+  const yGroupScale = d3.scalePoint()
+    .domain(groups)
+    .range(config.scales.yGroup.range)
+    .padding(1);
+
+  const yDensityScale = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.density)])
+    .range(config.scales.yDensity.range);
+
+  const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+    .domain(groups);
+
+  // Draw bars (ridgeline)
+  const barWidth = config.layers.find(l => l.id === 'bars').mark.width;
+
+  const bars = svg.append('g')
+    .attr('class', 'bars');
+
+  bars.selectAll('rect')
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('x', d => xScale(d.x) - barWidth/2)
+    .attr('y', d => yGroupScale(d.group) - yDensityScale(d.density))
+    .attr('width', barWidth)
+    .attr('height', d => yDensityScale(d.density))
+    .attr('fill', d => colorScale(d.group))
+    .attr('opacity', 0.7);
+
+  // X Axis
+  const xAxis = d3.axisBottom(xScale).ticks(5);
+  svg.append('g')
+    .attr('class', 'axis x-axis')
+    .attr('transform', `translate(0,${height - margin.bottom})`)
+    .call(xAxis);
+
+  // Y Axis (group labels)
+  const yAxis = d3.axisLeft(yGroupScale).tickSize(0);
+  svg.append('g')
+    .attr('class', 'axis y-axis')
+    .attr('transform', `translate(${margin.left},0)`)
+    .call(yAxis);
+
+  // Annotations
+  const annotationGroup = svg.append('g')
+    .attr('class', 'annotations');
+
+  config.annotations.forEach(a => {
+    if (a.type === 'text') {
+      annotationGroup.append('text')
+        .attr('x', a.x)
+        .attr('y', a.y)
+        .attr('text-anchor', a.textAnchor || 'start')
+        .attr('transform', a.rotation ? `rotate(${a.rotation},${a.x},${a.y})` : null)
+        .text(a.text);
+    }
+  });
+</script>
+</body>
+</html>

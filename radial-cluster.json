@@ -1,0 +1,133 @@
+{
+  "id": "radial-cluster",
+  "title": "Radial Cluster",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Cluster A",
+            "children": [
+              {
+                "name": "Item 1"
+              },
+              {
+                "name": "Item 2"
+              },
+              {
+                "name": "Item 3"
+              },
+              {
+                "name": "Item 4"
+              }
+            ]
+          },
+          {
+            "name": "Cluster B",
+            "children": [
+              {
+                "name": "Item 5"
+              },
+              {
+                "name": "Item 6"
+              },
+              {
+                "name": "Item 7"
+              },
+              {
+                "name": "Item 8"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "hierarchy",
+        "params": {}
+      },
+      {
+        "type": "cluster",
+        "params": {
+          "size": [
+            6.283185307179586,
+            150
+          ]
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "type": "nominal",
+        "accessor": "data.name"
+      },
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      },
+      {
+        "name": "depth",
+        "type": "quantitative",
+        "accessor": "depth"
+      }
+    ]
+  },
+  "space": {
+    "width": 500,
+    "height": 500,
+    "coordinates": [
+      {
+        "id": "polar",
+        "type": "polar",
+        "origin": [
+          250,
+          250
+        ]
+      }
+    ]
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Set2"
+    }
+  },
+  "layers": [
+    {
+      "id": "links",
+      "mark": {
+        "type": "line"
+      },
+      "encoding": {
+        "stroke": {
+          "value": "#555"
+        }
+      }
+    },
+    {
+      "id": "nodes",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "r": {
+          "value": 2.5
+        },
+        "fill": {
+          "field": "depth",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

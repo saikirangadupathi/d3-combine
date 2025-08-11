@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scatterplot Matrix (SPLOM)</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #ccc;
+    shape-rendering: crispEdges;
+  }
+  .cell {
+    overflow: visible;
+  }
+</style>
+</head>
+<body>
+<svg id="splom" width="600" height="600"></svg>
+<script>
+// --- Data -------------------------------------------------------
+const data = [
+  {"metric1":23.5,"metric2":67.2,"metric3":45.8,"metric4":78.9,"category":"Group 1"},
+  {"metric1":45.8,"metric2":34.9,"metric3":67.1,"metric4":56.3,"category":"Group 2"},
+  {"metric1":67.1,"metric2":89.4,"metric3":23.5,"metric4":89.7,"category":"Group 3"},
+  {"metric1":12.9,"metric2":45.6,"metric3":78.3,"metric4":34.2,"category":"Group 1"},
+  {"metric1":78.3,"metric2":23.1,"metric3":34.7,"metric4":67.8,"category":"Group 2"},
+  {"metric1":34.7,"metric2":78.9,"metric3":56.2,"metric4":45.1,"category":"Group 3"},
+  {"metric1":56.2,"metric2":56.7,"metric3":89.6,"metric4":23.6,"category":"Group 1"},
+  {"metric1":89.6,"metric2":12.4,"metric3":21.4,"metric4":78.4,"category":"Group 2"},
+  {"metric1":21.4,"metric2":91.8,"metric3":65.9,"metric4":56.9,"category":"Group 3"},
+  {"metric1":65.9,"metric2":38.2,"metric3":47.3,"metric4":91.2,"category":"Group 1"}
+];
+
+// --- Configuration -------------------------------------------
+const dimensions = ["metric1","metric2","metric3","metric4"];
+const n = dimensions.length;
+const margin = {top: 80, right: 20, bottom: 80, left: 80};
+const width = 600;
+const height = 600;
+const cellSize = (width - margin.left - margin.right) / n;
+const svg = d3.select("#splom")
+    .attr("width", width)
+    .attr("height", height);
+
+// Title
+svg.append("text")
+    .attr("x", width/2)
+    .attr("y", margin.top/2)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "18px")
+    .text("Scatterplot Matrix (SPLOM)");
+
+// Color scale
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+// Compute global domains for each dimension
+const domains = {};
+dimensions.forEach(d => {
+  const values = data.map(p => +p[d]);
+  const [min, max] = d3.extent(values);
+  // add 5% padding
+  const pad = (max - min) * 0.05;
+  domains[d] = [min - pad, max + pad];
+});
+
+// Create a group for each cell
+const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Create scales for each dimension (shared across rows/cols)
+const scales = {};
+dimensions.forEach(d => {
+  scales[d] = d3.scaleLinear()
+    .domain(domains[d])
+    .range([0, cellSize]);
+});
+
+// Create the matrix cells
+dimensions.forEach((rowDim, row) => {
+  dimensions.forEach((colDim, col) => {
+    const cell = g.append("g")
+        .attr("class", "cell")
+        .attr("transform", `translate(${col * cellSize},${row * cellSize})`);
+        
+    // background rectangle for visual separation
+    cell.append("rect")
+        .attr("width", cellSize)
+        .attr("height", cellSize)
+        .attr("fill", "none")
+        .attr("stroke", "#eee");
+    
+    // Skip drawing points on diagonal; instead show variable name
+    if (row === col) {
+      cell.append("text")
+          .attr("x", cellSize/2)
+          .attr("y", cellSize/2)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .attr("font-size", "12px")
+          .text(rowDim);
+      return;
+    }
+    
+    const x = scales[colDim];
+    const y = scales[rowDim].copy().range([cellSize, 0]); // flip y
+    
+    // Plot points
+    cell.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => x(d[colDim]))
+        .attr("cy", d => y(d[rowDim]))
+        .attr("r", 3)
+        .attr("fill", d => color(d.category))
+        .attr("opacity", 0.6);
+    
+    // Add x-axis on bottom row
+    if (row === n-1) {
+      const xAxis = d3.axisBottom(x).ticks(4).tickSize(2);
+      cell.append("g")
+          .attr("class", "axis x")
+          .attr("transform", `translate(0,${cellSize})`)
+          .call(xAxis);
+    }
+    
+    // Add y-axis on first column
+    if (col === 0) {
+      const yAxis = d3.axisLeft(y).ticks(4).tickSize(2);
+      cell.append("g")
+          .attr("class", "axis y")
+          .call(yAxis);
+    }
+  });
+});
+
+// Legend for categories
+const categories = Array.from(new Set(data.map(d => d.category)));
+const legend = svg.append("g")
+    .attr("transform", `translate(${width - margin.right - 120},${margin.top})`);
+
+categories.forEach((cat, i) => {
+  const g = legend.append("g")
+      .attr("transform", `translate(0,${i*20})`);
+  g.append("rect")
+    .attr("width", 12)
+    .attr("height", 12)
+    .attr("fill", color(cat));
+  g.append("text")
+    .attr("x", 16)
+    .attr("y", 10)
+    .text(cat);
+});
+
+</script>
+</body>
+</html>

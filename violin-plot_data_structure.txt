@@ -1,0 +1,20 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   group   : nominal (categorical identifier for │
+      │               each group, e.g., "Group A")          │
+      │   value   : quantitative (numeric measurement │
+      │               associated with each observation)│
+      │   density : quantitative (density value │
+      │               computed for the violin plot)│
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- group – a nominal (categorical) field that identifies the group to which each observation belongs. Used for the x‑axis band scale.
+- value – a quantitative (numeric) field representing the measured value for each observation. Mapped to the y‑axis.
+- density – a quantitative (numeric) field representing the density estimate for the value; used to shape the violin (area) shape. 
+
+The data is a flat array (no nested arrays such as nodes/links). The chart will group the data by the group field and compute a density distribution (via the `density` transform) before rendering the violin shapes.

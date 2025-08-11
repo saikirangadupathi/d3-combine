@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sankey Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .link { fill: none; stroke: #999; }
+  .node { stroke: #000; stroke-width: 1px; }
+  .title { font-size: 20px; text-anchor: middle; }
+</style>
+</head>
+<body>
+<svg width="800" height="400"></svg>
+<script>
+// Inline data from configuration
+const graph = {
+  nodes: [
+    { id: "Source A", x0: 50,  y0: 100, x1: 65, y1: 150 },
+    { id: "Source B", x0: 50,  y0: 200, x1: 65, y1: 250 },
+    { id: "Source C", x0: 50,  y0: 300, x1: 65, y1: 350 },
+    { id: "Target X", x0: 735, y0: 80,  x1: 750, y1: 180 },
+    { id: "Target Y", x0: 735, y0: 200, x1: 750, y1: 280 },
+    { id: "Target Z", x0: 735, y0: 300, x1: 750, y1: 370 }
+  ],
+  links: [
+    { source: "Source A", target: "Target X", value: 50, path: "M65,125 Q400,125 735,130", width: 25 },
+    { source: "Source A", target: "Target Y", value: 30, path: "M65,125 Q400,125 735,240", width: 15 },
+    { source: "Source B", target: "Target Y", value: 40, path: "M65,225 Q400,225 735,240", width: 20 },
+    { source: "Source B", target: "Target Z", value: 35, path: "M65,225 Q400,225 735,335", width: 17.5 },
+    { source: "Source C", target: "Target Z", value: 25, path: "M65,325 Q400,325 735,335", width: 12.5 }
+  ]
+};
+
+// SVG container
+const svg = d3.select("svg")
+    .attr("width", 800)
+    .attr("height", 400);
+
+// Title
+svg.append("text")
+    .attr("class", "title")
+    .attr("x", 400)
+    .attr("y", 30)
+    .text("Sankey Diagram");
+
+// Color scale for nodes (ordinal)
+const color = d3.scaleOrdinal(d3.schemeCategory10)
+    .domain(graph.nodes.map(d => d.id));
+
+// ---- Links layer ----
+svg.selectAll("path.link")
+    .data(graph.links)
+    .enter()
+    .append("path")
+    .attr("class", "link")
+    .attr("d", d => d.path)
+    .attr("stroke-width", d => d.width);
+
+// ---- Nodes layer ----
+svg.selectAll("rect.node")
+    .data(graph.nodes)
+    .enter()
+    .append("rect")
+    .attr("class", "node")
+    .attr("x", d => d.x0)
+    .attr("y", d => d.y0)
+    .attr("width", d => d.x1 - d.x0)   // x1 - x0
+    .attr("height", d => d.y1 - d.y0)  // y1 - y0
+    .attr("fill", d => color(d.id));
+
+// Optional: node labels
+svg.selectAll("text.label")
+    .data(graph.nodes)
+    .enter()
+    .append("text")
+    .attr("class", "label")
+    .attr("x", d => d.x0 + (d.x1 - d.x0) / 2)
+    .attr("y", d => (d.y0 + d.y1) / 2)
+    .attr("dy", ".35em")
+    .attr("text-anchor", "middle")
+    .attr("fill", "#fff")
+    .style("font-size", "10px")
+    .text(d => d.id);
+</script>
+</body>
+</html>

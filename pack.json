@@ -1,0 +1,154 @@
+{
+  "id": "pack",
+  "title": "Circle Packing",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Category A",
+            "children": [
+              {
+                "name": "Item 1",
+                "value": 234
+              },
+              {
+                "name": "Item 2",
+                "value": 456
+              },
+              {
+                "name": "Item 3",
+                "value": 123
+              },
+              {
+                "name": "Item 4",
+                "value": 345
+              },
+              {
+                "name": "Item 5",
+                "value": 567
+              }
+            ]
+          },
+          {
+            "name": "Category B",
+            "children": [
+              {
+                "name": "Item 6",
+                "value": 789
+              },
+              {
+                "name": "Item 7",
+                "value": 234
+              },
+              {
+                "name": "Item 8",
+                "value": 456
+              },
+              {
+                "name": "Item 9",
+                "value": 123
+              },
+              {
+                "name": "Item 10",
+                "value": 345
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "hierarchy",
+        "params": {
+          "value": "value",
+          "sum": true
+        }
+      },
+      {
+        "type": "pack",
+        "params": {
+          "size": [
+            700,
+            350
+          ],
+          "padding": 3
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "type": "nominal",
+        "accessor": "data.name"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "depth",
+        "type": "quantitative",
+        "accessor": "depth"
+      },
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      },
+      {
+        "name": "r",
+        "type": "quantitative",
+        "accessor": "r"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Pastel1"
+    }
+  },
+  "layers": [
+    {
+      "id": "circles",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "x": {
+          "field": "x"
+        },
+        "y": {
+          "field": "y"
+        },
+        "r": {
+          "field": "r"
+        },
+        "fill": {
+          "field": "depth",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        },
+        "opacity": {
+          "value": 0.8
+        }
+      }
+    }
+  ]
+}

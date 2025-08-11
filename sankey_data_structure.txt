@@ -1,0 +1,54 @@
+DATA
+│
+└── <root>: {                                 <-- top‑level object
+    │   "nodes": [                            <-- array of node objects
+    │       ┌───────────────────────────────────────────────────────┐
+    │       │ {                                                   │
+    │       │   "id":      string   // unique identifier for the node (e.g., "Source A") │
+    │       │   "x0":       number   // left‑hand x‑coordinate (pixel) of the node rectangle │
+    │       │   "y0":       number   // top‑hand y‑coordinate (pixel) of the rectangle │
+    │       │   "x1":       number   // right‑hand x‑coordinate (pixel) of the rectangle │
+    │       │   "y1":       number   // bottom‑hand y‑coordinate (pixel) of the rectangle │
+    │       │   "category": string   // optional categorical label used for color encoding (not present in the sample but referenced in the node encoding) │
+    │       │ }                                                   │
+    │       └───────────────────────────────────────────────────────┘
+    │   ],
+    │   "links": [                            <-- array of link objects
+    │       ┌───────────────────────────────────────────────────────┐
+    │       │ {                                                   │
+    │       │   "source":   string   // id of the source node (matches a node.id) │
+    │       │   "target":   string   // id of the target node (matches a node.id) │
+    │       │   "value":    number   // quantitative flow amount between source and target │
+    │       │   "path":     string   // SVG path string that draws the curved link │
+    │       │   "width":    number   // visual thickness of the link (derived from value) │
+    │       │ }                                                   │
+    │       └───────────────────────────────────────────────────────┘
+    │   ],
+    │   "transforms": [                       // optional array of transform specifications
+    │       { "type": "sankey", "params": { "nodeWidth": 15, "nodePadding": 10 } }
+    │   ],
+    │   "fields": [                          // field metadata used by the chart
+    │       { "name": "id",    "type": "nominal",      "accessor": "id" },
+    │       { "name": "value", "type": "quantitative", "accessor": "value" },
+    │       { "name": "x0",    "type": "quantitative", "accessor": "x0" },
+    │       { "name": "y0",    "type": "quantitative", "accessor": "y0" },
+    │       { "name": "x1",    "type": "quantitative", "accessor": "x1" },
+    │       { "name": "y1",    "type": "quantitative", "accessor": "y1" }
+    │   ]
+    │
+    │   // Additional top‑level keys (id, title, space, scales, layers) are
+    │   // configuration metadata and not part of the data payload.
+    │
+    }   // end of <root> object
+
+Explanation of key fields:
+- id (string, nominal): unique identifier for each node; also used as a reference in links.
+- x0, y0 (number, quantitative): top‑left coordinates of a node rectangle.
+- x1, y1 (number, quantitative): bottom‑right coordinates of a node rectangle.
+- category (string, nominal): optional categorical label for node coloring (referenced in the node encoding).
+- source / target (string, nominal): link endpoints, referencing node.id values.
+- value (number, quantitative): amount of flow; determines link width.
+- path (string, nominal): SVG path string that draws the curved link.
+- width (number, quantitative): visual thickness of the link (often derived from value).
+
+The data structure consists of two top‑level arrays (`nodes` and `links`) that are referenced by the chart’s layers. No further nesting is required beyond these arrays.

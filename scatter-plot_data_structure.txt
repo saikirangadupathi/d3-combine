@@ -1,0 +1,22 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   id: string – unique identifier for each point,   │  ← unique key for the datum
+      │   x: number (quantitative) – horizontal coordinate, │  ← numeric value plotted on the X‑axis
+      │   y: number (quantitative) – vertical coordinate,│  ← numeric value plotted on the Y‑axis
+      │   size: number (quantitative) – marker size,  │  ← optional size attribute (not used in encoding)
+      │   category: string (nominal) – group label for colour encoding │
+      │   // (no nested arrays)                         │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- id: a unique string identifier for each point (e.g., “point‑0”).  
+- x: quantitative numeric value representing the horizontal position of the point.  
+- y: quantitative numeric value representing the vertical position of the point.  
+- size: numeric value that could be used to scale the visual size of the point (present but not mapped in the current layer).  
+- category: nominal (categorical) label used to assign colors via the ordinal “color” scale.  
+
+The data consists solely of a flat array of objects; there are no nested arrays such as nodes or links.

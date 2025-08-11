@@ -1,0 +1,27 @@
+DATA
+│
+└── data: [                                   <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     │
+      │   category   : string (nominal) – the name of the   │
+      │                device category (e.g., "Mobile")      │
+      │   value      : number (quantitative) – the numeric   │
+      │                value associated with the category │
+      │                (e.g., 45, 35, 20)                │
+      │   startAngle : number (quantitative) – the start   │
+      │                angle (in radians) for the slice   │
+      │                of the pie (0, 2.827, 5.026)       │
+      │   endAngle   : number (quantitative) – the end   │
+      │                angle (in radians) for the slice │
+      │                of the pie (2.827, 5.026, 6.283) │
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- category – categorical identifier used for color encoding; tells which slice belongs to which device type.
+- value – quantitative measure that drives the size of each slice (the pie transform uses this field).
+- startAngle – pre‑computed start angle (radians) for the slice; used by the arc generator.
+- endAngle – pre‑computed end angle (radians) for the slice; used by the arc generator.
+
+The data consists solely of this flat array; there are no nested arrays such as nodes or links.

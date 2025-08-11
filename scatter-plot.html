@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scatter Plot</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body {font-family: Arial, sans-serif;}
+  .axis path, .axis line {
+    fill: none;
+    stroke: #555;
+    shape-rendering: crispEdges;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+  .title {
+    font-size: 18px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+<svg id="scatter-plot" width="600" height="400"></svg>
+
+<script>
+const config = {
+  "id": "scatter-plot",
+  "title": "Scatter Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {"x":23.5,"y":67.2,"size":12.3,"category":"Group 1","id":"point-0"},
+        {"x":45.8,"y":34.9,"size":8.7,"category":"Group 2","id":"point-1"},
+        {"x":67.1,"y":89.4,"size":15.2,"category":"Group 3","id":"point-2"},
+        {"x":12.9,"y":45.6,"size":9.8,"category":"Group 1","id":"point-3"},
+        {"x":78.3,"y":23.1,"size":18.5,"category":"Group 4","id":"point-4"},
+        {"x":34.7,"y":78.9,"size":11.4,"category":"Group 2","id":"point-5"},
+        {"x":56.2,"y":56.7,"size":14.1,"category":"Group 5","id":"point-6"},
+        {"x":89.6,"y":12.4,"size":7.9,"category":"Group 3","id":"point-7"},
+        {"x":21.4,"y":91.8,"size":16.7,"category":"Group 1","id":"point-8"},
+        {"x":65.9,"y":38.2,"size":13.6,"category":"Group 4","id":"point-9"}
+      ]
+    },
+    "fields": [
+      {"name":"x","type":"quantitative","accessor":"x"},
+      {"name":"y","type":"quantitative","accessor":"y"},
+      {"name":"category","type":"nominal","accessor":"category"}
+    ]
+  },
+  "space": {"width":600,"height":400},
+  "scales": {
+    "x": {"type":"linear","domainFrom":{"data":"main","field":"x","method":"extent"},"range":[50,550],"nice":true},
+    "y": {"type":"linear","domainFrom":{"data":"main","field":"y","method":"extent"},"range":[350,50],"nice":true},
+    "color": {"type":"ordinal","scheme":"Category10"}
+  },
+  "layers": [
+    {
+      "id":"points",
+      "mark":{"type":"circle"},
+      "encoding":{
+        "x":{"field":"x","scale":"x"},
+        "y":{"field":"y","scale":"y"},
+        "color":{"field":"category","scale":"color"},
+        "size":{"value":4}
+      }
+    }
+  ]
+};
+
+// SVG container
+const svg = d3.select("#scatter-plot")
+    .attr("width", config.space.width)
+    .attr("height", config.space.height);
+
+// Title
+svg.append("text")
+    .attr("class", "title")
+    .attr("x", config.space.width / 2)
+    .attr("y", 30)
+    .text(config.title);
+
+// Scales
+const xScale = d3.scaleLinear()
+    .domain(d3.extent(config.data.source.data, d => d.x)).nice()
+    .range(config.scales.x.range);
+
+const yScale = d3.scaleLinear()
+    .domain(d3.extent(config.data.source.data, d => d.y)).nice()
+    .range(config.scales.y.range);
+
+const colorScale = d3.scaleOrdinal()
+    .domain([...new Set(config.data.source.data.map(d => d.category))])
+    .range(d3.schemeCategory10);
+
+// Axes
+const xAxis = d3.axisBottom(xScale).ticks(6);
+const yAxis = d3.axisLeft(yScale).ticks(6);
+
+svg.append("g")
+    .attr("class", "axis x")
+    .attr("transform", `translate(0,${config.scales.y.range[0]})`)
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "axis y")
+    .attr("transform", `translate(${config.scales.x.range[0]},0)`)
+    .call(yAxis);
+
+// Points
+svg.selectAll("circle")
+    .data(config.data.source.data)
+    .enter()
+    .append("circle")
+    .attr("cx", d => xScale(d.x))
+    .attr("cy", d => yScale(d.y))
+    .attr("r", config.layers[0].encoding.size.value)
+    .attr("fill", d => colorScale(d.category))
+    .attr("opacity", 0.8);
+
+// Axis labels
+svg.append("text")
+    .attr("x", (config.scales.x.range[0] + config.scales.x.range[1]) / 2)
+    .attr("y", config.scales.y.range[0] + 40)
+    .attr("text-anchor", "middle")
+    .text("X Axis");
+
+svg.append("text")
+    .attr("x", -(config.scales.y.range[1] + config.scales.y.range[0]) / 2)
+    .attr("y", 15)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "middle")
+    .text("Y Axis");
+</script>
+</body>
+</html>

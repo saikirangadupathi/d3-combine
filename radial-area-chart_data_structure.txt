@@ -1,0 +1,17 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │ hour   : ordinal (0‑23) – represents the hour of │
+      │          the day (used as the angular position)   │
+      │ value  : quantitative (≈34‑85) – measured value │
+      │          plotted as the radial distance (outerRadius)│
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields  
+- hour – *ordinal* (categorical ordered) field indicating the hour of the day (0‑23). It drives the angle scale, positioning each point around the circle.  
+- value – *quantitative* numeric field representing the measured value for that hour. It drives the radius scale, determining how far from the centre each point is plotted (the outer radius of the area).  
+
+The data consists solely of this flat array; there are no nested arrays such as nodes or links. The chart uses this array (named “main” in the configuration) as the single data source for the radial‑area visualization.

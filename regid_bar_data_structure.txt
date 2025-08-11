@@ -1,0 +1,18 @@
+DATA
+│
+└── source: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   group:  string  (nominal) – name of the group,     │  ← categorical identifier for each series (e.g., “Group A”)  
+      │   x:  number  (quantitative) – horizontal position,│  ← numeric value plotted on the x‑axis (0, 5, 10…)  
+      │   density:  number  (quantitative) – height of the │  ← density value used to compute bar height (and ridge shape)  
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields  
+- group: categorical (nominal) field that groups rows into separate ridgeline “layers”. It acts as a series identifier.  
+- x: quantitative field representing the horizontal coordinate for each bar (and ridge).  
+- density: quantitative field representing the magnitude (height) of each bar; also used to scale the vertical offset of the ridgeline.  
+
+The data array is flat; there are no nested arrays such as nodes or links. The chart reads this array directly as its data source.

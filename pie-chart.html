@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pie Chart</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .title { text-anchor: middle; font-size: 18px; font-weight: bold; }
+</style>
+</head>
+<body>
+<svg id="pie-chart" width="400" height="400"></svg>
+<script>
+const width = 400, height = 400;
+const radius = 150;
+
+// Inline data
+const data = [
+  { category: "Mobile",   value: 45, startAngle: 0,      endAngle: 2.827 },
+  { category: "Desktop",  value: 35, startAngle: 2.827,  endAngle: 5.026 },
+  { category: "Tablet",   value: 20, startAngle: 5.026,  endAngle: 6.283 }
+];
+
+// Color scale using Set3 scheme
+const color = d3.scaleOrdinal()
+    .domain(data.map(d => d.category))
+    .range(d3.schemeSet3);
+
+// Create SVG container
+const svg = d3.select("#pie-chart")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .append("g")
+    .attr("transform", `translate(${width/2},${height/2})`);
+
+// Title
+svg.append("text")
+    .attr("class", "title")
+    .attr("y", -180)
+    .attr("x", 0)
+    .text("Pie Chart");
+
+// Arc generator
+const arc = d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius)
+    .startAngle(d => d.startAngle)
+    .endAngle(d => d.endAngle);
+
+// Draw slices
+svg.selectAll("path")
+  .data(data)
+  .enter()
+  .append("path")
+  .attr("d", arc)
+  .attr("fill", d => color(d.category))
+  .attr("stroke", "white")
+  .attr("stroke-width", 2);
+</script>
+</body>
+</html>

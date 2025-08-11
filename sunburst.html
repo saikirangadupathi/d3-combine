@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sunburst Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .title { text-align: center; font-size: 20px; margin-top: 10px; }
+  .chart { margin: 0 auto; display: block; }
+</style>
+</head>
+<body>
+<div class="title">Sunburst Chart</div>
+<svg class="chart" width="500" height="500"></svg>
+<script>
+// Inline data
+const data = {
+  name: "root",
+  children: [
+    {
+      name: "Category A",
+      children: [
+        { name: "Item 1", value: 234 },
+        { name: "Item 2", value: 456 },
+        { name: "Item 3", value: 123 }
+      ]
+    },
+    {
+      name: "Category B",
+      children: [
+        { name: "Item 4", value: 789 },
+        { name: "Item 5", value: 345 }
+      ]
+    }
+  ]
+};
+
+// SVG dimensions and center
+const width = 500, height = 500;
+const radius = 200; // as defined in config
+const center = [width / 2, height / 2];
+
+// Create root hierarchy and compute partition
+const root = d3.hierarchy(data)
+    .sum(d => d.value)
+    .sort((a,b) => b.value - a.value);
+
+const partition = d3.partition()
+    .size([2 * Math.PI, radius])
+    .padding(0);
+
+partition(root);
+
+// Color scale based on depth
+const color = d3.scaleOrdinal()
+    .domain([0,1,2]) // depth levels
+    .range(d3.schemeCategory10);
+
+// Arc generator
+const arc = d3.arc()
+    .startAngle(d => d.x0)
+    .endAngle(d => d.x1)
+    .innerRadius(d => d.y0)
+    .outerRadius(d => d.y1);
+
+// Create SVG
+const svg = d3.select("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .append("g")
+    .attr("transform", `translate(${center[0]},${center[1]})`);
+
+// Draw arcs
+svg.selectAll("path")
+    .data(root.descendants())
+    .enter()
+    .append("path")
+    .attr("display", d => d.depth ? null : "none") // hide root
+    .attr("d", d => arc(d))
+    .attr("fill", d => color(d.depth))
+    .attr("stroke", "white");
+
+// Optional: add labels for leaf nodes
+svg.selectAll("text")
+    .data(root.leaves())
+    .enter()
+    .append("text")
+    .attr("transform", d => {
+        const angle = ((d.x0 + d.x1) / 2) - Math.PI / 2;
+        const r = (d.y0 + d.y1) / 2;
+        return `rotate(${(angle * 180 / Math.PI)}) translate(${r},0)`;
+    })
+    .attr("dx", "0.5em")
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "10px")
+    .attr("fill", "#000")
+    .text(d => d.data.name);
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+{
+  "id": "slope-chart",
+  "title": "Slope Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "country": "USA",
+          "year2010": 75,
+          "year2020": 82
+        },
+        {
+          "country": "China",
+          "year2010": 45,
+          "year2020": 68
+        },
+        {
+          "country": "Japan",
+          "year2010": 85,
+          "year2020": 88
+        },
+        {
+          "country": "Germany",
+          "year2010": 78,
+          "year2020": 81
+        },
+        {
+          "country": "India",
+          "year2010": 35,
+          "year2020": 55
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "country",
+        "type": "nominal",
+        "accessor": "country"
+      },
+      {
+        "name": "year2010",
+        "type": "quantitative",
+        "accessor": "year2010"
+      },
+      {
+        "name": "year2020",
+        "type": "quantitative",
+        "accessor": "year2020"
+      }
+    ]
+  },
+  "space": {
+    "width": 400,
+    "height": 300
+  },
+  "scales": {
+    "x": {
+      "type": "point",
+      "domain": [
+        "2010",
+        "2020"
+      ],
+      "range": [
+        50,
+        350
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        250,
+        50
+      ],
+      "nice": true
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "slopes",
+      "mark": {
+        "type": "line"
+      },
+      "encoding": {
+        "stroke": {
+          "field": "country",
+          "scale": "color"
+        },
+        "strokeWidth": {
+          "value": 2
+        }
+      }
+    }
+  ]
+}

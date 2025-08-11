@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stacked Area Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body {font-family: sans-serif; margin: 0; padding: 0;}
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<svg id="stacked-area-chart" width="800" height="400"></svg>
+<script>
+const width = 800;
+const height = 400;
+const margin = {top: 50, right: 50, bottom: 50, left: 50};
+
+const svg = d3.select('#stacked-area-chart')
+    .attr('viewBox', `0 0 ${width} ${height}`);
+
+const rawData = [
+  {"date":"2019-12-31T18:30:00.000Z","series1":35.2,"series2":28.4,"series3":18.7},
+  {"date":"2020-01-01T18:30:00.000Z","series1":42.8,"series2":31.5,"series3":22.1},
+  {"date":"2020-01-02T18:30:00.000Z","series1":38.1,"series2":35.9,"series3":19.8},
+  {"date":"2020-01-03T18:30:00.000Z","series1":45.5,"series2":29.2,"series3":25.3},
+  {"date":"2020-01-04T18:30:00.000Z","series1":41.9,"series2":33.8,"series3":21.4},
+  {"date":"2020-01-05T18:30:00.000Z","series1":47.3,"series2":27.6,"series3":23.9},
+  {"date":"2020-01-06T18:30:00.000Z","series1":39.1,"series2":36.4,"series3":20.2},
+  {"date":"2020-01-07T18:30:00.000Z","series1":43.8,"series2":30.7,"series3":24.8},
+  {"date":"2020-01-08T18:30:00.000Z","series1":46.4,"series2":32.1,"series3":22.6},
+  {"date":"2020-01-09T18:30:00.000Z","series1":44.2,"series2":34.5,"series3":26.1}
+];
+
+// parse dates
+const data = rawData.map(d => ({
+    date: new Date(d.date),
+    series1: d.series1,
+    series2: d.series2,
+    series3: d.series3
+}));
+
+// stack transform
+const keys = ["series1","series2","series3"];
+const stack = d3.stack().keys(keys);
+const series = stack(data); // array of 3 series
+
+// prepare data for area generator
+const stackedData = series.map(s => ({
+    key: s.key,
+    values: s.map((d, i) => ({
+        date: data[i].date,
+        y0: d[0],
+        y1: d[1],
+        series: s.key
+    }))
+}));
+
+// scales
+const xScale = d3.scaleTime()
+    .domain(d3.extent(data, d => d.date))
+    .range([margin.left, width - margin.right]);
+
+const yMax = d3.max(stackedData, s => d3.max(s.values, d => d.y1));
+const yScale = d3.scaleLinear()
+    .domain([0, yMax])
+    .nice()
+    .range([height - margin.bottom, margin.top]);
+
+const colorScale = d3.scaleOrdinal()
+    .domain(keys)
+    .range(d3.schemeCategory10);
+
+// area generator
+const area = d3.area()
+    .x(d => xScale(d.date))
+    .y0(d => yScale(d.y0))
+    .y1(d => yScale(d.y1))
+    .curve(d3.curveMonotoneX);
+
+// draw areas
+svg.selectAll('.area')
+    .data(stackedData)
+    .enter()
+    .append('path')
+    .attr('class', 'area')
+    .attr('fill', d => colorScale(d.key))
+    .attr('d', d => area(d.values));
+
+// axes
+const xAxis = g => g
+    .attr('transform', `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(xScale).ticks(6));
+
+const yAxis = g => g
+    .attr('transform', `translate(${margin.left},0)`)
+    .call(d3.axisLeft(yScale).ticks(6));
+
+svg.append('g')
+    .attr('class', 'axis')
+    .call(xAxis);
+
+svg.append('g')
+    .attr('class', 'axis')
+    .call(yAxis);
+</script>
+</body>
+</html>
