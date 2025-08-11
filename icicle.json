@@ -1,0 +1,160 @@
+{
+  "id": "icicle",
+  "title": "Icicle Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Category A",
+            "children": [
+              {
+                "name": "Item 1",
+                "value": 234
+              },
+              {
+                "name": "Item 2",
+                "value": 456
+              },
+              {
+                "name": "Item 3",
+                "value": 123
+              }
+            ]
+          },
+          {
+            "name": "Category B",
+            "children": [
+              {
+                "name": "Item 4",
+                "value": 789
+              },
+              {
+                "name": "Item 5",
+                "value": 345
+              },
+              {
+                "name": "Item 6",
+                "value": 567
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "hierarchy",
+        "params": {
+          "value": "value",
+          "sum": true
+        }
+      },
+      {
+        "type": "partition",
+        "params": {
+          "size": [
+            700,
+            350
+          ]
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "type": "nominal",
+        "accessor": "data.name"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "depth",
+        "type": "quantitative",
+        "accessor": "depth"
+      },
+      {
+        "name": "x0",
+        "type": "quantitative",
+        "accessor": "x0"
+      },
+      {
+        "name": "y0",
+        "type": "quantitative",
+        "accessor": "y0"
+      },
+      {
+        "name": "x1",
+        "type": "quantitative",
+        "accessor": "x1"
+      },
+      {
+        "name": "y1",
+        "type": "quantitative",
+        "accessor": "y1"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "sequential",
+      "scheme": "Blues"
+    }
+  },
+  "layers": [
+    {
+      "id": "rectangles",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "x0"
+        },
+        "y": {
+          "field": "y0"
+        },
+        "width": {
+          "field": "x1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "x0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "height": {
+          "field": "y1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "y0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "fill": {
+          "field": "depth",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        }
+      }
+    }
+  ]
+}

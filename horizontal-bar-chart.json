@@ -1,0 +1,114 @@
+{
+  "id": "horizontal-bar-chart",
+  "title": "Horizontal Bar Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "Product A",
+          "value": 78.5,
+          "count": 785
+        },
+        {
+          "category": "Product B",
+          "value": 45.2,
+          "count": 452
+        },
+        {
+          "category": "Product C",
+          "value": 92.1,
+          "count": 921
+        },
+        {
+          "category": "Product D",
+          "value": 34.8,
+          "count": 348
+        },
+        {
+          "category": "Product E",
+          "value": 67.3,
+          "count": 673
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "max"
+      },
+      "range": [
+        50,
+        750
+      ],
+      "nice": true
+    },
+    "y": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "category",
+        "method": "values"
+      },
+      "range": [
+        50,
+        350
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Set3"
+    }
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "value": 50
+        },
+        "y": {
+          "field": "category",
+          "scale": "y"
+        },
+        "width": {
+          "field": "value",
+          "scale": "x"
+        },
+        "height": {
+          "value": 30
+        },
+        "color": {
+          "field": "category",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

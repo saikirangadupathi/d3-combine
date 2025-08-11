@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hexbin Plot</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-hexbin@0.2.2"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+  }
+  .title {
+    text-anchor: middle;
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<svg id="hexbin" width="600" height="400"></svg>
+<script>
+// Configuration
+const config = {
+  "space": {"width": 600, "height": 400},
+  "margin": {top: 50, right: 20, bottom: 50, left: 50}
+};
+
+const width = config.space.width;
+const height = config.space.height;
+const margin = config.margin;
+
+// Inline data
+const rawData = [
+  {"x":23.5,"y":67.2,"count":12},
+  {"x":45.8,"y":34.9,"count":8},
+  {"x":67.1,"y":89.4,"count":15},
+  {"x":12.9,"y":45.6,"count":6},
+  {"x":78.3,"y":23.1,"count":18},
+  {"x":34.7,"y":78.9,"count":9},
+  {"x":56.2,"y":56.7,"count":14},
+  {"x":89.6,"y":12.4,"count":7},
+  {"x":21.4,"y":91.8,"count":11},
+  {"x":65.9,"y":38.2,"count":13}
+];
+
+// Create SVG container
+const svg = d3.select("#hexbin")
+    .attr("width", width)
+    .attr("height", height);
+
+// Group for chart area
+const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+// Scales
+const xScale = d3.scaleLinear()
+    .domain(d3.extent(rawData, d => d.x))
+    .range([0, innerWidth]);
+
+const yScale = d3.scaleLinear()
+    .domain(d3.extent(rawData, d => d.y))
+    .range([innerHeight, 0]);
+
+// Hexbin generator
+const hexbin = d3.hexbin()
+    .x(d => xScale(d.x))
+    .y(d => yScale(d.y))
+    .radius(10)
+    .extent([[0,0],[innerWidth, innerHeight]]);
+
+const bins = hexbin(rawData);
+
+// Color scale (sequential YlOrRd)
+const color = d3.scaleSequential(d3.interpolateYlOrRd)
+    .domain([0, d3.max(bins, d => d.length)]);
+
+// Draw hexagons
+g.selectAll("path")
+  .data(bins)
+  .enter()
+  .append("path")
+  .attr("d", d => hexbin.hexagon(10))
+  .attr("transform", d => `translate(${d.x},${d.y})`)
+  .attr("fill", d => color(d.length))
+  .attr("stroke", "white");
+
+// Axes
+const xAxis = d3.axisBottom(xScale).ticks(6);
+const yAxis = d3.axisLeft(yScale).ticks(6);
+
+svg.append("g")
+  .attr("class", "axis")
+  .attr("transform", `translate(${margin.left},${height - margin.bottom})`)
+  .call(xAxis);
+
+svg.append("g")
+  .attr("class", "axis")
+  .attr("transform", `translate(${margin.left},${margin.top})`)
+  .call(yAxis);
+
+// Axis labels
+svg.append("text")
+  .attr("class", "title")
+  .attr("x", width/2)
+  .attr("y", margin.top/2)
+  .text("Hexbin Plot");
+
+svg.append("text")
+  .attr("class", "axis-label")
+  .attr("x", width/2)
+  .attr("y", height - 10)
+  .attr("text-anchor", "middle")
+  .text("X Axis");
+
+svg.append("text")
+  .attr("class", "axis-label")
+  .attr("x", -height/2)
+  .attr("y", 15)
+  .attr("transform", `rotate(-90)`)
+  .attr("text-anchor", "middle")
+  .text("Y Axis");
+</script>
+</body>
+</html>

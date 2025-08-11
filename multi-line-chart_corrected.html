@@ -1,0 +1,161 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Multi‑Line Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<svg id="multi-line-chart" width="800" height="400"></svg>
+
+<script>
+(() => {
+  /* --------------------------------------------------------------
+   * Configuration (kept from the original example)
+   * -------------------------------------------------------------- */
+  const config = {
+    "id": "multi-line-chart",
+    "title": "Multi‑Line Chart",
+    "data": {
+      "source": {
+        "type": "inline",
+        "data": [
+          {"date":"2022-12-31T18:30:00.000Z","price":150.25,"symbol":"AAPL","volume":125000},
+          {"date":"2023-01-01T18:30:00.000Z","price":152.8,"symbol":"AAPL","volume":135000},
+          {"date":"2023-01-02T18:30:00.000Z","price":148.9,"symbol":"AAPL","volume":145000},
+          {"date":"2022-12-31T18:30:00.000Z","price":2750.45,"symbol":"GOOGL","volume":85000},
+          {"date":"2023-01-01T18:30:00.000Z","price":2780.2,"symbol":"GOOGL","volume":95000},
+          {"date":"2023-01-02T18:30:00.000Z","price":2765.8,"symbol":"GOOGL","volume":105000},
+          {"date":"2022-12-31T18:30:00.000Z","price":245.75,"symbol":"MSFT","volume":165000},
+          {"date":"2023-01-01T18:30:00.000Z","price":248.3,"symbol":"MSFT","volume":175000},
+          {"date":"2023-01-02T18:30:00.000Z","price":251.9,"symbol":"MSFT","volume":185000}
+        ]
+      },
+      "fields": [
+        {"name":"date","type":"temporal","accessor":"date"},
+        {"name":"price","type":"quantitative","accessor":"price"},
+        {"name":"symbol","type":"nominal","accessor":"symbol"}
+      ]
+    },
+    "space": {"width":800,"height":400},
+    "scales": {
+      "x": {"type":"time","range":[50,750]},
+      "y": {"type":"linear","range":[350,50],"nice":true},
+      "color": {"type":"ordinal","scheme":"schemeCategory10"}
+    },
+    "layers": [
+      {
+        "id":"lines",
+        "mark":{
+          "type":"line",
+          "generator":{"type":"line","curve":"curveMonotoneX"},
+          "groupBy":["symbol"]
+        },
+        "encoding":{
+          "x":{"field":"date","scale":"x"},
+          "y":{"field":"price","scale":"y"},
+          "stroke":{"field":"symbol","scale":"color"},
+          "strokeWidth":{"value":2}
+        }
+      }
+    ]
+  };
+
+  /* --------------------------------------------------------------
+   * Data preparation
+   * -------------------------------------------------------------- */
+  const data = config.data.source.data.map(d => ({
+    date:   new Date(d.date),
+    price:  d.price,
+    symbol: d.symbol
+  }));
+
+  /* --------------------------------------------------------------
+   * SVG & layout
+   * -------------------------------------------------------------- */
+  const svg = d3.select(`#${config.id}`);
+  const width  = config.space.width;
+  const height = config.space.height;
+
+  const margin = {top: 60, right: 20, bottom: 50, left: 50};
+
+  /* --------------------------------------------------------------
+   * Scales
+   * -------------------------------------------------------------- */
+  const xScale = d3.scaleTime()
+      .domain(d3.extent(data, d => d.date))
+      .range(config.scales.x.range);
+
+  const yScale = d3.scaleLinear()
+      .domain(d3.extent(data, d => d.price))
+      .nice()
+      .range(config.scales.y.range);
+
+  const colorScale = d3.scaleOrdinal(d3[config.scales.color.scheme])
+      .domain([...new Set(data.map(d => d.symbol))]);
+
+  /* --------------------------------------------------------------
+   * Axes
+   * -------------------------------------------------------------- */
+  const xAxis = g => g
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(xScale).ticks(5));
+
+  const yAxis = g => g
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(yScale));
+
+  svg.append("g").attr("class","x axis").call(xAxis);
+  svg.append("g").attr("class","y axis").call(yAxis);
+
+  /* --------------------------------------------------------------
+   * Line generator
+   * -------------------------------------------------------------- */
+  const lineGen = d3.line()
+      .x(d => xScale(d[config.layers[0].encoding.x.field]))
+      .y(d => yScale(d[config.layers[0].encoding.y.field]))
+      .curve(d3[config.layers[0].mark.generator.curve]);
+
+  /* --------------------------------------------------------------
+   * Group data by symbol and draw the lines
+   * -------------------------------------------------------------- */
+  const grouped = d3.group(data, d => d.symbol);
+
+  svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+    .selectAll("path")
+    .data(Array.from(grouped.entries()))
+    .join("path")
+      .attr("stroke", d => colorScale(d[0]))
+      .attr("stroke-width", config.layers[0].encoding.strokeWidth.value)
+      .attr("d", d => lineGen(d[1]));
+
+  /* --------------------------------------------------------------
+   * Title
+   * -------------------------------------------------------------- */
+  svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", margin.top / 2)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "18px")
+      .text(config.title);
+})();
+</script>
+</body>
+</html>
+```

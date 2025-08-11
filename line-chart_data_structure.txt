@@ -1,0 +1,18 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │   date:   temporal (ISO‑8601 string, e.g., "2020‑01‑01T18:30:00.000Z")│  ← timestamp for the x‑axis (time scale)   │
+      │   value:  quantitative (numeric, e.g., 52.8)                           │  ← measured value plotted on y‑axis      │
+      │   category: categorical (string, e.g., "Series 1")                     │  ← optional series identifier       │
+      │ }                                                                     │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation  
+- date – temporal field used as the primary time axis; ISO‑8601 format.  
+- value – quantitative measurement that the line chart visualizes.  
+- category – optional categorical label that could be used for grouping or coloring (not currently encoded in the chart).  
+
+The data consists solely of a flat array; there are no nested arrays such as nodes or links.

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Horizontal Bar Chart</title>
+<style>
+  body {font-family: sans-serif;}
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  .title {
+    font-size: 24px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+<svg id="horizontal-bar-chart" width="800" height="400"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+const config = {
+  "id": "horizontal-bar-chart",
+  "title": "Horizontal Bar Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {"category":"Product A","value":78.5,"count":785},
+        {"category":"Product B","value":45.2,"count":452},
+        {"category":"Product C","value":92.1,"count":921},
+        {"category":"Product D","value":34.8,"count":348},
+        {"category":"Product E","value":67.3,"count":673}
+        ]
+    },
+    "fields": [
+      {"name":"category","type":"nominal","accessor":"category"},
+      {"name":"value","type":"quantitative","accessor":"value"}
+    ]
+  },
+  "space": {"width":800,"height":400},
+  "scales": {
+    "x": {"type":"linear","domainFrom":{"data":"main","field":"value","method":"max"},"range":[50,750],"nice":true},
+    "y": {"type":"band","domainFrom":{"data":"main","field":"category","method":"values"},"range":[50,350],"params":{"padding":0.1}},
+    "color": {"type":"ordinal","scheme":"Set3"}
+  },
+  "layers": [
+    {
+      "id":"bars",
+      "mark":{"type":"rect"},
+      "encoding":{
+        "x":{"value":50},
+        "y":{"field":"category","scale":"y"},
+        "width":{"field":"value","scale":"x"},
+        "height":{"value":30},
+        "color":{"field":"category","scale":"color"}
+      }
+    }
+  ]
+};
+
+// ---------- Data ----------
+const data = config.data.source.data;
+
+// ---------- Scales ----------
+const xScale = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.value)]).nice()
+    .range(config.scales.x.range);
+
+const yScale = d3.scaleBand()
+    .domain(data.map(d => d.category))
+    .range(config.scales.y.range)
+    .padding(config.scales.y.params.padding);
+
+const colorScale = d3.scaleOrdinal()
+    .domain(data.map(d => d.category))
+    .range(d3.schemeSet3);
+
+// ---------- SVG container ----------
+const svg = d3.select('#' + config.id)
+    .attr('width', config.space.width)
+    .attr('height', space = config.space.height);
+
+// ---------- Title ----------
+svg.append('text')
+    .attr('class', 'title')
+    .attr('x', config.space.width / 2)
+    .attr('y', 30)
+    .text(config.title);
+
+// ---------- Bars ----------
+svg.append('g')
+    .attr('class', 'bars')
+    .selectAll('rect')
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('x', config.layers[0].encoding.x.value) // 50
+    .attr('y', d => yScale(d.category))
+    .attr('width', d => xScale(d.value) - config.layers[0].encoding.x.value) // width = xScale(value)-50
+    .attr('height', yScale.bandwidth())
+    .attr('fill', d => colorScale(d.category));
+
+// ---------- Axes ----------
+const xAxis = d3.axisBottom(xScale).ticks(5);
+svg.append('g')
+    .attr('class', 'axis')
+    .attr('transform', `translate(0,${config.scales.y.range[1]})`)
+    .call(xAxis);
+
+const yAxis = d3.axisLeft(yScale);
+svg.append('g')
+    .attr('class', 'axis')
+    .attr('transform', `translate(${config.layers[0].encoding.x.value},0)`)
+    .call(yAxis);
+</script>
+</body>
+</html>

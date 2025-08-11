@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hierarchical Edge Bundling (D3 v7)</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .node { font-size: 10px; }
+  .link { fill: none; }
+</style>
+</head>
+<body>
+<svg id="chart" width="600" height="600"></svg>
+
+<script>
+// ------------------------------------------------------------
+// Data
+// ------------------------------------------------------------
+const data = {
+  name: "root",
+  children: [
+    {
+      name: "Cluster A",
+      children: [
+        { name: "Node 1" },
+        { name: "Node 2" },
+        { name: "Node 3" },
+        { name: "Node 4" }
+      ]
+    },
+    {
+      name: "Cluster B",
+      children: [
+        { name: "Node 5" },
+        { name: "Node 6" },
+        { name: "Node 7" },
+        { name: "Node 8" }
+      ]
+    }
+  ],
+  // indices refer to the leaf order (0‑7)
+  links: [
+    { source: 0, target: 4 },
+    { source: 1, target: 5 },
+    { source: 2, target: 6 },
+    { source: 3, target: 7 }
+  ]
+};
+
+// ------------------------------------------------------------
+// Layout
+// ------------------------------------------------------------
+const width  = 600,
+      height = 600,
+      radius = Math.min(width, height) / 2 - 20;
+
+const svg = d3.select("#chart")
+    .attr("viewBox", [-width / 2, -height / 2, width, height]);
+
+// Build hierarchy (ignore the `links` property)
+const root = d3.hierarchy(data, d => d.children);
+root.sum(() => 1);
+
+// Cluster layout (polar coordinates)
+const cluster = d3.cluster()
+    .size([2 * Math.PI, radius]);
+
+cluster(root);
+
+// ------------------------------------------------------------
+// Helper functions
+// ------------------------------------------------------------
+const leaves = root.leaves();               // leaf nodes in order
+leaves.forEach((d, i) => d.index = i);     // give each leaf an index
+
+// map leaf index → node
+const nodeByIndex = leaves;
+
+// Lowest common ancestor
+function lca(a, b) {
+  while (a !== b) {
+    if (a.depth > b.depth) a = a.parent;
+    else if (b.depth > a.depth) b = b.parent;
+    else { a = a.parent; b = b.parent; }
+  }
+  return a;
+}
+
+// Convert polar (angle, radius) → Cartesian (x, y)
+function polarToCartesian(angle, r) {
+  const a = angle - Math.PI / 2; // rotate so 12 o’clock = 0
+  return [Math.cos(a) * r, Math.sin(a) * r];
+}
+
+// ------------------------------------------------------------
+// Draw links (bundled curves)
+// ------------------------------------------------------------
+const line = d3.line()
+    .curve(d3.curveBundle.beta(0.85))
+    .x(d => d[0])
+    .y(d => d[1]);
+
+svg.append("g")
+    .attr("class", "links")
+  .selectAll("path")
+  .data(data.links)
+  .enter()
+  .append("path")
+    .attr("class", "link")
+    .attr("stroke", "steelblue")
+    .attr("stroke-opacity", 0.6)
+    .attr("stroke-width", 1.2)
+    .attr("d", d => {
+      const source = leaves[d.source];
+      const target = leaves[d.target];
+      const common = lca(source, target);
+
+      // Build the node sequence: source → … → LCA → … → target
+      const seq = [];
+
+      // up from source to (but not including) LCA
+      let cur = source;
+      while (cur !== common) {
+        seq.push(cur);
+        cur = cur.parent;
+      }
+
+      // add LCA
+      seq.push(common);
+
+      // down from LCA to target (excluding LCA)
+      const down = [];
+      cur = target;
+      while (cur !== common) {
+        down.push(cur);
+        cur = cur.parent;
+      }
+      down.reverse(); // from LCA down to target
+      seq.push(...down);
+
+      // Convert to Cartesian points for the line generator
+      const points = seq.map(p => polarToCartesian(p.x, p.y));
+      return line(points);
+    });
+
+// ------------------------------------------------------------
+// Draw node labels
+// ------------------------------------------------------------
+svg.append("g")
+    .attr("class", "labels")
+  .selectAll("text")
+  .data(leaves)
+  .enter()
+  .append("text")
+    .attr("class", "node")
+    .attr("dx", d => {
+      const [x] = polarToCartesian(d.x, d.y);
+      return x > 0 ? 8 : -8;
+    })
+    .attr("dy", "0.31em")
+    .attr("text-anchor", d => d.x > Math.PI ? "end" : "start")
+    .attr("transform", d => {
+      const [x, y] = polarToCartesian(d.x, d.y);
+      const angle = (d.x * 180 / Math.PI) - 90; // rotate to align with radius
+      return `rotate(${angle}) translate(${x},${y})`;
+    })
+    .text(d => d.data.name);
+</script>
+</body>
+</html>

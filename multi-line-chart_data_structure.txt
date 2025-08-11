@@ -1,0 +1,20 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │   date   : temporal (ISO‑8601 timestamp, e.g., "2022‑12‑31T18:30:00Z")│  ← temporal identifier for each observation (time axis)   │
+      │   price  : quantitative (numeric price of the symbol)               │  ← numeric value plotted on the y‑axis                     │
+      │   symbol : nominal (stock ticker such as "AAPL", "GOOGL", "MSFT")    │  ← categorical series identifier (used for colour)      │
+      │   volume : quantitative (trade volume)                           │  ← additional numeric field, not used in the chart but   │
+      │               (could be used for size, tooltip, etc.)                │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- date – temporal field that defines the horizontal position of each point on the time axis.
+- price – quantitative field representing the price to be plotted vertically.
+- symbol – nominal field that groups the data into separate lines (AAPL, GOOGL, MSFT) and drives the color scale.
+- volume – quantitative field present in the data but not mapped in the current layer; could be used for additional encodings (e.g., tooltip or size). 
+
+The data is a flat array; there are no nested arrays such as nodes or links.

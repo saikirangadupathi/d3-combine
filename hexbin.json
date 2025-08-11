@@ -1,0 +1,145 @@
+{
+  "id": "hexbin",
+  "title": "Hexbin Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "x": 23.5,
+          "y": 67.2,
+          "count": 12
+        },
+        {
+          "x": 45.8,
+          "y": 34.9,
+          "count": 8
+        },
+        {
+          "x": 67.1,
+          "y": 89.4,
+          "count": 15
+        },
+        {
+          "x": 12.9,
+          "y": 45.6,
+          "count": 6
+        },
+        {
+          "x": 78.3,
+          "y": 23.1,
+          "count": 18
+        },
+        {
+          "x": 34.7,
+          "y": 78.9,
+          "count": 9
+        },
+        {
+          "x": 56.2,
+          "y": 56.7,
+          "count": 14
+        },
+        {
+          "x": 89.6,
+          "y": 12.4,
+          "count": 7
+        },
+        {
+          "x": 21.4,
+          "y": 91.8,
+          "count": 11
+        },
+        {
+          "x": 65.9,
+          "y": 38.2,
+          "count": 13
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "hexbin",
+        "params": {
+          "x": "x",
+          "y": "y",
+          "radius": 10
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      },
+      {
+        "name": "count",
+        "type": "quantitative",
+        "accessor": "length"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "x",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        550
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "y",
+        "method": "extent"
+      },
+      "range": [
+        350,
+        50
+      ]
+    },
+    "color": {
+      "type": "sequential",
+      "scheme": "YlOrRd"
+    }
+  },
+  "layers": [
+    {
+      "id": "hexagons",
+      "mark": {
+        "type": "path",
+        "generator": {
+          "type": "hexbin"
+        }
+      },
+      "encoding": {
+        "d": {
+          "field": "path"
+        },
+        "fill": {
+          "field": "count",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "id": "hierarchical-edge-bundling",
+  "title": "Hierarchical Edge Bundling",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Cluster A",
+            "children": [
+              {
+                "name": "Node 1"
+              },
+              {
+                "name": "Node 2"
+              },
+              {
+                "name": "Node 3"
+              },
+              {
+                "name": "Node 4"
+              }
+            ]
+          },
+          {
+            "name": "Cluster B",
+            "children": [
+              {
+                "name": "Node 5"
+              },
+              {
+                "name": "Node 6"
+              },
+              {
+                "name": "Node 7"
+              },
+              {
+                "name": "Node 8"
+              }
+            ]
+          }
+        ],
+        "links": [
+          {
+            "source": 0,
+            "target": 5
+          },
+          {
+            "source": 1,
+            "target": 6
+          },
+          {
+            "source": 2,
+            "target": 7
+          },
+          {
+            "source": 3,
+            "target": 8
+          },
+          {
+            "source": 4,
+            "target": 9
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "hierarchy",
+        "params": {}
+      },
+      {
+        "type": "cluster",
+        "params": {
+          "size": [
+            6.283185307179586,
+            200
+          ]
+        }
+      },
+      {
+        "type": "bundle",
+        "params": {
+          "beta": 0.85
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "type": "nominal",
+        "accessor": "data.name"
+      },
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 600,
+    "coordinates": [
+      {
+        "id": "polar",
+        "type": "polar",
+        "origin": [
+          300,
+          300
+        ]
+      }
+    ]
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "bundles",
+      "mark": {
+        "type": "path",
+        "generator": {
+          "type": "line",
+          "curve": "curveBundle"
+        }
+      },
+      "encoding": {
+        "d": {
+          "field": "path"
+        },
+        "stroke": {
+          "value": "steelblue"
+        },
+        "opacity": {
+          "value": 0.6
+        }
+      }
+    }
+  ]
+}

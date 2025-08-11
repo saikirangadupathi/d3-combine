@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Horizon Chart</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+  .title { font-size: 16px; text-anchor: middle; }
+</style>
+</head>
+<body>
+
+<svg id="horizon-chart" width="800" height="200"></svg>
+
+<script>
+// Inline data from configuration
+const rawData = [
+  {"series":"Series A","date":"2022-12-31T18:30:00.000Z","value":45.2},
+  {"series":"Series A","date":"2023-01-01T18:30:00.000Z","value":52.8},
+  {"series":"Series A","date":"2023-01-02T18:30:00.000Z","value":48.1},
+  {"series":"Series B","date":"2022-12-31T18:30:00.000Z","value":67.3},
+  {"series":"Series B","date":"2023-01-01T18:30:00.000Z","value":72.1},
+  {"series":"Series B","date":"2023-01-02T18:30:00.000Z","value":69.8},
+  {"series":"Series C","date":"2022-12-31T18:30:00.000Z","value":34.7},
+  {"series":"Series C","date":"2023-01-01T18:30:00.000Z","value":41.9},
+  {"series":"Series C","date":"2023-01-02T18:30:00.000Z","value":38.2},
+  {"series":"Series D","date":"2022-12-31T18:30:00.000Z","value":89.6},
+  {"series":"Series D","date":"2023-01-01T18:30:00.000Z","value":85.3},
+  {"series":"Series D","date":"2023-01-02T18:30:00.000Z","value":91.7}
+];
+
+// Parse dates
+const parseDate = d3.isoParse;
+rawData.forEach(d => d.date = parseDate(d.date));
+
+// Dimensions
+const width = 800;
+const height = 200;
+const margin = {top: 30, right: 50, bottom: 30, left: 50};
+
+// Scales
+const xScale = d3.scaleTime()
+    .domain(d3.extent(rawData, d => d.date))
+    .range([margin.left, width - margin.right]);
+
+const yScale = d3.scaleLinear()
+    .domain([0, d3.max(rawData, d => d.value)])
+    .nice()
+    .range([height - margin.bottom, margin.top]);
+
+// Color scale
+const seriesNames = Array.from(new Set(rawData.map(d => d.series)));
+const colorScale = d3.scaleOrdinal()
+    .domain(seriesNames)
+    .range(d3.schemeCategory10);
+
+// SVG container
+const svg = d3.select("#horizon-chart");
+
+// Title
+svg.append("text")
+    .attr("class", "title")
+    .attr("x", width/2)
+    .attr("y", margin.top/2)
+    .text("Horizon Chart");
+
+// Axes
+const xAxis = d3.axisBottom(xScale).ticks(4).tickFormat(d3.timeFormat("%b %d"));
+const yAxis = d3.axisLeft(yScale).ticks(5);
+
+svg.append("g")
+    .attr("class", "axis x")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "axis y")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(yAxis);
+
+// Group data by series
+const nested = d3.group(rawData, d => d.series);
+
+// Area generator
+const area = d3.area()
+    .x(d => xScale(d.date))
+    .y0(yScale(0))
+    .y1(d => yScale(d.value))
+    .curve(d3.curveMonotoneX);
+
+// Draw areas per series
+for (const [key, values] of nested) {
+  svg.append("path")
+      .datum(values.sort((a,b)=>d3.ascending(a.date,b.date)))
+      .attr("fill", colorScale(key))
+      .attr("stroke", "none")
+      .attr("opacity", 0.7)
+      .attr("d", area);
+}
+
+// Legend
+const legend = svg.append("g")
+    .attr("transform", `translate(${width - margin.right + 10},${margin.top})`);
+
+seriesNames.forEach((name,i) => {
+  const g = legend.append("g")
+      .attr("transform", `translate(0,${i*20})`);
+  g.append("rect")
+    .attr("width", 12)
+    .attr("height", 12)
+    .attr("fill", colorScale(name));
+  g.append("text")
+    .attr("x", 16)
+    .attr("y", 10)
+    .text(name);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Histogram</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    stroke: #000;
+  }
+  .title {
+    text-anchor: middle;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .label {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<svg id="histogram" width="800" height="400"></svg>
+<script>
+  // Inline data
+  const data = [
+    { "value": 12.5, "count": 45, "x0": 10, "x1": 15 },
+    { "value": 17.8, "count": 67, "x0": 15, "x1": 20 },
+    { "value": 23.2, "count": 89, "x0": 20, "x1": 25 },
+    { "value": 28.9, "count": 123, "x0": 25, "x1": 30 },
+    { "value": 34.1, "count": 156, "x0": 30, "x1": 35 },
+    { "value": 39.7, "count": 134, "x0": 35, "x1": 40 },
+    { "value": 44.3, "count": 98, "x0": 40, "x1": 45 },
+    { "value": 49.8, "count": 76, "x0": 45, "x1": 50 },
+    { "value": 54.6, "count": 54, "x0": 50, "x1": 55 },
+    { "value": 59.2, "count": 32, "x0": 55, "x1": 60 }
+  ];
+
+  const svg = d3.select('#histogram');
+  const width = 800;
+  const height = 400;
+  const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
+
+  // Scales
+  const xScale = d3.scaleLinear()
+    .domain([d3.min(data, d => d.x0), d3.max(data, d => d.x1)])
+    .range([margin.left, width - margin.right]);
+
+  const yScale = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.count)])
+    .nice()
+    .range([height - margin.bottom, margin.top]); // 350 → 50
+
+  // Axes
+  const xAxis = d3.axisBottom(xScale).ticks(10);
+  const yAxis = d3.axisLeft(yScale).ticks(5);
+
+  svg.append('g')
+    .attr('transform', `translate(0,${height - margin.bottom})`)
+    .call(xAxis);
+
+  svg.append('g')
+    .attr('transform', `translate(${margin.left},0)`)
+    .call(yAxis);
+
+  // Title
+  svg.append('text')
+    .attr('x', width / 2)
+    .attr('y', margin.top / 2)
+    .attr('class', 'title')
+    .text('Histogram');
+
+  // X axis label
+  svg.append('text')
+    .attr('x', width / 2)
+    .attr('y', height - 10)
+    .attr('class', 'label')
+    .attr('text-anchor', 'middle')
+    .text('Value');
+
+  // Y axis label
+  svg.append('text')
+    .attr('x', -height / 2)
+    .attr('y', 15)
+    .attr('transform', 'rotate(-90)')
+    .attr('class', 'label')
+    .attr('text-anchor', 'middle')
+    .text('Count');
+
+  // Bars (rects)
+  svg.selectAll('.bar')
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('class', 'bar')
+    .attr('x', d => xScale(d.x0))
+    .attr('y', d => yScale(d.count))
+    .attr('width', d => xScale(d.x1) - xScale(d.x0))
+    .attr('height', d => (height - margin.bottom) - yScale(d.count))
+    .attr('fill', 'steelblue');
+</script>
+</body>
+</html>

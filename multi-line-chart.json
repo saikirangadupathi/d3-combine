@@ -1,0 +1,149 @@
+{
+  "id": "multi-line-chart",
+  "title": "Multi-Line Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "date": "2022-12-31T18:30:00.000Z",
+          "price": 150.25,
+          "symbol": "AAPL",
+          "volume": 125000
+        },
+        {
+          "date": "2023-01-01T18:30:00.000Z",
+          "price": 152.8,
+          "symbol": "AAPL",
+          "volume": 135000
+        },
+        {
+          "date": "2023-01-02T18:30:00.000Z",
+          "price": 148.9,
+          "symbol": "AAPL",
+          "volume": 145000
+        },
+        {
+          "date": "2022-12-31T18:30:00.000Z",
+          "price": 2750.45,
+          "symbol": "GOOGL",
+          "volume": 85000
+        },
+        {
+          "date": "2023-01-01T18:30:00.000Z",
+          "price": 2780.2,
+          "symbol": "GOOGL",
+          "volume": 95000
+        },
+        {
+          "date": "2023-01-02T18:30:00.000Z",
+          "price": 2765.8,
+          "symbol": "GOOGL",
+          "volume": 105000
+        },
+        {
+          "date": "2022-12-31T18:30:00.000Z",
+          "price": 245.75,
+          "symbol": "MSFT",
+          "volume": 165000
+        },
+        {
+          "date": "2023-01-01T18:30:00.000Z",
+          "price": 248.3,
+          "symbol": "MSFT",
+          "volume": 175000
+        },
+        {
+          "date": "2023-01-02T18:30:00.000Z",
+          "price": 251.9,
+          "symbol": "MSFT",
+          "volume": 185000
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "price",
+        "type": "quantitative",
+        "accessor": "price"
+      },
+      {
+        "name": "symbol",
+        "type": "nominal",
+        "accessor": "symbol"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "price",
+        "method": "extent"
+      },
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "lines",
+      "mark": {
+        "type": "line",
+        "generator": {
+          "type": "line",
+          "curve": "curveMonotoneX"
+        },
+        "groupBy": [
+          "symbol"
+        ]
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "price",
+          "scale": "y"
+        },
+        "stroke": {
+          "field": "symbol",
+          "scale": "color"
+        },
+        "strokeWidth": {
+          "value": 2
+        }
+      }
+    }
+  ]
+}

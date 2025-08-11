@@ -1,0 +1,142 @@
+{
+  "id": "horizon-chart",
+  "title": "Horizon Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "series": "Series A",
+          "date": "2022-12-31T18:30:00.000Z",
+          "value": 45.2
+        },
+        {
+          "series": "Series A",
+          "date": "2023-01-01T18:30:00.000Z",
+          "value": 52.8
+        },
+        {
+          "series": "Series A",
+          "date": "2023-01-02T18:30:00.000Z",
+          "value": 48.1
+        },
+        {
+          "series": "Series B",
+          "date": "2022-12-31T18:30:00.000Z",
+          "value": 67.3
+        },
+        {
+          "series": "Series B",
+          "date": "2023-01-01T18:30:00.000Z",
+          "value": 72.1
+        },
+        {
+          "series": "Series B",
+          "date": "2023-01-02T18:30:00.000Z",
+          "value": 69.8
+        },
+        {
+          "series": "Series C",
+          "date": "2022-12-31T18:30:00.000Z",
+          "value": 34.7
+        },
+        {
+          "series": "Series C",
+          "date": "2023-01-01T18:30:00.000Z",
+          "value": 41.9
+        },
+        {
+          "series": "Series C",
+          "date": "2023-01-02T18:30:00.000Z",
+          "value": 38.2
+        },
+        {
+          "series": "Series D",
+          "date": "2022-12-31T18:30:00.000Z",
+          "value": 89.6
+        },
+        {
+          "series": "Series D",
+          "date": "2023-01-01T18:30:00.000Z",
+          "value": 85.3
+        },
+        {
+          "series": "Series D",
+          "date": "2023-01-02T18:30:00.000Z",
+          "value": 91.7
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "series",
+        "type": "nominal",
+        "accessor": "series"
+      },
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 200
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        0,
+        40
+      ]
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "horizons",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "area"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "value",
+          "scale": "y"
+        },
+        "fill": {
+          "field": "series",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

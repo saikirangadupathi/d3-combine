@@ -1,0 +1,147 @@
+{
+  "id": "marimekko",
+  "title": "Marimekko Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "market": "North America",
+          "segment": "Premium",
+          "value": 150,
+          "x0": 0,
+          "y0": 0,
+          "x1": 200,
+          "y1": 150
+        },
+        {
+          "market": "North America",
+          "segment": "Standard",
+          "value": 200,
+          "x0": 0,
+          "y0": 150,
+          "x1": 200,
+          "y1": 350
+        },
+        {
+          "market": "Europe",
+          "segment": "Premium",
+          "value": 120,
+          "x0": 200,
+          "y0": 0,
+          "x1": 350,
+          "y1": 120
+        },
+        {
+          "market": "Europe",
+          "segment": "Standard",
+          "value": 180,
+          "x0": 200,
+          "y0": 120,
+          "x1": 350,
+          "y1": 300
+        },
+        {
+          "market": "Asia",
+          "segment": "Premium",
+          "value": 80,
+          "x0": 350,
+          "y0": 0,
+          "x1": 450,
+          "y1": 80
+        },
+        {
+          "market": "Asia",
+          "segment": "Standard",
+          "value": 250,
+          "x0": 350,
+          "y0": 80,
+          "x1": 450,
+          "y1": 330
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "treemap",
+        "params": {
+          "tile": "sliceDice"
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "market",
+        "type": "nominal",
+        "accessor": "market"
+      },
+      {
+        "name": "segment",
+        "type": "nominal",
+        "accessor": "segment"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Set3"
+    }
+  },
+  "layers": [
+    {
+      "id": "cells",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "x0"
+        },
+        "y": {
+          "field": "y0"
+        },
+        "width": {
+          "field": "x1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "x0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "height": {
+          "field": "y1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "y0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "fill": {
+          "field": "segment",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        }
+      }
+    }
+  ]
+}

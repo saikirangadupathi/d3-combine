@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hierarchical Edge Bundling</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .node { font-size: 10px; }
+  .link { fill: none; }
+</style>
+</head>
+<body>
+<svg id="chart" width="600" height="600"></svg>
+<script>
+// Data (inline)
+const data = {
+  name: "root",
+  children: [
+    {
+      name: "Cluster A",
+      children: [
+        { name: "Node 1" },
+        { name: "Node 2" },
+        { name: "Node 3" },
+        { name: "Node 4" }
+      ]
+    },
+    {
+      name: "Cluster B",
+      children: [
+        { name: "Node 5" },
+        { name: "Node 6" },
+        { name: "Node 7" },
+        { name: "Node 8" }
+      ]
+    }
+  ],
+  links: [
+    { source: 0, target: 5 },
+    { source: 1, target: 6 },
+    { source: 2, target: 7 },
+    { source: 3, target: 8 },
+    { source: 4, target: 9 }
+  ]
+};
+
+// Dimensions
+const width = 600;
+const height = 600;
+const radius = Math.min(width, height) / 2 - 20;
+
+// Create SVG
+const svg = d3.select("#chart")
+  .attr("viewBox", [-width/2, -height/2, width, height]);
+
+// Build hierarchy and compute layout
+const root = d3.hierarchy(data, d => d.children);
+root.sum(() => 1);
+
+// Cluster layout with polar coordinates
+const cluster = d3.cluster()
+  .size([2 * Math.PI, radius]);
+
+cluster(root);
+
+// Create a map from leaf index to node
+const leaves = root.leaves(); // leaf nodes in order
+// Assign an index for each leaf
+leaves.forEach((d,i) => d.index = i);
+
+// Build an array of nodes for easy lookup by index
+const nodeByIndex = leaves;
+
+// Function to compute lowest common ancestor
+function lca(a, b) {
+  while (a !== b) {
+    if (a.depth > b.depth) a = a.parent;
+    else if (b.depth > a.depth) b = b.parent;
+    else { a = a.parent; b = b.parent; }
+  }
+  return a;
+}
+
+// Convert polar coordinates (angle, radius) to Cartesian (x,y)
+function polarToCartesian(angle, r) {
+  const a = angle - Math.PI/2; // rotate so 12 o'clock = 0
+  return [Math.cos(a) * r, Math.sin(a) * r];
+}
+
+// Build paths for each link using bundled curves
+const lineGenerator = d3.line()
+  .curve(d3.curveBundle.beta(0.85))
+  .x(d => d[0])
+  .y(d => d[1]);
+
+// Draw bundles
+svg.append("g")
+  .attr("class", "links")
+  .selectAll("path")
+  .data(data.links)
+  .enter()
+  .append("path")
+    .attr("class", "link")
+    .attr("stroke", "steelblue")
+    .attr("stroke-opacity", 0.6)
+    .attr("stroke-width", 1.2)
+    .attr("d", d => {
+      const source = leaves[d.source];
+      const target = leaves[d.target];
+
+      // Build path from source up to LCA then down to target
+      const common = lca(source, target);
+      const points = [];
+
+      // upward from source to LCA
+      let cur = source;
+      while (cur !== common) {
+        points.push(polarToCartesian(cur.x, cur.y));
+        cur = cur.parent;
+      }
+      // add LCA
+      const lcaPoint = polarToCartesian(common.x, common.y);
+      const path = [lcaPoint];
+
+      // collect nodes from target up to LCA (excluding LCA)
+      const right = [];
+      cur = target;
+      while (cur !== common) {
+        right.push(polarToCartesian(cur.x, cur.y));
+        cur = cur.parent;
+      }
+      right.reverse(); // from LCA down to target
+      path.push(...right);
+
+      // prepend source side (already collected)
+      const sourcePath = [];
+      cur = source;
+      const up = [];
+      while (cur !== common) {
+        up.push(polarToCartesian(cur.x, cur.y));
+        cur = cur.parent;
+      }
+      up.reverse();
+      path.unshift(...up);
+
+      return lineGenerator(path);
+    });
+
+// Optional: Draw node labels
+svg.append("g")
+  .attr("class", "labels")
+  .selectAll("text")
+  .data(leaves)
+  .enter()
+  .append("text")
+    .attr("class", "node")
+    .attr("dx", d => {
+      const [x, y] = polarToCartesian(d.x, d.y);
+      return x > 0 ? 8 : -8;
+    })
+    .attr("dy", "0.31em")
+    .attr("text-anchor", d => d.x > Math.PI ? "end" : "start")
+    .attr("transform", d => {
+      const [x, y] = polarToCartesian(d.x, d.y);
+        return `rotate(${(d.x * 180 / Math.PI - 90)}) translate(${x},${y})`;
+      })
+    .text(d => d.data.name);
+</script>
+</body>
+</html>

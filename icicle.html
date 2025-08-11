@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Icicle Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .title { text-align: center; font-size: 24px; margin-top: 20px; }
+  .node { cursor: pointer; }
+  .label { font-size: 10px; fill: #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="title">Icicle Chart</div>
+<svg id="icicle" width="800" height="400"></svg>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const config = {
+    "space": { "width": 800, "height": 400 },
+    "data": {
+      "source": {
+        "type": "inline",
+        "data": {
+          "name": "root",
+          "children": [
+            {
+              "name": "Category A",
+              "children": [
+                { "name": "Item 1", "value": 234 },
+                { "name": "Item 2", "value": 456 },
+                { "name": "Item 3", "value": 123 }
+              ]
+            },
+            {
+              "name": "Category B",
+              "children": [
+                { "name": "Item 4", "value": 789 },
+                { "name": "Item 5", "value": 345 },
+                { "name": "Item 6", "value": 567 }
+              ]
+            }
+          ]
+        }
+      },
+      "transforms": [
+        { "type": "hierarchy", "params": { "value": "value", "sum": true } },
+        { "type": "partition", "params": { "size": [700, 350] } }
+      ]
+    },
+    "scales": {
+      "color": {
+        "type": "sequential",
+        "scheme": "Blues"
+      }
+    }
+  };
+
+  const svg = d3.select("#icicle")
+                .attr("viewBox", `0 0 ${config.space.width} ${config.space.height}`)
+                .attr("preserveAspectRatio", "xMidYMid meet");
+
+  // Build hierarchy
+  const root = d3.hierarchy(config.data.source.data)
+                 .sum(d => d.value)
+                 .sort((a,b) => b.value - a.value);
+
+  // Apply partition layout
+  const partition = d3.partition()
+                      .size([config.space.width * 0.9, config.space.height * 0.9])
+                      .padding(1);
+  partition(root);
+
+  // Determine max depth for color scaling
+  const maxDepth = root.height;
+
+  // Color scale
+  const color = d3.scaleSequential()
+                  .interpolator(d3.interpolateBlues)
+                  .domain([0, maxDepth]);
+
+  // Group for rectangles
+  const g = svg.append("g")
+               .attr("transform", `translate(${(config.space.width - 700)/2}, ${(config.space.height - 350)/2})`);
+
+  // Draw rectangles
+  const nodes = root.descendants().filter(d => d.depth > 0); // exclude root
+
+  const rects = g.selectAll("g")
+                 .data(nodes)
+                 .enter()
+                 .append("g")
+                 .attr("class", "node")
+                 .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+  rects.append("rect")
+       .attr("width", d => d.x1 - d.x0)
+       .attr("height", d => d.y1 - d.y0)
+       .attr("fill", d => color(d.depth))
+       .attr("stroke", "white");
+
+  // Add labels
+  rects.append("text")
+       .attr("x", 4)
+       .attr("y", 12)
+       .text(d => d.data.name)
+       .attr("class", "label")
+       .attr("pointer-events", "none");
+
+});
+</script>
+</body>
+</html>

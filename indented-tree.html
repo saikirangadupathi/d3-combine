@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Indented Tree</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; }
+  .node { font-size: 14px; }
+</style>
+</head>
+<body>
+<h2>Indented Tree</h2>
+<svg id="indented-tree" width="600" height="500"></svg>
+<script>
+// Inline data as defined in the config
+const rawData = {
+  "name": "root",
+  "children": [
+    {
+      "name": "Category A",
+      "children": [
+        { "name": "Item 1", "value": 234 },
+        { "name": "Item 2", "value": 456 },
+        { "name": "Item 3", "value": 123 }
+      ]
+    },
+    {
+      "name": "Category B",
+      "children": [
+        { "name": "Item 4", "value": 789 },
+        { "name": "Item 5", "value": 345 },
+        { "name": "Item 6", "value": 567 }
+      ]
+    }
+  ]
+};
+
+// Build hierarchy and compute a flat list of nodes
+const root = d3.hierarchy(rawData, d => d.children);
+const nodes = root.descendants();          // array of all nodes
+nodes.forEach((d, i) => d.index = i);      // assign index for vertical positioning
+
+// Scales
+const color = d3.scaleOrdinal(d3.schemeCategory10); // ordinal color scale
+
+// SVG setup
+const width = 600, height = 500;
+const svg = d3.select("#indented-tree")
+  .attr("width", width)
+  .attr("height", height);
+
+// Render each node as text
+svg.selectAll("text")
+  .data(nodes)
+  .enter()
+  .append("text")
+  .attr("class", "node")
+  .attr("x", d => d.depth * 20 + 20)      // depth * factor + offset
+  .attr("y", d => d.index * 20 + 20)       // index * factor + offset
+  .text(d => d.data.name)
+  .attr("fill", d => color(d.depth));
+</script>
+</body>
+</html>

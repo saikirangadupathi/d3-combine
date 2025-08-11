@@ -1,0 +1,17 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   x: ordinal (categorical index for the column),   │  ← identifies the column position (0, 1, 2, …) – treated as a categorical/ordinal field
+      │   y: ordinal (categorical index for the row),      │  identifies the row position (0, 1, 2, …) – also a categorical/ordinal field
+      │   value: quantitative (numeric measurement), │  numeric value that will be mapped to color intensity; the quantitative field driving the heat‑map
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation  
+- x and y are ordinal identifiers that locate each cell in the grid (column and row).  
+- value is a quantitative measurement that determines the cell’s color via the “color” scale (Viridis).  
+
+The data set is a flat array; there are no nested arrays such as nodes or links.

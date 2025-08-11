@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Marimekko Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <style>
+    body { font-family: sans-serif; }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+  </style>
+</head>
+<body>
+  <svg id="chart" width="800" height="400"></svg>
+  <script>
+    // Configuration
+    const config = {
+      id: "marimekko",
+      title: "Marimekko Chart",
+      data: [
+        { market: "North America", segment: "Premium", value: 150, x0: 0,   y0: 0,   x1: 200, y1: 150 },
+        { market: "North America", segment: "Standard", value: 200, x0: 0,   y0: 150, x1: 200, y1: 350 },
+        { market: "Europe",        segment: "Premium", value: 120, x0: 200, y0: 0,   x1: 350, y1: 120 },
+        { market: "Europe",        segment: "Standard", value: 180, x0: 200, y0: 120, x1: 350, y1: 300 },
+        { market: "Asia",          segment: "Premium", value: 80,  x0: 350, y0: 0,   x1: 450, y1: 80  },
+        { market: "Asia",          segment: "Standard", value: 250, x0: 350, y0: 80,  x1: 450, y1: 330 }
+      ]
+    };
+
+    const width = 800;
+    const height = 400;
+    const margin = {top: 40, right: 20, bottom: 40, left: 50};
+
+    const svg = d3.select("#chart")
+                  .attr("width", width)
+                  .attr("height", height);
+
+    // Title
+    svg.append("text")
+       .attr("x", width / 2)
+       .attr("y", margin.top / 2)
+       .attr("text-anchor", "middle")
+       .attr("font-size", "20px")
+       .attr("font-weight", "bold")
+       .text(config.title);
+
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+
+    const g = svg.append("g")
+                 .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Scales
+    const maxX = d3.max(config.data, d => d.x1);
+    const maxY = d3.max(config.data, d => d.y1);
+
+    const xScale = d3.scaleLinear()
+                     .domain([0, maxX])
+                     .range([0, innerWidth]);
+
+    const yScale = d3.scaleLinear()
+                     .domain([0, maxY])
+                     .range([0, innerHeight]); // Note: y grows downward
+
+    // Color scale
+    const segments = Array.from(new Set(config.data.map(d => d.segment)));
+    const color = d3.scaleOrdinal()
+                    .domain(segments)
+                    .range(d3.schemeSet3);
+
+    // Draw cells
+    g.selectAll("rect")
+      .data(config.data)
+      .enter()
+      .append("rect")
+      .attr("x", d => xScale(d.x0))
+      .attr("y", d => yScale(d.y0))
+      .attr("width", d => xScale(d.x1) - xScale(d.x0))
+      .attr("height", d => yScale(d.y1) - yScale(d.y0))
+      .attr("fill", d => color(d.segment))
+      .attr("stroke", "white");
+
+    // X Axis
+    const xAxis = d3.axisBottom(xScale);
+    g.append("g")
+     .attr("class", "axis")
+     .attr("transform", `translate(0,${innerHeight})`)
+     .call(xAxis);
+
+    // Y Axis
+    const yAxis = d3.axisLeft(yScale);
+    g.append("g")
+     .attr("class", "axis")
+     .call(yAxis);
+
+    // Axis Labels
+    svg.append("text")
+       .attr("x", margin.left + innerWidth / 2)
+       .attr("y", height - margin.bottom / 4)
+       .attr("text-anchor", "middle")
+       .attr("font-size", "12px")
+       .text("Market Width (scaled)");
+
+    svg.append("text")
+       .attr("transform", `translate(${margin.left / 4},${margin.top + innerHeight / 2}) rotate(-90)`)
+       .attr("text-anchor", "middle")
+       .attr("font-size", "12px")
+       .text("Market Height (scaled)");
+  </script>
+</body>
+</html>

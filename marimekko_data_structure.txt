@@ -1,0 +1,29 @@
+DATA
+│
+└── data: [                                   <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │ market: string (categorical) – name of the market region (e.g.,        │
+      │          "North America", "Europe", "Asia"); used as a primary          │
+      │          identifier for the top‑level groups in the Marimekko chart.   │
+      │ segment: string (categorical) – product segment within the market,   │
+      │          e.g., "Premium" or "Standard". Determines the fill      │
+      │          color of each rectangle.                              │
+      │ value: number (quantitative) – numeric measure that drives      │
+      │          the size of each cell (e.g., sales amount).       │
+      │ x0: number (quantitative) – left‑hand x‑coordinate of the   │
+      │          rectangle's origin (pixel position).           │
+      │ y0: number (quantitative) – top‑hand y‑coordinate of the │
+      │          rectangle's origin (pixel position).       │
+      │ x1: number (quantitative) – right‑hand x‑coordinate (pixel)│
+      │          of the rectangle's far edge. Used with a subtract │
+      │          offset (x0) to compute the rectangle's width.│
+      │ y1: number (quantitative) – bottom‑hand y‑coordinate (pixel)│
+      │          of the rectangle's far edge. Used with a subtract │
+      │          offset (y0) to compute the rectangle's height.│
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- The data array is flat (no nested arrays like nodes/links).  
+- Each object represents a single cell in the Marimekko chart, combining categorical identifiers (market, segment) with the quantitative value and pre‑computed layout coordinates (x0, y0, x1, y1) that the rendering layer uses to draw rectangles.

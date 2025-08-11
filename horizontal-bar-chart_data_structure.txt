@@ -1,0 +1,20 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   category: string (nominal) – name of the product   │  ← categorical identifier for each bar
+      │   value: number (quantitative) – metric to plot as │  ← numeric value used for bar length
+      │          horizontal length (e.g., score, percentage)│
+      │   count: integer (quantitative) – raw count or   │  ← auxiliary numeric field, not used in
+      │          secondary metric (e.g., number of units)│    the current visual encoding
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- category: nominal (categorical) field serving as the unique identifier for each bar (Product A‑E).  
+- value: quantitative field that determines the bar’s width (horizontal length).  
+- count: additional quantitative field (e.g., raw count) present in the data but not directly used in the chart’s encoding.  
+
+No nested arrays (e.g., nodes/links) are present; the data is a flat array of objects.

@@ -1,0 +1,174 @@
+{
+  "id": "histogram",
+  "title": "Histogram",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "value": 12.5,
+          "count": 45,
+          "x0": 10,
+          "x1": 15
+        },
+        {
+          "value": 17.8,
+          "count": 67,
+          "x0": 15,
+          "x1": 20
+        },
+        {
+          "value": 23.2,
+          "count": 89,
+          "x0": 20,
+          "x1": 25
+        },
+        {
+          "value": 28.9,
+          "count": 123,
+          "x0": 25,
+          "x1": 30
+        },
+        {
+          "value": 34.1,
+          "count": 156,
+          "x0": 30,
+          "x1": 35
+        },
+        {
+          "value": 39.7,
+          "count": 134,
+          "x0": 35,
+          "x1": 40
+        },
+        {
+          "value": 44.3,
+          "count": 98,
+          "x0": 40,
+          "x1": 45
+        },
+        {
+          "value": 49.8,
+          "count": 76,
+          "x0": 45,
+          "x1": 50
+        },
+        {
+          "value": 54.6,
+          "count": 54,
+          "x0": 50,
+          "x1": 55
+        },
+        {
+          "value": 59.2,
+          "count": 32,
+          "x0": 55,
+          "x1": 60
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "bin",
+        "params": {
+          "field": "value",
+          "thresholds": 20
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "count",
+        "type": "quantitative",
+        "accessor": "length"
+      },
+      {
+        "name": "x0",
+        "type": "quantitative",
+        "accessor": "x0"
+      },
+      {
+        "name": "x1",
+        "type": "quantitative",
+        "accessor": "x1"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "count",
+        "method": "max"
+      },
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    }
+  },
+  "layers": [
+    {
+      "id": "bins",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "x0",
+          "scale": "x"
+        },
+        "y": {
+          "field": "count",
+          "scale": "y"
+        },
+        "width": {
+          "field": "x1",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "x0",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "height": {
+          "field": "count",
+          "scale": "y",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": 350,
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "fill": {
+          "value": "steelblue"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "heatmap",
+  "title": "Heatmap",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "x": 0,
+          "y": 0,
+          "value": 23.5
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "value": 45.8
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "value": 67.1
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "value": 12.9
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "value": 78.3
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "value": 34.7
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "value": 56.2
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "value": 89.6
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "value": 21.4
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "value": 65.9
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "x",
+        "type": "ordinal",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "ordinal",
+        "accessor": "y"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 500,
+    "height": 500
+  },
+  "scales": {
+    "x": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "x",
+        "method": "values"
+      },
+      "range": [
+        50,
+        450
+      ]
+    },
+    "y": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "y",
+        "method": "values"
+      },
+      "range": [
+        50,
+        450
+      ]
+    },
+    "color": {
+      "type": "sequential",
+      "scheme": "Viridis"
+    }
+  },
+  "layers": [
+    {
+      "id": "cells",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "x",
+          "scale": "x"
+        },
+        "y": {
+          "field": "y",
+          "scale": "y"
+        },
+        "width": {
+          "value": 40
+        },
+        "height": {
+          "value": 40
+        },
+        "fill": {
+          "field": "value",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

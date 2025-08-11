@@ -1,0 +1,17 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   series: nominal (categorical identifier),      │  ← name of the series (e.g., “Series A”) – used to differentiate
+      │   date:   temporal (ISO‑8601 timestamp),       │  ← time point for each observation, used on the x‑axis
+      │   value:  quantitative (numeric measurement)│  ← numeric value plotted on the y‑axis
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- series – a nominal (categorical) field that identifies which series the record belongs to (Series A, B, C, D). It drives the color encoding and separates the area layers.
+- date – a temporal field in ISO‑8601 format representing the point in time for each observation. It is mapped to the time scale on the x‑axis.
+- value – a quantitative (numeric) field representing the measured value for that date and series. It is mapped to the linear y‑scale.
+
+The data is a flat array; there are no nested arrays such as nodes or links. The chart will render one area per series, colored by the “color” ordinal scale, with time on the horizontal axis and value on the vertical axis.

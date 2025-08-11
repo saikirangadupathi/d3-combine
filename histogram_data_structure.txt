@@ -1,0 +1,19 @@
+DATA
+│
+└── data: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   value: number – quantitative field representing │
+      │          the central (or representative) value │
+      │          of each histogram bin.               │
+      │   count: number – quantitative field │
+      │          representing how many observations │
+      │          fall into the bin (frequency).   │
+      │   x0: number – quantitative field │
+      │          indicating the lower bound (start) │
+      │          of the bin interval.          │
+      │   x1: number – quantitative field │
+      │          indicating the upper bound (end) │
+      │          of the bin interval.          │
+      └───────────────────────────────────────────────────────┘
+The array is a flat list—there are no nested arrays (no nodes/links). Each object supplies the numeric values needed for the histogram’s x‑position (x0, x1), height (count), and a central value (value) used for binning.

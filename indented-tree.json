@@ -1,0 +1,126 @@
+{
+  "id": "indented-tree",
+  "title": "Indented Tree",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": {
+        "name": "root",
+        "children": [
+          {
+            "name": "Category A",
+            "children": [
+              {
+                "name": "Item 1",
+                "value": 234
+              },
+              {
+                "name": "Item 2",
+                "value": 456
+              },
+              {
+                "name": "Item 3",
+                "value": 123
+              }
+            ]
+          },
+          {
+            "name": "Category B",
+            "children": [
+              {
+                "name": "Item 4",
+                "value": 789
+              },
+              {
+                "name": "Item 5",
+                "value": 345
+              },
+              {
+                "name": "Item 6",
+                "value": 567
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "transforms": [
+      {
+        "type": "hierarchy",
+        "params": {}
+      }
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "type": "nominal",
+        "accessor": "data.name"
+      },
+      {
+        "name": "depth",
+        "type": "quantitative",
+        "accessor": "depth"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 500
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "nodes",
+      "mark": {
+        "type": "text"
+      },
+      "encoding": {
+        "x": {
+          "field": "depth",
+          "transform": [
+            {
+              "type": "scale",
+              "params": {
+                "factor": 20
+              }
+            },
+            {
+              "type": "offset",
+              "params": {
+                "offset": 20
+              }
+            }
+          ]
+        },
+        "y": {
+          "field": "index",
+          "transform": [
+            {
+              "type": "scale",
+              "params": {
+                "factor": 20
+              }
+            }
+          ]
+        },
+        "text": {
+          "field": "name"
+        },
+        "fill": {
+          "field": "depth",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}
