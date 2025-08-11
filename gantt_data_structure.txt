@@ -1,0 +1,25 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │ task: string (nominal) – name of the task, used as an identifier and│
+      │       for positioning on the vertical (y) axis.                       │
+      │ start: string (temporal) – ISO‑8601 timestamp marking the start   │
+      │        of the task; used on the horizontal (x) axis.                  │
+      │ end: string (temporal) – ISO‑8601 timestamp marking the end of   │
+      │      the task; used to compute the bar width.                       │
+      │ progress: number (quantitative) – completion percentage (0‑100)│
+      │          of the task; can be used for tooltips or further encoding.│
+      │ category: string (nominal) – group or phase the task belongs to;│
+      │           drives the fill colour via the color scale.            │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- task: identifier for each row, displayed on the y‑axis as a band.
+- start / end: temporal bounds that define the horizontal span of each bar.
+- progress: numeric progress value (0‑100) that could be shown as a tooltip or additional visual encoding.
+- category: categorical label used to assign a colour from the “Set2” ordinal palette.
+
+The data consists solely of this flat array; there are no nested arrays such as nodes or links.

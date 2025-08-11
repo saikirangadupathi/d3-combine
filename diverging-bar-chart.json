@@ -1,0 +1,115 @@
+{
+  "id": "diverging-bar-chart",
+  "title": "Diverging Bar Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "Item A",
+          "value": 15
+        },
+        {
+          "category": "Item B",
+          "value": -25
+        },
+        {
+          "category": "Item C",
+          "value": 35
+        },
+        {
+          "category": "Item D",
+          "value": -10
+        },
+        {
+          "category": "Item E",
+          "value": 20
+        },
+        {
+          "category": "Item F",
+          "value": -30
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "category",
+        "method": "values"
+      },
+      "range": [
+        50,
+        350
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "color": {
+      "type": "threshold",
+      "domain": [
+        0
+      ],
+      "range": [
+        "#d73027",
+        "#1a9850"
+      ]
+    }
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "value": 400
+        },
+        "y": {
+          "field": "category",
+          "scale": "y"
+        },
+        "width": {
+          "field": "value",
+          "scale": "x"
+        },
+        "color": {
+          "field": "value",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "id": "donut-chart",
+  "title": "Donut Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "segment": "Q1",
+          "revenue": 250000,
+          "startAngle": 0,
+          "endAngle": 1.309
+        },
+        {
+          "segment": "Q2",
+          "revenue": 320000,
+          "startAngle": 1.309,
+          "endAngle": 2.982
+        },
+        {
+          "segment": "Q3",
+          "revenue": 180000,
+          "startAngle": 2.982,
+          "endAngle": 3.925
+        },
+        {
+          "segment": "Q4",
+          "revenue": 420000,
+          "startAngle": 3.925,
+          "endAngle": 6.283
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "pie",
+        "params": {
+          "value": "revenue"
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "segment",
+        "type": "nominal",
+        "accessor": "segment"
+      },
+      {
+        "name": "revenue",
+        "type": "quantitative",
+        "accessor": "revenue"
+      },
+      {
+        "name": "startAngle",
+        "type": "quantitative",
+        "accessor": "startAngle"
+      },
+      {
+        "name": "endAngle",
+        "type": "quantitative",
+        "accessor": "endAngle"
+      }
+    ]
+  },
+  "space": {
+    "width": 400,
+    "height": 400
+  },
+  "scales": {
+    "color": {
+      "type": "ordinal",
+      "scheme": "Spectral"
+    }
+  },
+  "layers": [
+    {
+      "id": "arcs",
+      "mark": {
+        "type": "arc",
+        "generator": {
+          "type": "arc",
+          "params": {
+            "innerRadius": 60,
+            "outerRadius": 150
+          }
+        }
+      },
+      "encoding": {
+        "startAngle": {
+          "field": "startAngle"
+        },
+        "endAngle": {
+          "field": "endAngle"
+        },
+        "color": {
+          "field": "segment",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        },
+        "strokeWidth": {
+          "value": 2
+        }
+      }
+    }
+  ]
+}

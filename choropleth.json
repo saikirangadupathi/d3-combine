@@ -1,0 +1,150 @@
+{
+  "id": "choropleth",
+  "title": "Choropleth Map",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "state": "California",
+          "value": 850000,
+          "density": 245.3,
+          "growth": 0.045,
+          "geometry": {}
+        },
+        {
+          "state": "Texas",
+          "value": 720000,
+          "density": 189.7,
+          "growth": 0.067,
+          "geometry": {}
+        },
+        {
+          "state": "Florida",
+          "value": 650000,
+          "density": 312.8,
+          "growth": 0.089,
+          "geometry": {}
+        },
+        {
+          "state": "New York",
+          "value": 580000,
+          "density": 421.6,
+          "growth": -0.012,
+          "geometry": {}
+        },
+        {
+          "state": "Pennsylvania",
+          "value": 490000,
+          "density": 287.4,
+          "growth": 0.023,
+          "geometry": {}
+        },
+        {
+          "state": "Illinois",
+          "value": 420000,
+          "density": 231.9,
+          "growth": -0.008,
+          "geometry": {}
+        },
+        {
+          "state": "Ohio",
+          "value": 380000,
+          "density": 289.5,
+          "growth": 0.015,
+          "geometry": {}
+        },
+        {
+          "state": "Georgia",
+          "value": 360000,
+          "density": 178.2,
+          "growth": 0.078,
+          "geometry": {}
+        },
+        {
+          "state": "North Carolina",
+          "value": 340000,
+          "density": 206.7,
+          "growth": 0.056,
+          "geometry": {}
+        },
+        {
+          "state": "Michigan",
+          "value": 320000,
+          "density": 175.8,
+          "growth": 0.034,
+          "geometry": {}
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "state",
+        "type": "nominal",
+        "accessor": "state"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "geometry",
+        "type": "geojson",
+        "accessor": "geometry"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 500,
+    "coordinates": [
+      {
+        "id": "map",
+        "type": "geographic",
+        "projection": {
+          "type": "albersUsa",
+          "scale": 1000,
+          "translate": [
+            400,
+            250
+          ]
+        }
+      }
+    ]
+  },
+  "scales": {
+    "color": {
+      "type": "sequential",
+      "scheme": "Blues",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "extent"
+      }
+    }
+  },
+  "layers": [
+    {
+      "id": "states",
+      "mark": {
+        "type": "geoshape",
+        "generator": {
+          "type": "path"
+        }
+      },
+      "encoding": {
+        "fill": {
+          "field": "value",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        },
+        "strokeWidth": {
+          "value": 0.5
+        }
+      }
+    }
+  ]
+}

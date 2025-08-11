@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bollinger Bands</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .axis path,
+  .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+  .axis text { font-size: 12px; }
+</style>
+</head>
+<body>
+<svg id="bollinger-bands" width="800" height="400"></svg>
+<script>
+// Data (inline)
+const data = [
+  {"date":"2022-12-31T18:30:00.000Z","price":125.5,"upperBand":135.2,"lowerBand":115.8,"movingAverage":125.5},
+  {"date":"2023-01-01T18:30:00.000Z","price":127.8,"upperBand":137.45,"lowerBand":118.15,"movingAverage":127.8},
+  {"date":"2023-01-02T18:30:00.000Z","price":129.45,"upperBand":139.1,"lowerBand":119.8,"movingAverage":129.45},
+  {"date":"2023-01-03T18:30:00.000Z","price":132.15,"upperBand":141.8,"lowerBand":122.5,"movingAverage":132.15},
+  {"date":"2023-01-04T18:30:00.000Z","price":133.7,"upperBand":143.35,"lowerBand":124.05,"movingAverage":133.7},
+  {"date":"2023-01-05T18:30:00.000Z","price":134.25,"upperBand":143.9,"lowerBand":124.6,"movingAverage":134.25},
+  {"date":"2023-01-06T18:30:00.000Z","price":135.9,"upperBand":145.55,"lowerBand":126.25,"movingAverage":135.9},
+  {"date":"2023-01-07T18:30:00.000Z","price":137.45,"upperBand":147.1,"lowerBand":127.8,"movingAverage":137.45},
+  {"date":"2023-01-08T18:30:00.000Z","price":138.6,"upperBand":148.25,"lowerBand":128.95,"movingAverage":138.6},
+  {"date":"2023-01-09T18:30:00.000Z","price":139.15,"upperBand":148.8,"lowerBand":129.5,"movingAverage":139.15}
+];
+
+// Parse dates
+const parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ");
+data.forEach(d => {
+  d.date = new Date(d.date); // already ISO format, new Date works
+});
+
+// Dimensions and margins
+const width = 800;
+const height = 400;
+const margin = {top: 50, right: 50, bottom: 50, left: 50};
+
+// Scales
+const xScale = d3.scaleTime()
+    .domain(d3.extent(data, d => d.date))
+    .range([margin.left, width - margin.right]);
+
+const yScale = d3.scaleLinear()
+    .domain([
+      d3.min(data, d => d.lowerBand),
+      d3.max(data, d => d.upperBand)
+    ])
+    .nice()
+    .range([height - margin.bottom, margin.top]);
+
+// Create SVG
+const svg = d3.select("#bollinger-bands");
+
+// Title
+svg.append("text")
+   .attr("x", width / 2)
+   .attr("y", margin.top / 2)
+   .attr("text-anchor", "middle")
+   .attr("font-size", "20px")
+   .text("Bollinger Bands");
+
+// Axis groups
+svg.append("g")
+   .attr("class", "x axis")
+   .attr("transform", `translate(0,${height - margin.bottom})`)
+   .call(d3.axisBottom(xScale));
+
+svg.append("g")
+   .attr("class", "y axis")
+   .attr("transform", `translate(${margin.left},0)`)
+   .call(d3.axisLeft(yScale));
+
+// Area for bands
+const area = d3.area()
+    .x(d => xScale(d.date))
+    .y0(d => yScale(d.lowerBand))
+    .y1(d => yScale(d.upperBand))
+    .curve(d3.curveMonotoneX);
+
+svg.append("path")
+    .datum(data)
+    .attr("fill", "lightblue")
+    .attr("opacity", 0.3)
+    .attr("d", area);
+
+// Price line
+const line = d3.line()
+    .x(d => xScale(d.date))
+    .y(d => yScale(d.price))
+    .curve(d3.curveMonotoneX);
+
+svg.append("path")
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 2)
+    .attr("d", line);
+
+// Axes labels
+svg.append("text")
+   .attr("x", width / 2)
+   .attr("y", height - 10)
+   .attr("text-anchor", "middle")
+   .attr("font-size", "12px")
+   .text("Date");
+
+svg.append("text")
+   .attr("transform", "rotate(-90)")
+   .attr("y", 15)
+   .attr("x", -height / 2)
+   .attr("text-anchor", "middle")
+   .attr("font-size", "12px")
+   .text("Price");
+</script>
+</body>
+</html>

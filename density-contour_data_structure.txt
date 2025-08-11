@@ -1,0 +1,18 @@
+DATA
+│
+└── main (inline data array): [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   x: number (quantitative) – horizontal coordinate │
+      │   y: number (quantitative) – vertical coordinate   │
+      │   density: number (quantitative) – estimated density value at (x, y) │
+      └───────────────────────────────────────────────────────┘
+      │
+      └── (10 objects total, each with the three fields above) 
+
+Explanation of fields:
+- x – numeric (quantitative) field representing the horizontal position of a point in the plot.
+- y – numeric (quantitative) field representing the vertical position of a point.
+- density – numeric (quantitative) field giving the density estimate for that (x, y) location; used for coloring the contour paths.
+
+The data does not contain nested arrays (no nodes/links). It is a flat array of point objects that will be transformed by the “contour” transform to generate contour paths. The resulting contour objects will have a `path` string and a `density` value used for the `fill` encoding.

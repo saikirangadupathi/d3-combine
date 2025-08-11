@@ -1,0 +1,180 @@
+{
+  "id": "bubble-chart",
+  "title": "Bubble Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "x": 23.5,
+          "y": 67.2,
+          "size": 35.8,
+          "category": "Group 1",
+          "id": "point-0"
+        },
+        {
+          "x": 45.8,
+          "y": 34.9,
+          "size": 28.4,
+          "category": "Group 2",
+          "id": "point-1"
+        },
+        {
+          "x": 67.1,
+          "y": 89.4,
+          "size": 42.1,
+          "category": "Group 3",
+          "id": "point-2"
+        },
+        {
+          "x": 12.9,
+          "y": 45.6,
+          "size": 19.7,
+          "category": "Group 1",
+          "id": "point-3"
+        },
+        {
+          "x": 78.3,
+          "y": 23.1,
+          "size": 51.3,
+          "category": "Group 4",
+          "id": "point-4"
+        },
+        {
+          "x": 34.7,
+          "y": 78.9,
+          "size": 33.6,
+          "category": "Group 2",
+          "id": "point-5"
+        },
+        {
+          "x": 56.2,
+          "y": 56.7,
+          "size": 38.9,
+          "category": "Group 5",
+          "id": "point-6"
+        },
+        {
+          "x": 89.6,
+          "y": 12.4,
+          "size": 24.2,
+          "category": "Group 3",
+          "id": "point-7"
+        },
+        {
+          "x": 21.4,
+          "y": 91.8,
+          "size": 46.5,
+          "category": "Group 1",
+          "id": "point-8"
+        },
+        {
+          "x": 65.9,
+          "y": 38.2,
+          "size": 31.7,
+          "category": "Group 4",
+          "id": "point-9"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      },
+      {
+        "name": "size",
+        "type": "quantitative",
+        "accessor": "size"
+      },
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "x",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        550
+      ],
+      "nice": true
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "y",
+        "method": "extent"
+      },
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    },
+    "size": {
+      "type": "sqrt",
+      "domainFrom": {
+        "data": "main",
+        "field": "size",
+        "method": "extent"
+      },
+      "range": [
+        3,
+        20
+      ]
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "bubbles",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "x": {
+          "field": "x",
+          "scale": "x"
+        },
+        "y": {
+          "field": "y",
+          "scale": "y"
+        },
+        "size": {
+          "field": "size",
+          "scale": "size"
+        },
+        "color": {
+          "field": "category",
+          "scale": "color"
+        },
+        "opacity": {
+          "value": 0.7
+        }
+      }
+    }
+  ]
+}

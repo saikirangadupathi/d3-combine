@@ -1,0 +1,22 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │ date: temporal (ISO‑8601 string) – the timestamp for each record   │
+      │ price: quantitative (number) – the actual price value for the day │
+      │ upperBand: quantitative (number) – upper Bollinger Band value │
+      │ lowerBand: quantitative (number) – Lower Bollinger Band value │
+      │ movingAverage: quantitative (number) – moving‑average (center) of │
+      │                the Bollinger band (same as price in this sample) │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- date – temporal identifier used for the x‑axis (time scale).  
+- price – quantitative measurement plotted as a line (price‑line layer).  
+- upperBand – quantitative value defining the upper edge of the Bollinger‑band area.  
+- lowerBand – quantitative value defining the lower edge of the Bollinger‑band area.  
+- movingAverage – quantitative value representing the central moving average; in this dataset it matches the price but can differ when the transform computes it.
+
+The data array is flat; there are no nested arrays such as nodes or links. The chart consumes this array directly for the x‑scale (date) and y‑scale (price, upperBand, lowerBand, movingAverage).

@@ -1,0 +1,23 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   category: string (nominal) – the quarter or      │
+      │            categorical identifier for each group   │
+      │            on the x‑axis (e.g., "Q1", "Q2", …)      │
+      │   series:   string (nominal) – the name of the      │
+      │            sub‑group (product) that will be        │
+      │            distinguished by color (e.g., "Product A")│
+      │   value:    number (quantitative) – the numeric   │
+      │            measurement to be plotted as the     │
+      │            bar height (e.g., sales, count)      │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- category – categorical (nominal) field used as the primary grouping on the x‑axis.
+- series   – categorical (nominal) field used to split each category into separate bars (grouped) and to map colors.
+- value   – quantitative field that determines the height of each bar on the y‑axis. 
+
+The data is a flat array (no nested nodes or links). The array is referenced as “main” in the scale definitions.

@@ -1,0 +1,220 @@
+{
+  "id": "candlestick-chart",
+  "title": "Candlestick Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "date": "2022-12-31T18:30:00.000Z",
+          "open": 125.5,
+          "high": 128.75,
+          "low": 123.25,
+          "close": 127.8,
+          "volume": 850000
+        },
+        {
+          "date": "2023-01-01T18:30:00.000Z",
+          "open": 127.8,
+          "high": 131.2,
+          "low": 126.9,
+          "close": 129.45,
+          "volume": 920000
+        },
+        {
+          "date": "2023-01-02T18:30:00.000Z",
+          "open": 129.45,
+          "high": 132.6,
+          "low": 128.1,
+          "close": 130.25,
+          "volume": 780000
+        },
+        {
+          "date": "2023-01-03T18:30:00.000Z",
+          "open": 130.25,
+          "high": 133.8,
+          "low": 129.5,
+          "close": 132.15,
+          "volume": 1100000
+        },
+        {
+          "date": "2023-01-04T18:30:00.000Z",
+          "open": 132.15,
+          "high": 134.9,
+          "low": 131.2,
+          "close": 133.7,
+          "volume": 950000
+        },
+        {
+          "date": "2023-01-05T18:30:00.000Z",
+          "open": 133.7,
+          "high": 135.4,
+          "low": 132.8,
+          "close": 134.25,
+          "volume": 820000
+        },
+        {
+          "date": "2023-01-06T18:30:00.000Z",
+          "open": 134.25,
+          "high": 136.75,
+          "low": 133.6,
+          "close": 135.9,
+          "volume": 1050000
+        },
+        {
+          "date": "2023-01-07T18:30:00.000Z",
+          "open": 135.9,
+          "high": 138.2,
+          "low": 134.7,
+          "close": 137.45,
+          "volume": 890000
+        },
+        {
+          "date": "2023-01-08T18:30:00.000Z",
+          "open": 137.45,
+          "high": 139.8,
+          "low": 136.3,
+          "close": 138.6,
+          "volume": 970000
+        },
+        {
+          "date": "2023-01-09T18:30:00.000Z",
+          "open": 138.6,
+          "high": 140.25,
+          "low": 137.4,
+          "close": 139.15,
+          "volume": 1200000
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "open",
+        "type": "quantitative",
+        "accessor": "open"
+      },
+      {
+        "name": "high",
+        "type": "quantitative",
+        "accessor": "high"
+      },
+      {
+        "name": "low",
+        "type": "quantitative",
+        "accessor": "low"
+      },
+      {
+        "name": "close",
+        "type": "quantitative",
+        "accessor": "close"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "values"
+      },
+      "range": [
+        50,
+        750
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    }
+  },
+  "layers": [
+    {
+      "id": "wicks",
+      "mark": {
+        "type": "line"
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "low",
+          "scale": "y"
+        },
+        "x2": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y2": {
+          "field": "high",
+          "scale": "y"
+        },
+        "stroke": {
+          "value": "black"
+        }
+      }
+    },
+    {
+      "id": "bodies",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "close",
+          "scale": "y"
+        },
+        "width": {
+          "value": 8
+        },
+        "height": {
+          "field": "open",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "close",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "fill": {
+          "field": "close",
+          "transform": [
+            {
+              "type": "compare",
+              "params": {
+                "field": "open",
+                "trueValue": "green",
+                "falseValue": "red"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

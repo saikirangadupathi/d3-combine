@@ -1,0 +1,28 @@
+DATA
+│
+└── main (or the default dataset name): [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     │
+      │   group   : string (nominal) – name of the group/category, e.g.      │
+      │               “Group A”, “Group B”, “Group C”. Used as the x‑axis key.│
+      │   q1      : number (quantitative) – first quartile (25th percentile)│
+      │               of the distribution for the group.                     │
+      │   median  : number (quantitative) – median (50th percentile) of │
+      │               the distribution for the group.                     │
+      │   q3      : number (quantitative) – third quartile (75th percentile)│
+      │               of the distribution for the group.                     │
+      │   min     : number (quantitative) – minimum (lower whisker) value. │
+      │   max     : number (quantitative) – maximum (upper whisker) value.│
+      │ }                                                                     │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- group – categorical identifier that determines the position of each box on the x‑axis.
+- q1 – lower edge of the box (bottom of the inter‑quartile range).
+- median – line drawn inside the box to show the median value.
+- q3 – upper edge of the box (top of the inter‑quartile range).
+- min – lower whisker (minimum value) for the box‑plot.
+- max – upper whisker (maximum value) for the box‑plot.
+
+The data is a flat array; there are no nested arrays such as nodes or links. The chart will use the `group` field for the band (x) scale and the quantitative fields (`min`, `q1`, `median`, `q3`, `max`) for the linear (y) scale to draw the box‑plot rectangles.

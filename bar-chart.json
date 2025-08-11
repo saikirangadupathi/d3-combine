@@ -1,0 +1,113 @@
+{
+  "id": "bar-chart",
+  "title": "Bar Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "A",
+          "value": 45.2,
+          "count": 234
+        },
+        {
+          "category": "B",
+          "value": 67.8,
+          "count": 456
+        },
+        {
+          "category": "C",
+          "value": 23.1,
+          "count": 123
+        },
+        {
+          "category": "D",
+          "value": 89.4,
+          "count": 789
+        },
+        {
+          "category": "E",
+          "value": 34.7,
+          "count": 345
+        },
+        {
+          "category": "F",
+          "value": 56.3,
+          "count": 567
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "category",
+        "method": "values"
+      },
+      "range": [
+        50,
+        750
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "max"
+      },
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "category",
+          "scale": "x"
+        },
+        "y": {
+          "field": "value",
+          "scale": "y"
+        },
+        "color": {
+          "field": "category",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

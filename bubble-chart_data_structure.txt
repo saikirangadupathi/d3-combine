@@ -1,0 +1,23 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   id: string – unique identifier for each point,   │
+      │   x: number (quantitative) – horizontal coordinate, │
+      │   y: number (quantitative) – vertical coordinate, │
+      │   size: number (quantitative) – value that determines │
+      │        bubble radius (scaled with sqrt),        │
+      │   category: string (nominal) – group label used │
+      │        for color encoding (e.g., “Group 1”).   │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- id – a unique string identifier for each data point (e.g., “point‑0”).  
+- x – quantitative numeric value plotted on the horizontal axis.  
+- y – numeric value plotted on the vertical axis.  
+- size – numeric value that determines the bubble’s size; scaled using a square‑root scale.  
+- category – nominal (categorical) label that determines the bubble’s color via the “color” ordinal scale.
+
+The data is a flat array; there are no nested arrays such as nodes or links.

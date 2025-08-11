@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bubble Map</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 20px; }
+  .title { font-size: 24px; text-align: center; margin-bottom: 10px; }
+  .tooltip {
+    position: absolute;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    pointer-events: none;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="title">Bubble Map</div>
+<svg id="bubble-map" width="800" height="500"></svg>
+<div class="tooltip" style="display:none;"></div>
+<script>
+  // Data
+  const data = [
+    {"city":"New York","lat":40.7128,"lon":-74.006,"population":8400000},
+    {"city":"Los Angeles","lat":34.0522,"lon":-118.2437,"population":3900000},
+    {"city":"Chicago","lat":41.8781,"lon":-87.6298,"population":2700000},
+    {"city":"Houston","lat":29.7604,"lon":-95.3698,"population":2300000},
+    {"city":"Phoenix","lat":33.4484,"lon":-112.074,"population":1600000},
+    {"city":"Philadelphia","lat":39.9526,"lon":-75.1652,"population":1500000}
+  ];
+
+  const width = 800, height = 500;
+
+  const svg = d3.select("#bubble-map")
+                .attr("width", width)
+                .attr("height", height);
+
+  // Projection
+  const proj = d3.geoAlbersUsa()
+                 .scale(1000)
+                 .translate([width/2, height/2]);
+
+  // Scales
+  const sizeScale = d3.scaleSqrt()
+                      .domain(d3.extent(data, d=>d.population))
+                      .range([5,40]);
+
+  const colorScale = d3.scaleSequential()
+                       .domain(d3.extent(data, d=>d.population))
+                       .interpolator(d3.interpolateBlues);
+
+  // Tooltip
+  const tooltip = d3.select(".tooltip");
+
+  // Draw bubbles
+  svg.selectAll("circle")
+     .data(data)
+     .enter()
+     .append("circle")
+     .attr("cx", d => {
+        const projCoord = proj([d.lon, d.lat]);
+        return projCoord[0];
+     })
+     .attr("cy", d => {
+        const projCoord = proj([d.lon, d.lat]);
+        return projCoord[1];
+     })
+     .attr("r", d => sizeScale(d.population))
+     .attr("fill", d => colorScale(d.population))
+     .attr("opacity", 0.7)
+     .attr("stroke", "white")
+     .on("mouseover", function(event,d){
+        tooltip.style("display","block")
+               .html(`<strong>${d.city}</strong><br/>Population: ${d.population.toLocaleString()}`)
+               .style("left",(event.pageX+10)+"px")
+               .style("top",(event.pageY-28)+"px");
+     })
+     .on("mousemove", function(event){
+        tooltip.style("left",(event.pageX+10)+"px")
+               .style("top",(event.pageY-28)+"px");
+     })
+     .on("mouseout",()=>tooltip.style("display","none"));
+
+  // Optional: Add a legend for size (simple)
+  const legend = svg.append("g")
+                    .attr("transform", `translate(${width-150},${height-120})`);
+
+  const legendData = [5000000, 2000000, 500000];
+
+  legend.selectAll("circle")
+        .data(legendData)
+        .enter()
+        .append("circle")
+        .attr("cy", d => -sizeScale(d))
+        .attr("r", d => sizeScale(d))
+        .attr("fill", "none")
+        .attr("stroke", "#555");
+
+  legend.selectAll("text")
+        .data(legendData)
+        .enter()
+        .append("text")
+        .attr("x", 30)
+        .attr("y", d => -2*sizeScale(d))
+        .attr("dy", "0.35em")
+        .text(d => d3.format(",")(d));
+
+  // Title (already in HTML)
+</script>
+</body>
+</html>

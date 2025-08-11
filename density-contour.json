@@ -1,0 +1,146 @@
+{
+  "id": "density-contour",
+  "title": "Density Contour Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "x": 23.5,
+          "y": 67.2,
+          "density": 0.045
+        },
+        {
+          "x": 45.8,
+          "y": 34.9,
+          "density": 0.089
+        },
+        {
+          "x": 67.1,
+          "y": 89.4,
+          "density": 0.067
+        },
+        {
+          "x": 12.9,
+          "y": 45.6,
+          "density": 0.078
+        },
+        {
+          "x": 78.3,
+          "y": 23.1,
+          "density": 0.092
+        },
+        {
+          "x": 34.7,
+          "y": 78.9,
+          "density": 0.054
+        },
+        {
+          "x": 56.2,
+          "y": 56.7,
+          "density": 0.063
+        },
+        {
+          "x": 89.6,
+          "y": 12.4,
+          "density": 0.087
+        },
+        {
+          "x": 21.4,
+          "y": 91.8,
+          "density": 0.041
+        },
+        {
+          "x": 65.9,
+          "y": 38.2,
+          "density": 0.076
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "contour",
+        "params": {
+          "x": "x",
+          "y": "y",
+          "bandwidth": 10,
+          "thresholds": 10
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      },
+      {
+        "name": "density",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "x",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        550
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "y",
+        "method": "extent"
+      },
+      "range": [
+        350,
+        50
+      ]
+    },
+    "color": {
+      "type": "sequential",
+      "scheme": "Blues"
+    }
+  },
+  "layers": [
+    {
+      "id": "contours",
+      "mark": {
+        "type": "path"
+      },
+      "encoding": {
+        "d": {
+          "field": "path"
+        },
+        "fill": {
+          "field": "density",
+          "scale": "color"
+        },
+        "stroke": {
+          "value": "white"
+        },
+        "strokeWidth": {
+          "value": 0.5
+        }
+      }
+    }
+  ]
+}

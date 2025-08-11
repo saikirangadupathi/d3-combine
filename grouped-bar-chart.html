@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grouped Bar Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+  .axis text { font-size: 12px; }
+  .title { font-size: 18px; text-anchor: middle; }
+</style>
+</head>
+<body>
+<svg id="grouped-bar-chart" width="800" height="400"></svg>
+<script>
+// Configuration
+const config = {
+  "space": {"width":800,"height":400},
+  "margin": {top: 50, right: 50, bottom: 50, left: 50},
+  "data": [
+    {"category":"Q1","series":"Product A","value":20},
+    {"category":"Q1","series":"Product B","value":30},
+    {"category":"Q2","series":"Product A","value":35},
+    {"category":"Q2","series":"Product B","value":25},
+    {"category":"Q3","series":"Product A","value":15},
+    {"category":"Q3","series":"Product B","value":40},
+    {"category":"Q4","series":"Product A","value":30},
+    {"category":"Q4","series":"Product B","value":20}
+  ],
+  "colorScheme": d3.schemeSet2
+};
+
+// Set up dimensions
+const {width, height} = config.space;
+const {top, right, bottom, left} = config.margin;
+const innerWidth = width - left - right;
+const innerHeight = height - top - bottom;
+
+// Create SVG container
+const svg = d3.select("#grouped-bar-chart")
+  .attr("width", width)
+  .attr("height", height);
+
+const chart = svg.append("g")
+  .attr("transform", `translate(${left},${top})`);
+
+// Extract categories and series
+const categories = Array.from(new Set(config.data.map(d => d.category)));
+const series = Array.from(new Set(config.data.map(d => d.series)));
+
+// Scales
+const x0 = d3.scaleBand()
+  .domain(categories)
+  .range([0, innerWidth])
+  .padding(0.1);
+
+const x1 = d3.scaleBand()
+  .domain(series)
+  .range([0, x0.bandwidth()])
+  .padding(0.05);
+
+const y = d3.scaleLinear()
+  .domain([0, d3.max(config.data, d => d.value)])
+  .nice()
+  .range([innerHeight, 0]);
+
+const color = d3.scaleOrdinal()
+  .domain(series)
+  .range(config.colorScheme);
+
+// Axes
+chart.append("g")
+  .attr("class", "axis x-axis")
+  .attr("transform", `translate(0,${innerHeight})`)
+  .call(d3.axisBottom(x0));
+
+chart.append("g")
+  .attr("class", "axis y-axis")
+  .call(d3.axisLeft(y));
+
+// Title
+svg.append("text")
+  .attr("class", "title")
+  .attr("x", width/2)
+  .attr("y", top/2)
+  .text("Grouped Bar Chart");
+
+// Create groups for each category
+const groups = chart.selectAll("g.category")
+  .data(data => {
+    const nested = d3.group(config.data, d => d.category);
+    return Array.from(nested, ([key, values]) => ({key, values}));
+  })
+  .enter()
+  .append("g")
+  .attr("class", "category")
+  .attr("transform", d => `translate(${x0(d.key)},0)`);
+
+// Add rectangles
+groups.selectAll("rect")
+  .data(d => d.values)
+  .enter()
+  .append("rect")
+  .attr("x", d => x1(d.series))
+  .attr("y", d => y(d.value))
+  .attr("width", x1.bandwidth())
+  .attr("height", d => innerHeight - y(d.value))
+  .attr("fill", d => color(d.series));
+
+// Legend
+const legend = svg.append("g")
+  .attr("transform", `translate(${width - right + 10},${top})`);
+
+series.forEach((s,i) => {
+  const legendRow = legend.append("g")
+    .attr("transform", `translate(0,${i*20})`);
+  legendRow.append("rect")
+    .attr("width", 15)
+    .attr("height", 15)
+    .attr("fill", color(s));
+  legendRow.append("text")
+    .attr("x", 20)
+    .attr("y", 12)
+    .text(s);
+});
+</script>
+</body>
+</html>

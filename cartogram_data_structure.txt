@@ -1,0 +1,29 @@
+DATA
+│
+└── data: [                                   <-- array of data objects (each row represents a U.S. state)
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     │
+      │   state:   string (nominal) – name of the state, used as a categorical │
+      │            identifier for each geographic region.                │
+      │   value:   number (quantitative) – numeric metric that drives   │
+      │            the cartogram distortion (e.g., population, sales).│
+      │   density: number (quantitative) – secondary quantitative metric│
+      │            (e.g., people per square mile) that could be used│
+      │            for additional analysis or tooltip.│
+      │   growth:  number (quantitative) – growth rate (fraction)│
+      │            indicating change over time; can be positive│
+      │            or negative.│
+      │   geometry: object (geojson) – geographic shape data for│
+      │            the state (GeoJSON Feature or Geometry).│
+      │ }                                                                     │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- state: categorical identifier, used to match each record to a geographic region.
+- value: primary quantitative field; drives the size/shape of the cartogram.
+- density: secondary quantitative field; optional for color or tooltip.
+- growth: quantitative change metric; can be used for color or tooltip.
+- geometry: nested GeoJSON object that defines the shape of the state; required for the geoshape mark. 
+
+No nested arrays (e.g., nodes/links) are present; each entry is a flat object with a nested GeoJSON object in the `geometry` field.

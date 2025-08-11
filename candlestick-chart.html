@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Candlestick Chart</title>
+<style>
+  body { font-family: sans-serif; }
+  .axis path, .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+  .axis text { font-size: 12px; }
+  .title { text-align: center; margin-top: 20px; }
+</style>
+</head>
+<body>
+<h2 class="title">Candlestick Chart</h2>
+<svg id="candlestick-chart" width="800" height="400"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// Data (inline)
+const rawData = [
+  {"date":"2022-12-31T18:30:00.000Z","open":125.5,"high":128.75,"low":123.25,"close":127.8,"volume":850000},
+  {"date":"2023-01-01T18:30:00.000Z","open":127.8,"high":131.2,"low":126.9,"close":129.45,"volume":920000},
+  {"date":"2023-01-02T18:30:00.000Z","open":129.45,"high":132.6,"low":128.1,"close":130.25,"volume":780000},
+  {"date":"2023-01-03T18:30:00.000Z","open":130.25,"high":133.8,"low":129.5,"close":132.15,"volume":1100000},
+  {"date":"2023-01-04T18:30:00.000Z","open":132.15,"high":134.9,"low":131.2,"close":133.7,"volume":950000},
+  {"date":"2023-01-05T18:30:00.000Z","open":133.7,"high":135.4,"low":132.8,"close":134.25,"volume":820000},
+  {"date":"2023-01-06T18:30:00.000Z","open":134.25,"high":136.75,"low":133.6,"close":135.9,"volume":1050000},
+  {"date":"2023-01-07T18:30:00.000Z","open":135.9,"high":138.2,"low":134.7,"close":137.45,"volume":890000},
+  {"date":"2023-01-08T18:30:00.000Z","open":137.45,"high":139.8,"low":136.3,"close":138.6,"volume":970000},
+  {"date":"2023-01-09T18:30:00.000Z","open":138.6,"high":140.25,"low":137.4,"close":139.15,"volume":1200000}
+];
+
+// Parse dates
+const parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
+const data = rawData.map(d => ({
+  date: parseDate(d.date),
+  open: d.open,
+  high: d.high,
+  low: d.low,
+  close: d.close,
+  volume: d.volume
+}));
+
+// SVG dimensions
+const width = 800;
+const height = 400;
+const margin = {top: 20, right: 20, bottom: 50, left: 50};
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+// Create SVG
+const svg = d3.select("#candlestick-chart")
+  .attr("viewBox", `0 0 ${width} ${height}`);
+
+const chartG = svg.append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// X scale (band)
+const x = d3.scaleBand()
+  .domain(data.map(d => d.date))
+  .range([0, innerWidth])
+  .padding(0.1);
+
+// Y scale (linear) - nice domain
+const y = d3.scaleLinear()
+  .domain([
+    d3.min(data, d => d.low),
+    d3.max(data, d => d.high)
+  ])
+  .range([innerHeight, 0])
+  .nice();
+
+// X Axis
+const xAxis = d3.axisBottom(x)
+  .tickFormat(d3.timeFormat("%b %d"))
+  .tickSizeOuter(0);
+
+chartG.append("g")
+  .attr("class", "axis x-axis")
+  .attr("transform", `translate(0,${innerHeight})`)
+  .call(xAxis);
+
+// Y Axis
+const yAxis = d3.axisLeft(y).ticks(6).tickSizeOuter(0);
+
+chartG.append("g")
+  .attr("class", "axis y-axis")
+  .call(yAxis);
+
+// Wicks (high-low lines)
+chartG.selectAll(".wick")
+  .data(data)
+  .enter()
+  .append("line")
+  .attr("class", "wick")
+  .attr("x1", d => x(d.date) + x.bandwidth() / 2)
+  .attr("x2", d => x(d.date) + x.bandwidth() / 2)
+  .attr("y1", d => y(d.low))
+  .attr("y2", d => y(d.high))
+  .attr("stroke", "black");
+
+// Bodies (rectangles)
+const rectWidth = 8; // constant as per config
+
+chartG.selectAll(".candle")
+  .data(data)
+  .enter()
+  .append("rect")
+  .attr("class", "candle")
+  .attr("x", d => x(d.date) + (x.bandwidth() - rectWidth) / 2)
+  .attr("y", d => {
+    // top Y is the larger (i.e., smaller pixel) of open and close
+    return y(Math.max(d.open, d.close));
+  })
+  .attr("width", rectWidth)
+  .attr("height", d => {
+    const h = Math.abs(y(d.open) - y(d.close));
+    // Minimum height to ensure visibility
+    return Math.max(h, 0.5);
+  })
+  .attr("fill", d => d.close >= d.open ? "green" : "red");
+
+// Title (already added as <h2> above)
+
+// End script
+</script>
+</body>
+</html>

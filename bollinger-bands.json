@@ -1,0 +1,197 @@
+{
+  "id": "bollinger-bands",
+  "title": "Bollinger Bands",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "date": "2022-12-31T18:30:00.000Z",
+          "price": 125.5,
+          "upperBand": 135.2,
+          "lowerBand": 115.8,
+          "movingAverage": 125.5
+        },
+        {
+          "date": "2023-01-01T18:30:00.000Z",
+          "price": 127.8,
+          "upperBand": 137.45,
+          "lowerBand": 118.15,
+          "movingAverage": 127.8
+        },
+        {
+          "date": "2023-01-02T18:30:00.000Z",
+          "price": 129.45,
+          "upperBand": 139.1,
+          "lowerBand": 119.8,
+          "movingAverage": 129.45
+        },
+        {
+          "date": "2023-01-03T18:30:00.000Z",
+          "price": 132.15,
+          "upperBand": 141.8,
+          "lowerBand": 122.5,
+          "movingAverage": 132.15
+        },
+        {
+          "date": "2023-01-04T18:30:00.000Z",
+          "price": 133.7,
+          "upperBand": 143.35,
+          "lowerBand": 124.05,
+          "movingAverage": 133.7
+        },
+        {
+          "date": "2023-01-05T18:30:00.000Z",
+          "price": 134.25,
+          "upperBand": 143.9,
+          "lowerBand": 124.6,
+          "movingAverage": 134.25
+        },
+        {
+          "date": "2023-01-06T18:30:00.000Z",
+          "price": 135.9,
+          "upperBand": 145.55,
+          "lowerBand": 126.25,
+          "movingAverage": 135.9
+        },
+        {
+          "date": "2023-01-07T18:30:00.000Z",
+          "price": 137.45,
+          "upperBand": 147.1,
+          "lowerBand": 127.8,
+          "movingAverage": 137.45
+        },
+        {
+          "date": "2023-01-08T18:30:00.000Z",
+          "price": 138.6,
+          "upperBand": 148.25,
+          "lowerBand": 128.95,
+          "movingAverage": 138.6
+        },
+        {
+          "date": "2023-01-09T18:30:00.000Z",
+          "price": 139.15,
+          "upperBand": 148.8,
+          "lowerBand": 129.5,
+          "movingAverage": 139.15
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "bollinger",
+        "params": {
+          "field": "price",
+          "period": 20,
+          "multiplier": 2
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "price",
+        "type": "quantitative",
+        "accessor": "price"
+      },
+      {
+        "name": "upperBand",
+        "type": "quantitative",
+        "accessor": "upperBand"
+      },
+      {
+        "name": "lowerBand",
+        "type": "quantitative",
+        "accessor": "lowerBand"
+      },
+      {
+        "name": "movingAverage",
+        "type": "quantitative",
+        "accessor": "movingAverage"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    }
+  },
+  "layers": [
+    {
+      "id": "bands",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "area"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y0": {
+          "field": "lowerBand",
+          "scale": "y"
+        },
+        "y1": {
+          "field": "upperBand",
+          "scale": "y"
+        },
+        "fill": {
+          "value": "lightblue"
+        },
+        "opacity": {
+          "value": 0.3
+        }
+      }
+    },
+    {
+      "id": "price-line",
+      "mark": {
+        "type": "line",
+        "generator": {
+          "type": "line"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "price",
+          "scale": "y"
+        },
+        "stroke": {
+          "value": "steelblue"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+DATA
+│
+└── data: [                                   <-- array of link objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     │
+      │   source: integer (quantitative) – index of the      │
+      │           source node (identifier for the source     │
+      │           entity in the chord diagram)            │
+      │   target: integer (quantitative) – index of the      │
+      │           target node (identifier for the target   │
+      │           entity)                               │
+      │   value:  number (quantitative) – magnitude of   │
+      │           the flow/connection between the      │
+      │           source and target (used to size the   │
+      │           chord width)                     │
+      │ }                                                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- source: numeric identifier for the originating node; used by the chord transform to position the start of a chord.
+- target: numeric identifier for the destination node; paired with source to define a directed link.
+- value: numeric weight of the link; determines the visual thickness of the chord and can be used for opacity or other quantitative encodings.
+
+The data consists solely of a flat array of link objects; there are no nested arrays such as separate “nodes” and “links” collections. The transform of type “chord” will internally compute the necessary node positions from these source‑target pairs.

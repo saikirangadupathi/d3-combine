@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Area Chart</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+</style>
+</head>
+<body>
+<svg id="area-chart" width="800" height="400"></svg>
+<script>
+// Inline data
+const data = [
+  {"date":"2019-12-31T18:30:00.000Z","value":45.2,"category":"Series 1"},
+  {"date":"2020-01-01T18:30:00.000Z","value":52.8,"category":"Series 1"},
+  {"date":"2020-01-02T18:30:00.000Z","value":48.1,"category":"Series 1"},
+  {"date":"2020-01-03T18:30:00.000Z","value":61.5,"category":"Series 1"},
+  {"date":"2020-01-04T18:30:00.000Z","value":58.9,"category":"Series 1"},
+  {"date":"2020-01-05T18:30:00.000Z","value":67.3,"category":"Series 1"},
+  {"date":"2020-01-06T18:30:00.000Z","value":72.1,"category":"Series 1"},
+  {"date":"2020-01-07T18:30:00.000Z","value":69.8,"category":"Series 1"},
+  {"date":"2020-01-08T18:30:00.000Z","value":75.4,"category":"Series 1"},
+  {"date":"2020-01-09T18:30:00.000Z","value":78.2,"category":"Series 1"}
+];
+
+// Parse dates
+data.forEach(d => d.date = new Date(d.date));
+
+// SVG container
+const svg = d3.select('#area-chart');
+
+// Scales
+const xScale = d3.scaleTime()
+  .domain(d3.extent(data, d => d.date))
+  .range([50, 750]);
+
+const yScale = d3.scaleLinear()
+  .domain([0, d3.max(data, d => d.value)])
+  .nice()
+  .range([350, 50]);
+
+// Axis generators
+const xAxis = d3.axisBottom(xScale).ticks(6);
+const yAxis = d3.axisLeft(yScale).ticks(6);
+
+// Render axes
+svg.append('g')
+  .attr('class', 'x axis')
+  .attr('transform', 'translate(0,350)')
+  .call(xAxis);
+
+svg.append('g')
+  .attr('class', 'y axis')
+  .attr('transform', 'translate(50,0)')
+  .call(yAxis);
+
+// Area generator
+const area = d3.area()
+  .curve(d3.curveMonotoneX)
+  .x(d => xScale(d.date))
+  .y0(yScale(0))
+  .y1(d => yScale(d.value));
+
+// Draw area
+svg.append('path')
+  .datum(data)
+  .attr('fill', 'steelblue')
+  .attr('opacity', 0.7)
+  .attr('d', area);
+
+// Title
+svg.append('text')
+  .attr('x', 400)
+  .attr('y', 30)
+  .attr('text-anchor', 'middle')
+  .style('font-size', '20px')
+  .text('Area Chart');
+</script>
+</body>
+</html>

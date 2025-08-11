@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bubble Chart</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    stroke: #777;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<h2>Bubble Chart</h2>
+<div id="bubble-chart"></div>
+
+<script>
+// Inline data as per configuration
+const data = [
+  {"x":23.5,"y":67.2,"size":35.8,"category":"Group 1","id":"point-0"},
+  {"x":45.8,"y":34.9,"size":28.4,"category":"Group 2","id":"point-1"},
+  {"x":67.1,"y":89.4,"size":42.1,"category":"Group 3","id":"point-2"},
+  {"x":12.9,"y":45.6,"size":19.7,"category":"Group 1","id":"point-3"},
+  {"x":78.3,"y":23.1,"size":51.3,"category":"Group 4","id":"point-4"},
+  {"x":34.7,"y":78.9,"size":33.6,"category":"Group 2","id":"point-5"},
+  {"x":56.2,"y":56.7,"size":38.9,"category":"Group 5","id":"point-6"},
+  {"x":89.6,"y":12.4,"size":24.2,"category":"Group 3","id":"point-7"},
+  {"x":21.4,"y":91.8,"size":46.5,"category":"Group 1","id":"point-8"},
+  {"x":65.9,"y":38.2,"size":31.7,"category":"Group 4","id":"point-9"}
+];
+
+// SVG dimensions from config
+const width = 600;
+const height = 400;
+
+// Create SVG container
+const svg = d3.select('#bubble-chart')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Scales
+const xScale = d3.scaleLinear()
+  .domain(d3.extent(data, d => d.x)).nice()
+  .range([50, 550]);
+
+const yScale = d3.scaleLinear()
+  .domain(d3.extent(data, d => d.y)).nice()
+  .range([350, 50]);
+
+const sizeScale = d3.scaleSqrt()
+  .domain(d3.extent(data, d => d.size))
+  .range([3, 20]);
+
+const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+// Axes
+const xAxis = d3.axisBottom(xScale);
+const yAxis = d3.axisLeft(yScale);
+
+// Add X axis
+svg.append('g')
+  .attr('class', 'axis')
+  .attr('transform', `translate(0,${350})`)
+  .call(xAxis);
+
+// Add Y axis
+svg.append('g')
+  .attr('class', 'axis')
+  .attr('transform', `translate(50,0)`)
+  .call(yAxis);
+
+// Render bubbles
+svg.selectAll('circle')
+  .data(data)
+  .enter()
+  .append('circle')
+  .attr('cx', d => xScale(d.x))
+  .attr('cy', d => yScale(d.y))
+  .attr('r', d => sizeScale(d.size))
+  .attr('fill', d => colorScale(d.category))
+  .attr('opacity', 0.7);
+
+// Optional: Add labels for axes (optional)
+svg.append('text')
+  .attr('x', width / 2)
+  .attr('y', height - 10)
+  .attr('text-anchor', 'middle')
+  .attr('font-size', '12px')
+  .text('X Axis');
+
+svg.append('text')
+  .attr('transform', 'rotate(-90)')
+  .attr('x', -height / 2)
+  .attr('y', 15)
+  .attr('text-anchor', 'middle')
+  .attr('font-size', '12px')
+  .text('Y Axis');
+</script>
+</body>
+</html>

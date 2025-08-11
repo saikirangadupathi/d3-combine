@@ -1,0 +1,57 @@
+DATA
+│
+└── root: {                                 ← top‑level object (the hierarchy root)
+    ├─ name: string – identifier for the root node (e.g., “root”)
+    └─ children: [                         ← array of cluster objects
+        ┌───────────────────────────────────────────────────────┐
+        │ {                                                     │
+        │   name: string – name of the cluster (e.g., “Cluster A”)│
+        │   children: [                                      ← array of leaf objects (items)│
+        │     {                                               │
+        │       name: string – name of the leaf item (e.g., “Item 1”)│
+        │     },                                              │
+        │     { … }                                            │
+        │   ]                                                 │
+        │ }                                                   │
+        └───────────────────────────────────────────────────────┘
+        … (additional clusters such as “Cluster B” with its own children)
+    ]
+}
+
+/* After the hierarchy and cluster transforms the library produces two
+   derived flat tables that the visual layers consume. */
+
+└── nodes: [                              ← array of node records (one per
+    ┌───────────────────────────────────────────────┐   hierarchy node)
+    │ {                                             │
+    │   name: string – original node label (e.g., “Item 4”)│
+    │   x: number – vertical position (pixel) after layout│
+    │   y: number – horizontal position (pixel) after layout│
+    │   depth: number – depth level in the tree (0 = root)│
+    │ }                                             │
+    └───────────────────────────────────────────────┘
+]
+
+└── links: [                              ← array of link records (edges)
+    ┌───────────────────────────────────────────────┐
+    │ {                                             │
+    │   source: {                                 │
+    │     x: number – source node y‑coordinate (pixel)│
+    │     y: number – source node x‑coordinate (pixel)│
+    │   },                                         │
+    │   target: {                                 │
+    │     x: number – target node y‑coordinate (pixel)│
+    │     y: number – target node x‑coordinate (pixel)│
+    │   }                                          │
+    │ }                                            │
+    └───────────────────────────────────────────────┘
+]
+
+Field purpose summary
+
+- name – categorical identifier for each node (cluster or leaf).  
+- x, y – quantitative pixel coordinates produced by the `cluster` layout; used for positioning nodes and drawing link lines.  
+- depth – quantitative level (0 = root, 1 = cluster, 2 = leaf); mapped to an ordinal color scale.  
+- source / target – objects that hold the coordinates of the two nodes that a link connects; required by the line mark.  
+
+The raw data is a nested hierarchy (root → clusters → items). After the hierarchy and cluster transforms, the chart consumes the flat nodes and links tables shown above. No additional nested arrays are needed beyond the initial `children` arrays in the source hierarchy.

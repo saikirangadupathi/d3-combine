@@ -1,0 +1,16 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   category: string (nominal) – name of the item,     │  ← categorical identifier for each bar
+      │   value: number (quantitative) – numeric value,   │  ← determines bar length and direction
+      │   (positive values extend right, negative left) │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- category: a nominal (categorical) field used as the y‑axis band domain; it identifies each row (Item A, Item B, …) and groups bars vertically.
+- value: a quantitative field representing the magnitude to plot. Positive values will extend to the right of the central axis (400), negative values to the left, and its sign also drives the color scale (negative → red, positive → green). 
+
+The data consists solely of this flat array; there are no nested arrays such as nodes or links.

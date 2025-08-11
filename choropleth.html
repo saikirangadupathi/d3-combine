@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Choropleth Map</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; margin: 0; }
+  .title { text-align: center; font-size: 24px; margin: 10px; }
+  .tooltip {
+    position: absolute;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    pointer-events: none;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="title">Choropleth Map</div>
+<div id="chart"></div>
+<script>
+// Inline data
+const data = [
+  { "state": "California", "value": 850000 },
+  { "state": "Texas", "value": 720000 },
+  { "state": "Florida", "value": 650000 },
+  { "state": "New York", "value": 580000 },
+  { "state": "Pennsylvania", "value": 490000 },
+  { "state": "Illinois", "value": 420000 },
+  { "state": "Ohio", "value": 380000 },
+  { "state": "Georgia", "value": 360000 },
+  { "state": "North Carolina", "value": 340000 },
+  { "state": "Michigan", "value": 320000 }
+];
+
+// Size
+const width = 800;
+const height = 500;
+
+// Create SVG container
+const svg = d3.select('#chart')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+// Tooltip
+const tooltip = d3.select('body')
+  .append('div')
+  .attr('class', 'tooltip')
+  .style('opacity', 0);
+
+// Projection & path generator
+const projection = d3.geoAlbersUsa()
+  .scale(1000)
+  .translate([width / 2, height / 2]);
+
+const path = d3.geoPath().projection(projection);
+
+// Color scale
+const values = data.map(d => d.value);
+const color = d3.scaleSequential()
+  .domain(d3.extent(values))
+  .interpolator(d3.interpolateBlues);
+
+// Load US states geometry (topojson) and draw map
+d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us => {
+  const states = topojson.feature(us, us.objects.states).features;
+
+  // Build a map from state name to value
+  const valueByState = new Map(data.map(d => [d.state, d.value]));
+
+  // Add state name to each geometry using a lookup of state names (using a separate name mapping)
+  // Since the topojson contains only numeric IDs, we use a known mapping from ID to state name.
+  const idToName = {
+    1: "Alabama", 2: "Alaska", 4: "Arizona", 5: "Arkansas", 6: "California", 8: "Colorado",
+    9: "Connecticut", 10: "Delaware", 11: "District of Columbia", 12: "Florida",
+    13: "Georgia", 15: "Hawaii", 16: "Idaho", 17: "Illinois", 18: "Indiana",
+    19: "Iowa", 20: "Kansas", 21: "Kentucky", 22: "Louisiana", 23: "Maine",
+    24: "Maryland", 25: "Massachusetts", 26: "Michigan", 27: "Minnesota",
+    28: "Mississippi", 29: "Missouri", 30: "Montana", 31: "Nebraska",
+    32: "Nevada", 33: "New Hampshire", 34: "New Jersey", 35: "New Mexico",
+    36: "New York", 37: "North Carolina", 38: "North Dakota", 39: "Ohio",
+    40: "Oklahoma", 41: "Oregon", 42: "Pennsylvania", 44: "Rhode Island",
+    45: "South Carolina", 46: "South Dakota", 47: "Tennessee", 48: "Texas",
+    49: "Utah", 50: "Vermont", 51: "Virginia", 53: "Washington",
+    54: "West Virginia", 55: "Wisconsin", 56: "Wyoming"
+  };
+
+  // Draw states
+  svg.append('g')
+    .selectAll('path')
+    .data(states)
+    .enter()
+    .append('path')
+    .attr('d', path)
+    .attr('fill', d => {
+      const name = idToName[d.id];
+      const val = valueByState.get(name);
+      return val != null ? color(val) : '#ddd';
+    })
+    .attr('stroke', 'white')
+    .attr('stroke-width', 0.5)
+    .on('mouseover', (event, d) => {
+      const name = idToName[d.id];
+      const val = valueByState.get(name) || 'N/A';
+      tooltip.transition().duration(200).style('opacity', 0.9);
+      tooltip.html(`<strong>${name}</strong><br/>Value: ${val}`)
+        .style('left', (event.pageX + 5) + 'px')
+        .style('top', (event.pageY - 28) + 'px');
+    })
+    .on('mouseout', () => {
+      tooltip.transition().duration(500).style('opacity', 0);
+    });
+
+  // Legend
+  const legendHeight = 200;
+  const legendWidth = 20;
+  const legendData = d3.range(0, 1.01, 0.01);
+  const legendScale = d3.scaleLinear()
+    .domain([0,1])
+    .range(color.domain());
+
+  const legend = svg.append('g')
+    .attr('transform', `translate(${width - 70},${height - 250})`);
+
+  const legendScaleY = d3.scaleLinear()
+    .range([legendHeight, 0])
+    .domain(color.domain());
+
+  const legendAxis = d3.axisRight(legendScaleY)
+    .ticks(5)
+    .tickSize(6)
+    .tickFormat(d3.format(".0s"));
+
+  legend.selectAll('rect')
+    .data(legendData)
+    .enter()
+    .append('rect')
+    .attr('x', 0)
+    .attr('y', d => legendScaleY(legendScale(d)))
+    .attr('width', legendWidth)
+    .attr('height', 2)
+    .attr('fill', d => color(legendScale(d)));
+
+  legend.append('g')
+    .attr('transform', `translate(${legendWidth},0)`)
+    .call(legendAxis);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+{
+  "id": "dot-plot",
+  "title": "Dot Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "Alpha",
+          "value": 78.5,
+          "count": 785
+        },
+        {
+          "category": "Beta",
+          "value": 45.2,
+          "count": 452
+        },
+        {
+          "category": "Gamma",
+          "value": 92.1,
+          "count": 921
+        },
+        {
+          "category": "Delta",
+          "value": 34.8,
+          "count": 348
+        },
+        {
+          "category": "Epsilon",
+          "value": 67.3,
+          "count": 673
+        },
+        {
+          "category": "Zeta",
+          "value": 56.9,
+          "count": 569
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 600,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        550
+      ],
+      "nice": true
+    },
+    "y": {
+      "type": "point",
+      "domainFrom": {
+        "data": "main",
+        "field": "category",
+        "method": "values"
+      },
+      "range": [
+        50,
+        350
+      ]
+    }
+  },
+  "layers": [
+    {
+      "id": "dots",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "x": {
+          "field": "value",
+          "scale": "x"
+        },
+        "y": {
+          "field": "category",
+          "scale": "y"
+        },
+        "size": {
+          "value": 6
+        },
+        "fill": {
+          "value": "steelblue"
+        }
+      }
+    }
+  ]
+}

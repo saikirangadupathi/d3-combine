@@ -1,0 +1,132 @@
+{
+  "id": "area-chart",
+  "title": "Area Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "date": "2019-12-31T18:30:00.000Z",
+          "value": 45.2,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-01T18:30:00.000Z",
+          "value": 52.8,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-02T18:30:00.000Z",
+          "value": 48.1,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-03T18:30:00.000Z",
+          "value": 61.5,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-04T18:30:00.000Z",
+          "value": 58.9,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-05T18:30:00.000Z",
+          "value": 67.3,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-06T18:30:00.000Z",
+          "value": 72.1,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-07T18:30:00.000Z",
+          "value": 69.8,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-08T18:30:00.000Z",
+          "value": 75.4,
+          "category": "Series 1"
+        },
+        {
+          "date": "2020-01-09T18:30:00.000Z",
+          "value": 78.2,
+          "category": "Series 1"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "date",
+        "type": "temporal",
+        "accessor": "date"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "domainFrom": {
+        "data": "main",
+        "field": "date",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "max"
+      },
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    }
+  },
+  "layers": [
+    {
+      "id": "area",
+      "mark": {
+        "type": "area",
+        "generator": {
+          "type": "area",
+          "curve": "curveMonotoneX"
+        }
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "scale": "x"
+        },
+        "y": {
+          "field": "value",
+          "scale": "y"
+        },
+        "fill": {
+          "value": "steelblue"
+        },
+        "opacity": {
+          "value": 0.7
+        }
+      }
+    }
+  ]
+}

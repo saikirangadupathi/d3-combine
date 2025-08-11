@@ -1,0 +1,29 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   date: 2022-12-31T18:30:00.000Z (temporal) –      │
+      │         ISO‑8601 timestamp representing the day │
+      │         for which the value is measured.          │
+      │   value: 23.5 (quantitative) – numeric measurement │
+      │         (e.g., temperature, count, etc.) for the │
+      │         corresponding date.                │
+      │   day: 0 (ordinal) – day‑of‑week index (0‑6) │
+      │         where 0 = Sunday, 1 = Monday, …   │
+      │   week: 0 (ordinal) – week index within the │
+      │         displayed calendar (0 = first week, │
+      │         1 = second week, …).               │
+      └───────────────────────────────────────────────────────┘
+      ┌───────────────────────────────────────────────────────┐
+      │ { … }  // additional objects with the same fields │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- date – temporal identifier used for time‑based positioning or tooltip.
+- value – quantitative metric that drives the cell’s color intensity.
+- day – categorical/ordinal field mapping to the vertical position (day of week).
+- week – categorical/ordinal field mapping to the horizontal position (week column).
+
+The data is a flat array; there are no nested arrays such as nodes or links.

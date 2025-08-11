@@ -1,0 +1,145 @@
+{
+  "id": "gantt",
+  "title": "Gantt Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "task": "Task 1",
+          "start": "2022-12-31T18:30:00.000Z",
+          "end": "2023-01-14T18:30:00.000Z",
+          "progress": 100,
+          "category": "Phase 1"
+        },
+        {
+          "task": "Task 2",
+          "start": "2023-01-09T18:30:00.000Z",
+          "end": "2023-02-04T18:30:00.000Z",
+          "progress": 75,
+          "category": "Phase 1"
+        },
+        {
+          "task": "Task 3",
+          "start": "2023-01-31T18:30:00.000Z",
+          "end": "2023-02-28T18:30:00.000Z",
+          "progress": 50,
+          "category": "Phase 2"
+        },
+        {
+          "task": "Task 4",
+          "start": "2023-02-14T18:30:00.000Z",
+          "end": "2023-03-14T18:30:00.000Z",
+          "progress": 25,
+          "category": "Phase 2"
+        },
+        {
+          "task": "Task 5",
+          "start": "2023-02-28T18:30:00.000Z",
+          "end": "2023-03-31T18:30:00.000Z",
+          "progress": 0,
+          "category": "Phase 3"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "task",
+        "type": "nominal",
+        "accessor": "task"
+      },
+      {
+        "name": "start",
+        "type": "temporal",
+        "accessor": "start"
+      },
+      {
+        "name": "end",
+        "type": "temporal",
+        "accessor": "end"
+      },
+      {
+        "name": "progress",
+        "type": "quantitative",
+        "accessor": "progress"
+      },
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 300
+  },
+  "scales": {
+    "x": {
+      "type": "time",
+      "range": [
+        50,
+        750
+      ]
+    },
+    "y": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "task",
+        "method": "values"
+      },
+      "range": [
+        50,
+        250
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Set2"
+    }
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "start",
+          "scale": "x"
+        },
+        "y": {
+          "field": "task",
+          "scale": "y"
+        },
+        "width": {
+          "field": "end",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": "start",
+                "operation": "subtract"
+              }
+            }
+          ]
+        },
+        "height": {
+          "value": 20
+        },
+        "fill": {
+          "field": "category",
+          "scale": "color"
+        },
+        "opacity": {
+          "value": 0.8
+        }
+      }
+    }
+  ]
+}

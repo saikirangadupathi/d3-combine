@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Calendar Heatmap</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line { fill: none; stroke: #333; shape-rendering: crispEdges; }
+  .title { text-anchor: middle; font-size: 18px; font-weight: bold; }
+</style>
+</head>
+<body>
+<svg id="calendar" width="900" height="200"></svg>
+<script>
+// ----- Configuration -----
+const config = {
+  "title": "Calendar Heatmap",
+  "data": [
+    {"date":"2022-12-31T18:30:00.000Z","value":23.5,"day":0,"week":0},
+    {"date":"2023-01-01T18:30:00.000Z","value":45.8,"day":1,"week":0},
+    {"date":"2023-01-02T18:30:00.000Z","value":67.1,"day":2,"week":0},
+    {"date":"2023-01-03T18:30:00.000Z","value":12.9,"day":3,"week":0},
+    {"date":"2023-01-04T18:30:00.000Z","value":78.3,"day":4,"week":0},
+    {"date":"2023-01-05T18:30:00.000Z","value":34.7,"day":5,"week":0},
+    {"date":"2023-01-06T18:30:00.000Z","value":56.2,"day":6,"week":0},
+    {"date":"2023-01-07T18:30:00.000Z","value":89.6,"day":0,"week":1},
+    {"date":"2023-01-08T18:30:00.000Z","value":21.4,"day":1,"week":1},
+    {"date":"2023-01-09T18:30:00.000Z","value":65.9,"day":2,"week":1}
+  ],
+  "space": {"width":900,"height":200},
+  "scales": {
+    "x": {"range":[50,850]},
+    "y": {"range":[50,150]},
+    "color":{"scheme":"RdYlBu"}
+  },
+  "widthRect":15,
+  "heightRect":15
+};
+
+// ---- SVG Setup ----
+const svg = d3.select("#calendar")
+    .attr("width", config.space.width)
+    .attr("height", config.space.height);
+
+// Title
+svg.append("text")
+    .attr("class","title")
+    .attr("x", config.space.width/2)
+    .attr("y",30)
+    .text(config.title);
+
+// Scales
+const xExtent = d3.extent(config.data, d=>d.week);
+const xScale = d3.scaleLinear()
+    .domain([xExtent[0], xExtent[1]+1]) // extend to fit last column
+    .range(config.scales.x.range);
+
+const yExtent = d3.extent(config.data, d=>d.day);
+const yScale = d3.scaleLinear()
+    .domain([yExtent[0], yExtent[1]]) // 0-6
+    .range(config.scales.y.range);
+
+// Color scale (sequential)
+const values = config.data.map(d=>d.value);
+const colorScale = d3.scaleSequential()
+    .domain(d3.extent(values))
+    .interpolator(d3.interpolateRdYlBu);
+
+// Axes
+const xAxis = d3.axisBottom(xScale)
+    .ticks(xExtent[1] - xExtent[0] + 1)
+    .tickFormat(d => `W${d}`);
+svg.append("g")
+    .attr("class","axis")
+    .attr("transform", `translate(0,${config.scales.y.range[1] + 20})`)
+    .call(xAxis);
+
+const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const yAxis = d3.axisLeft(yScale)
+    .ticks(7)
+    .tickFormat(d => dayNames[d]||d);
+svg.append("g")
+    .attr("class","axis")
+    .attr("transform", `translate(${config.scales.x.range[0]},0)`)
+    .call(yAxis);
+
+// Rects (heatmap cells)
+svg.selectAll("rect")
+    .data(config.data)
+    .enter()
+    .append("rect")
+    .attr("x", d => xScale(d.week) - config.widthRect/2)
+    .attr("y", d => yScale(d.day) - config.heightRect/2)
+    .attr("width", config.widthRect)
+    .attr("height", config.heightRect)
+    .attr("fill", d => colorScale(d.value))
+    .attr("stroke", "#fff");
+
+// Tooltip (optional)
+const tooltip = d3.select("body").append("div")
+    .style("position","absolute")
+    .style("pointer-events","none")
+    .style("padding","4px 8px")
+    .style("background","rgba(0,0,0,0.7)")
+    .style("color","#fff")
+    .style("border-radius","3px")
+    .style("font-size","12px")
+    .style("opacity",0);
+
+svg.selectAll("rect")
+    .on("mouseover", (event,d) => {
+        tooltip.style("opacity",1)
+            .html(`Date: ${d.date}<br>Value: ${d.value}`)
+            .style("left", (event.pageX+10)+"px")
+            .style("top", (event.pageY-28)+"px");
+    })
+    .on("mouseout", () => tooltip.style("opacity",0));
+
+</script>
+</body>
+</html>

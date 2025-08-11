@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Arc Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .axis path,
+  .axis line { stroke: #999; }
+</style>
+</head>
+<body>
+<h2>Arc Diagram</h2>
+<svg id="arc-diagram" width="800" height="400"></svg>
+<script>
+// Data from configuration
+const data = {
+  nodes: [
+    {"id":"node-0","group":1,"index":0},
+    {"id":"node-1","group":1,"index":1},
+    {"id":"node-2","group":2,"index":2},
+    {"id":"node-3","group":2,"index":3},
+    {"id":"node-4","group":3,"index":4},
+    {"id":"node-5","group":3,"index":5},
+    {"id":"node-6","group":4,"index":6},
+    {"id":"node-7","group":4,"index":7},
+    {"id":"node-8","group":5,"index":8},
+    {"id":"node-9","group":5,"index":9}
+  ],
+  links: [
+    {"source":"node-0","target":"node-3","arcPath":"M100,350 Q200,200 300,350"},
+    {"source":"node-1","target":"node-5","arcPath":"M150,350 Q275,180 400,350"},
+    {"source":"node-2","target":"node-7","arcPath":"M200,350 Q350,160 500,350"},
+    {"source":"node-4","target":"node-8","arcPath":"M350,350 Q475,140 600,350"},
+    {"source":"node-6","target":"node-9","arcPath":"M450,350 Q525,120 600,350"}
+  ]
+};
+
+const cfg = {
+  space: { width: 800, height: 400 },
+  scales: {
+    x: {
+      type: "point",
+      domainFrom: { data: "nodes", field: "id", method: "values" },
+      range: [50, 750]
+    },
+    color: { type: "ordinal", scheme: "Category10" }
+  }
+};
+
+const svg = d3.select('#arc-diagram')
+    .attr('width', cfg.space.width)
+    .attr('height', cfg.space.height);
+
+// X scale (point)
+const xScale = d3.scalePoint()
+    .domain(data.nodes.map(d=>d.id))
+    .range(cfg.scales.x.range);
+
+// Color scale (ordinal)
+const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+    .domain([...new Set(data.nodes.map(d=>d.group))]);
+
+// Draw arcs (paths) using provided path strings
+svg.append('g')
+  .selectAll('path')
+  .data(data.links)
+  .enter()
+  .append('path')
+  .attr('d', d=>d.arcPath)
+  .attr('stroke', 'steelblue')
+  .attr('fill', 'none')
+  .attr('stroke-width', 1.5);
+
+// Draw nodes (circles)
+svg.append('g')
+  .selectAll('circle')
+  .data(data.nodes)
+  .enter()
+  .append('circle')
+  .attr('cx', d => xScale(d.id))
+  .attr('cy', 350)
+  .attr('r', 4)
+  .attr('fill', d => colorScale(d.group));
+
+// X axis at the bottom
+svg.append('g')
+  .attr('class', 'axis')
+  .attr('transform', `translate(0, ${350 + 20})`) // slightly below nodes
+  .call(d3.axisBottom(xScale).tickSize(0))
+  .selectAll('text')
+  .attr('font-size', '10px');
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+DATA  
+│  
+└── main: [               <-- array of data objects  
+      ┌───────────────────────────────────────────────────────┐  
+      │ {                                                     }│  
+      │   category: string (nominal) – name of the category,  │  
+      │               used as a categorical identifier for the y‑axis. │  
+      │   value: number (quantitative) – numeric measurement │  
+      │          that determines the horizontal (x) position of each dot. │  
+      │   count: integer (quantitative) – raw count associated │  
+      │          with the category (not used in the visual but │  
+      │          available for tool‑tips or further analysis). │  
+      └───────────────────────────────────────────────────────┘  
+]  
+
+Explanation  
+- category: nominal (categorical) field; serves as the identifier for each row and maps to the point‑scale y‑axis.  
+- value: quantitative (continuous) field; drives the linear x‑scale, positioning each dot horizontally.  
+- count: quantitative integer field; not mapped to a visual channel in this config but can be used for additional calculations or tool‑tips.  
+
+The data consists of a flat array; there are no nested arrays (e.g., no separate nodes or links structures).

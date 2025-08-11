@@ -1,0 +1,24 @@
+DATA
+│
+└── main: [                               <-- array of data objects (each row represents a trading day)
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     }│
+      │   date   : temporal (ISO‑8601 timestamp) – the trading day/date.   │
+      │   open   : quantitative (numeric) – opening price for the day.   │
+      │   high   : quantitative (numeric) – highest price reached that day.│
+      │   low    : quantitative (numeric) – lowest price reached that day.│
+      │   close  : quantitative (numeric) – closing price for the day.│
+      │   volume : quantitative (numeric) – trading volume (shares) for the day.│
+      │   // No nested arrays; each object is flat.                           │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- date – temporal identifier used for the x‑axis (band scale).  
+- open – quantitative value; used to compute the rectangle height and color (compare with close).  
+- high – quantitative; defines the top of the wick line (y2).  
+- low – quantitative; defines the bottom of the wick line (y).  
+- close – quantitative; defines the top of the candle body (y) and also used for color (green if close > open, else red).  
+- volume – quantitative; present in the data but not used in the current visual encoding.  
+
+The chart expects a flat array named main (as referenced by the scale’s `domainFrom`), with each object containing the fields listed above. No nested structures such as nodes or links are present.

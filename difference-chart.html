@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Difference Chart</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+  }
+  .title {
+    text-anchor: middle;
+    font-size: 16px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<svg id="difference-chart" width="800" height="400"></svg>
+<script>
+// Data (inline)
+const data = [
+  {"date":"2022-12-31T18:30:00.000Z","series1":45.2,"series2":52.8},
+  {"date":"2023-01-01T18:30:00.000Z","series1":48.1,"series2":43.7},
+  {"date":"2023-01-02T18:30:00.000Z","series1":61.5,"series2":67.3},
+  {"date":"2023-01-03T18:30:00.000Z","series1":58.9,"series2":54.2},
+  {"date":"2023-01-04T18:30:00.000Z","series1":67.3,"series2":72.1},
+  {"date":"2023-01-05T18:30:00.000Z","series1":72.1,"series2":69.8},
+  {"date":"2023-01-06T18:30:00.000Z","series1":69.8,"series2":75.4},
+  {"date":"2023-01-07T18:30:00.000Z","series1":75.4,"series2":71.6},
+  {"date":"2023-01-08T18:30:00.000Z","series1":78.2,"series2":83.9},
+  {"date":"2023-01-09T18:30:00.000Z","series1":81.7,"series2":79.3}
+];
+
+// Parse dates
+data.forEach(d => { d.date = new Date(d.date); });
+
+// Set dimensions and margins
+const width = 800;
+const height = 400;
+const margin = {top: 40, right: 30, bottom: 40, left: 50};
+
+// Scales
+const x = d3.scaleTime()
+  .domain(d3.extent(data, d => d.date))
+  .range([margin.left, width - margin.right]);
+
+const y = d3.scaleLinear()
+  .domain([
+    d3.min(data, d => Math.min(d.series1, d.series2)),
+    d3.max(data, d => Math.max(d.series1, d.series2))
+  ])
+  .nice()
+  .range([height - margin.bottom, margin.top]);
+
+// Area generators with conditional rendering
+const areaPositive = d3.area()
+  .defined(d => d.series2 > d.series1)
+  .x(d => x(d.date))
+  .y0(d => y(d.series1))
+  .y1(d => y(d.series2));
+
+const areaNegative = d3.area()
+  .defined(d => d.series2 < d.series1)
+  .x(d => x(d.date))
+  .y0(d => y(d.series1))
+  .y1(d => y(d.series2));
+
+// SVG container
+const svg = d3.select('#' + 'difference-chart')
+  .attr('viewBox', `0 0 ${width} ${height}`);
+
+// Title
+svg.append('text')
+  .attr('class', 'title')
+  .attr('x', width / 2)
+  .attr('y', margin.top / 2)
+  .text('Difference Chart');
+
+// Positive area (green)
+svg.append('path')
+  .datum(data)
+  .attr('fill', 'green')
+  .attr('opacity', 0.5)
+  .attr('d', areaPositive);
+
+// Negative area (red)
+svg.append('path')
+  .datum(data)
+  .attr('fill', 'red')
+  .attr('opacity', 0.5)
+  .attr('d', areaNegative);
+
+// Axes
+const xAxis = d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat('%b %d'));
+const yAxis = d3.axisLeft(y).ticks(5);
+
+svg.append('g')
+  .attr('class', 'axis')
+  .attr('transform', `translate(0,${height - margin.bottom})`)
+  .call(xAxis);
+
+svg.append('g')
+  .attr('class', 'axis')
+  .attr('transform', `translate(${margin.left},0)`)
+  .call(yAxis);
+</script>
+</body>
+</html>

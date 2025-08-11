@@ -1,0 +1,145 @@
+{
+  "id": "bubble-map",
+  "title": "Bubble Map",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "city": "New York",
+          "lat": 40.7128,
+          "lon": -74.006,
+          "population": 8400000
+        },
+        {
+          "city": "Los Angeles",
+          "lat": 34.0522,
+          "lon": -118.2437,
+          "population": 3900000
+        },
+        {
+          "city": "Chicago",
+          "lat": 41.8781,
+          "lon": -87.6298,
+          "population": 2700000
+        },
+        {
+          "city": "Houston",
+          "lat": 29.7604,
+          "lon": -95.3698,
+          "population": 2300000
+        },
+        {
+          "city": "Phoenix",
+          "lat": 33.4484,
+          "lon": -112.074,
+          "population": 1600000
+        },
+        {
+          "city": "Philadelphia",
+          "lat": 39.9526,
+          "lon": -75.1652,
+          "population": 1500000
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "city",
+        "type": "nominal",
+        "accessor": "city"
+      },
+      {
+        "name": "lat",
+        "type": "quantitative",
+        "accessor": "lat"
+      },
+      {
+        "name": "lon",
+        "type": "quantitative",
+        "accessor": "lon"
+      },
+      {
+        "name": "population",
+        "type": "quantitative",
+        "accessor": "population"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 500,
+    "coordinates": [
+      {
+        "id": "map",
+        "type": "geographic",
+        "projection": {
+          "type": "albersUsa",
+          "scale": 1000,
+          "translate": [
+            400,
+            250
+          ]
+        }
+      }
+    ]
+  },
+  "scales": {
+    "size": {
+      "type": "sqrt",
+      "domainFrom": {
+        "data": "main",
+        "field": "population",
+        "method": "extent"
+      },
+      "range": [
+        5,
+        40
+      ]
+    },
+    "color": {
+      "type": "sequential",
+      "scheme": "Blues"
+    }
+  },
+  "layers": [
+    {
+      "id": "bubbles",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "x": {
+          "field": "lon",
+          "transform": [
+            {
+              "type": "projection"
+            }
+          ]
+        },
+        "y": {
+          "field": "lat",
+          "transform": [
+            {
+              "type": "projection"
+            }
+          ]
+        },
+        "r": {
+          "field": "population",
+          "scale": "size"
+        },
+        "fill": {
+          "field": "population",
+          "scale": "color"
+        },
+        "opacity": {
+          "value": 0.7
+        },
+        "stroke": {
+          "value": "white"
+        }
+      }
+    }
+  ]
+}

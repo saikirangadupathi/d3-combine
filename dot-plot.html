@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dot Plot</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    stroke: #333;
+  }
+  .axis text {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<svg id="dot-plot" width="600" height="400"></svg>
+
+<script>
+// Configuration
+const config = {
+  "id": "dot-plot",
+  "title": "Dot Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        { "category": "Alpha",   "value": 78.5, "count": 785 },
+        { "category": "Beta",    "value": 45.2, "count": 452 },
+        { "category": "Gamma",   "value": 92.1, "count": 921 },
+        { "category": "Delta",   "value": 34.8, "count": 348 },
+        { "category": "Epsilon", "value": 67.3, "count": 673 },
+        { "category": "Zeta",    "value": 56.9, "count": 569 }
+      ]
+    },
+    "fields": [
+      { "name": "category", "type": "nominal", "accessor": "category" },
+      { "name": "value",    "type": "quantitative", "accessor": "value" }
+    ]
+  },
+  "space": { "width": 600, "height": 400 },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": { "data": "main", "field": "value", "method": "extent" },
+      "range": [50, 550],
+      "nice": true
+    },
+    "y": {
+      "type": "point",
+      "domainFrom": { "data": "main", "field": "category", "method": "values" },
+      "range": [50, 350]
+    }
+  },
+  "layers": [
+    {
+      "id": "dots",
+      "mark": { "type": "circle" },
+      "encoding": {
+        "x": { "field": "value", "scale": "x" },
+        "y": { "field": "category", "scale": "y" },
+        "size": { "value": 6 },
+        "fill": { "value": "steelblue" }
+      }
+    }
+  ]
+};
+
+// Dimensions
+const width = config.space.width;
+const height = config.space.height;
+
+// SVG container
+const svg = d3.select(`#${config.id}`)
+    .attr("viewBox", `0 0 ${width} ${height}`);
+
+// Title
+svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", 30)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "20px")
+    .text(config.title);
+
+// Scales
+const xScale = d3.scaleLinear()
+    .domain(d3.extent(config.data.source.data, d => d[config.layers[0].encoding.x.field]))
+    .range(config.scales.x.range)
+    .nice();
+
+const yScale = d3.scalePoint()
+    .domain(config.data.source.data.map(d => d[config.layers[0].encoding.y.field]))
+    .range(config.scales.y.range);
+
+// Axes
+const xAxis = d3.axisBottom(xScale).ticks(5);
+const yAxis = d3.axisLeft(yScale).tickSize(0);
+
+svg.append("g")
+    .attr("class", "axis x")
+    .attr("transform", `translate(0,${config.scales.y.range[1]})`)
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "axis y")
+    .attr("transform", `translate(${config.scales.x.range[0]},0)`)
+    .call(yAxis);
+
+// Dots layer
+const dotLayer = config.layers[0];
+svg.selectAll("circle")
+    .data(config.data.source.data)
+    .enter()
+    .append("circle")
+    .attr("cx", d => xScale(d[dotLayer.encoding.x.field]))
+    .attr("cy", d => yScale(d[dotLayer.encoding.y.field]))
+    .attr("r", dotLayer.encoding.size.value)
+    .attr("fill", dotLayer.encoding.fill.value);
+</script>
+</body>
+</html>

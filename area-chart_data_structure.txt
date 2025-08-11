@@ -1,0 +1,23 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   date:   temporal (ISO‑8601 string, e.g.               │
+      │            "2020-01-03T18:30:00.000Z") – timestamp used│
+      │            as the x‑axis (time scale).               │
+      │   value:  quantitative (number) – the numeric metric│
+      │            plotted on the y‑axis (e.g., 61.5).          │
+      │   category: categorical (string) – identifies the │
+      │            series or group the point belongs to; │
+      │            here all rows are "Series 1".               │
+      │   // (no other fields)                              │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- date – temporal identifier, parsed as a Date object for the time scale.
+- value – quantitative measurement plotted vertically.
+- category – optional categorical label for series grouping (not used in the current encoding but present in the data). 
+
+The data is a flat array; there are no nested arrays such as nodes or links.

@@ -1,0 +1,36 @@
+DATA
+│
+└── data: {                                 <-- main data object (inline source)
+    ├── nodes: [                           <-- array of node objects
+    │   ┌───────────────────────────────────────────────────────┐
+    │   │ {                                                   }│
+    │   │   id: string,                                      │  ← unique identifier for each node (e.g., "node-0")
+    │   │   group: integer (nominal),                       │  ← categorical group label (1‑5) used for color encoding
+    │   │   index: integer (quantitative),                │  ← numeric position/index of the node (0‑9) used for ordering
+    │   └───────────────────────────────────────────────────────┘
+    │   // ... more node objects
+    │ ]
+    │
+    ├── links: [                           <-- array of link (edge) objects
+    │   ┌───────────────────────────────────────────────────────┐
+    │   │ {                                                   }│
+    │   │   source: string,                                 │  ← id of source node (e.g., "node-0")
+    │   │   target: string,                                 │  ← id of target node (e.g., "node-3")
+    │   │   arcPath: string (SVG path),                   │  ← pre‑computed SVG path for the arc (e.g., "M100,350 Q200,200 300,350")
+    │   └─────────────────────────────────────────────────────┘
+    │   // ... more link objects
+    │ ]
+    │
+    └── fields: [                         <-- field metadata (optional for tooling)
+        ┌───────────────────────────────────────┐
+        │ {                                     }│
+        │   name: string,                     │  name of the field (e.g., "id")
+        │   type: string (nominal/quantitative),│  data type / role
+        │   accessor: string                │  key used to read the field from each object
+        └───────────────────────────────────────┘
+    ]
+}
+Explanation of key parts:
+- nodes: collection of points placed along a horizontal axis; each node has an identifier, a group for color, and an index for positioning.
+- links: connections between two nodes; each link references source and target node IDs and provides a ready‑made SVG path (arc) that will be drawn as a path mark.
+- fields: describes how each property should be interpreted (nominal vs quantitative) and how to access it in the data objects.

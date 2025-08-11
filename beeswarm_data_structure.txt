@@ -1,0 +1,21 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   id: integer, unique identifier for each point   │  ← unique numeric ID for the datum (used for internal referencing) 
+      │   value: number, quantitative measurement (e.g., 23.5) │  ← primary quantitative value plotted on the x‑axis 
+      │   category: string, categorical group label (e.g., "Group 1") │  ← nominal category used for color encoding 
+      │   x: number, same as value, used for x‑position   │  ← numeric coordinate (same as value) for the horizontal axis 
+      │   y: number, vertical coordinate (e.g., 95)        │  ← numeric coordinate for the vertical axis (later offset) 
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- id – integer identifier, not visualized directly but useful for data joins.
+- value – quantitative field representing the measurement to be plotted; also used as the x‑scale domain.
+- category – nominal (categorical) field that determines the color of each circle via the “color” ordinal scale.
+- x – numeric copy of *value* used for the x‑encoding; the dodge transform will adjust its position to avoid overlap.
+- y – numeric vertical position; a transform adds a constant offset (100) before rendering, placing the swarm near the middle of the chart.
+
+The data does not contain nested arrays (no nodes/links); it is a flat array of objects.

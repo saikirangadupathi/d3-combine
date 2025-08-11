@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chord Diagram</title>
+<!-- D3 v7 -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body {font-family: Arial, sans-serif; margin: 0; padding: 20px;}
+  .group-label {
+    font-size: 12px;
+    pointer‑events: none;
+  }
+  .chord-path {
+    stroke: #000;
+    opacity: 0.7;
+  }
+  .group-path {
+    stroke: #000;
+    opacity: 0.8;
+  }
+</style>
+</head>
+<body>
+<h2>Chord Diagram</h2>
+<svg id="chord-diagram" width="500" height="500"></svg>
+
+<script>
+// --------------------
+// Data
+// --------------------
+const rawData = [
+  {"source":0,"target":1,"value":11975},
+  {"source":0,"target":2,"value":5871},
+  {"source":0,"target":3,"value":8916},
+  {"source":1,"target":0,"value":1951},
+  {"source":1,"target":2,"value":10048},
+  {"source":1,"target":3,"value":2060},
+  {"source":2,"target":0,"value":8010},
+  {"source":2,"target":1,"value":16145},
+  {"source":2,"target":3,"value":8090},
+  {"source":3,"target":0,"value":1013},
+  {"source":3,"target":1,"value":990},
+  {"source":3,"target":2,"value":940}
+];
+
+// --------------------
+// Build matrix
+// --------------------
+const nodeSet = new Set();
+rawData.forEach(d => { nodeSet.add(d.source); nodeSet.add(d.target); });
+const n = nodeSet.size;
+
+const matrix = Array.from({length: n}, () => Array(n).fill(0));
+rawData.forEach(d => {
+  matrix[d.source][d.target] = d.value;
+});
+
+// --------------------
+// Dimensions & SVG
+// --------------------
+const width = 500;
+const height = 500;
+const radius = Math.min(width, height) / 2 - 30;
+const innerRadius = radius - 20;
+const outerRadius = radius;
+
+const svg = d3.select('#chord-diagram')
+  .attr('viewBox', `0 0 ${width} ${height}`)
+  .append('g')
+  .attr('transform', `translate(${width/2},${height/2})`);
+
+// --------------------
+// Scales & Layout
+// --------------------
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+const chordLayout = d3.chord()
+  .padAngle(0.05)
+  .sortSubgroups(d3.descending); // optional, makes larger values appear first
+
+const chords = chordLayout(matrix); // <-- this returns an object with .groups and . chords
+
+// Arc generator for groups
+const groupArc = d3.arc()
+  .innerRadius(innerRadius)
+  .outerRadius(outerRadius);
+
+// Ribbon generator for chords
+const ribbon = d3.ribbon()
+  .radius(innerRadius);
+
+// --------------------
+// Draw chords (ribbons)
+// --------------------
+svg.append('g')
+  .selectAll('path')
+  .data(chords) // array of chord objects
+  .enter()
+  .append('path')
+    .attr('class', 'chord-path')
+    .attr('d', ribbon)
+    .attr('fill', d => color(d.source.index))
+    .attr('stroke', '#000');
+
+// --------------------
+// Draw groups (arcs)
+// --------------------
+const groups = svg.append('g')
+  .selectAll('g')
+  .data(chords.groups)
+  .enter()
+  .append('g');
+
+// arcs
+groups.append('path')
+    .attr('class', 'group-path')
+    .attr('d', d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(outerRadius)
+        .startAngle(d => d.startAngle)
+        .endAngle(d => d.endAngle))
+    .attr('fill', d => color(d.index));
+
+// labels
+groups.append('text')
+    .attr('class', 'group-label')
+    .attr('transform', d => {
+      const angle = (d.startAngle + d.endAngle) / 2;
+      const x = Math.cos(angle - Math.PI/2) * (outerRadius + 20);
+      const y = Math.sin(angle - Math.PI/2) * (outerRadius + 20);
+      const rotate = (angle * 180 / Math.PI) - 90;
+      return `translate(${x},${y}) rotate(${rotate})`;
+    })
+    .attr('dx', d => ((d.startAngle + d.endAngle) / 2 > Math.PI ? -10 : 0))
+    .attr('dy', '0.35em')
+    .attr('text-anchor', d => ((d.startAngle + d.endAngle) / 2 > Math.PI ? 'end' : 'start'))
+    .text(d => `Node ${d.index}`);
+
+</script>
+</body>
+</html>

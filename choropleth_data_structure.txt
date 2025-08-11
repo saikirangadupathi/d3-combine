@@ -1,0 +1,30 @@
+DATA
+│
+└── data: [                                   <-- array of data objects (each row represents a U.S. state)
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     │
+      │   state:   string (nominal) – name of the state, used as a categorical │
+      │            identifier for each geographic feature.               │
+      │   value:   number (quantitative) – numeric metric that will be   │
+      │            visualized with a color scale (e.g., population, sales).│
+      │   density: number (quantitative) – additional numeric metric│
+      │            (e.g., population density) that could be used for   │
+      │            tool‑tips or secondary encodings.               │
+      │   growth:  number (quantitative) – growth rate (decimal) │
+      │            that may be shown in tool‑tips or used for   │
+      │            conditional formatting.               │
+      │   geometry: object (geojson) – geometric shape of the state │
+      │            in GeoJSON format; required for the      │
+      │            geoshape mark to draw the map.        │
+      │ }                                                                     │
+      └───────────────────────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- state – categorical identifier, used to match each data row to a geographic region.
+- value – primary quantitative measure, drives the fill color via the “color” scale.
+- density – secondary quantitative measure (not currently mapped, but available for analysis).
+- growth – secondary quantitative measure (e.g., percent change), also not currently mapped.
+- geometry – nested GeoJSON object that defines the polygon for the state; required for the geoshape mark.
+
+No nested arrays such as nodes or links are present; each entry is a flat object with a nested GeoJSON object for geometry.

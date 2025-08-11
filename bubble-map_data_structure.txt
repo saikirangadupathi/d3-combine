@@ -1,0 +1,23 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │ city: string (nominal) – name of the city, used as   │
+      │        a categorical identifier for each point.    │
+      │ lat: number (quantitative) – latitude coordinate   │
+      │      of the city, used for geographic projection.│
+      │ lon: number (quantitative) – longitude coordinate │
+      │      of the city, used for geographic projection.│
+      │ population: number (quantitative) – city’s population│
+      │      value; drives bubble size (scale “size”) and │
+      │      color (scale “color”).                     │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- city – categorical (nominal) field that identifies each data point (city name).  
+- lat and lon – quantitative geographic coordinates; they are transformed by the map projection to produce the x‑ and y‑positions on the map.  
+- population – quantitative measure; determines both the radius of the bubble (via a sqrt size scale) and its fill color (via a sequential color scale).  
+
+The data array is flat; there are no nested arrays such as nodes or links.

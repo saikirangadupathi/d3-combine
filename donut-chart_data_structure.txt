@@ -1,0 +1,23 @@
+DATA
+│
+└── data: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │ segment: string (categorical identifier for each │
+      │          quarter, e.g., "Q1", "Q2", etc.)            │
+      │ revenue: number (quantitative value representing │
+      │          revenue in dollars, used for slice size) │
+      │ startAngle: number (quantitative angle in │
+      │            radians, start of the arc segment) │
+      │ endAngle: number (quantitative angle in │
+      │          radians, end of the arc segment) │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- segment – nominal (categorical) field that identifies each slice of the donut (quarter label).  
+- revenue – quantitative numeric field representing the monetary value for each segment; drives the size of each slice.  
+- startAngle – quantitative numeric (radians) indicating where the arc begins; used by the arc generator.  
+- endAngle – quantitative numeric (radians) indicating where the arc ends; used by the arc generator.  
+
+The data consists solely of this flat array; there are no nested arrays such as nodes or links.

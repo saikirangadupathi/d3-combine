@@ -1,0 +1,128 @@
+{
+  "id": "grouped-bar-chart",
+  "title": "Grouped Bar Chart",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "category": "Q1",
+          "series": "Product A",
+          "value": 20
+        },
+        {
+          "category": "Q1",
+          "series": "Product B",
+          "value": 30
+        },
+        {
+          "category": "Q2",
+          "series": "Product A",
+          "value": 35
+        },
+        {
+          "category": "Q2",
+          "series": "Product B",
+          "value": 25
+        },
+        {
+          "category": "Q3",
+          "series": "Product A",
+          "value": 15
+        },
+        {
+          "category": "Q3",
+          "series": "Product B",
+          "value": 40
+        },
+        {
+          "category": "Q4",
+          "series": "Product A",
+          "value": 30
+        },
+        {
+          "category": "Q4",
+          "series": "Product B",
+          "value": 20
+        }
+      ]
+    },
+    "fields": [
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "series",
+        "type": "nominal",
+        "accessor": "series"
+      },
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 400
+  },
+  "scales": {
+    "x": {
+      "type": "band",
+      "domainFrom": {
+        "data": "main",
+        "field": "category",
+        "method": "values"
+      },
+      "range": [
+        50,
+        750
+      ],
+      "params": {
+        "padding": 0.1
+      }
+    },
+    "y": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "max"
+      },
+      "range": [
+        350,
+        50
+      ],
+      "nice": true
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Set2"
+    }
+  },
+  "layers": [
+    {
+      "id": "groups",
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "x": {
+          "field": "category",
+          "scale": "x"
+        },
+        "y": {
+          "field": "value",
+          "scale": "y"
+        },
+        "color": {
+          "field": "series",
+          "scale": "color"
+        }
+      }
+    }
+  ]
+}

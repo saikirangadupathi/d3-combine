@@ -1,0 +1,36 @@
+DATA
+│
+└── graphData: [                                   <-- top‑level object containing the network
+      ┌───────────────────────────────────────────────────────────────────────┐
+      │ {                                                                     │
+      │   nodes: [                                                            │
+      │     {                                                                 │
+      │       id:   string   (unique node identifier, e.g., "node-0")           │
+      │       group:   nominal   (categorical group number, 1‑5)                 │
+      │       size:   quantitative   (size metric for the node, e.g., 8.5)        │
+      │       name:   string   (display label for the node, e.g., "Node 0")       │
+      │     },                                                                │
+      │     … (other node objects)                                          │
+      │   ],                                                                   │
+      │   links: [                                                            │
+      │     {                                                                 │
+      │       source: string   (id of source node, e.g., "node-0")               │
+      │       target: string   (id of target node, e.g., "node-1")               │
+      │       value:  numeric   (link strength/value, used for stroke width) │
+      │       weight: numeric   (link weight, influences force strength)│
+      │     },                                                                │
+      │     … (other link objects)                                         │
+      │   ]                                                                    │
+      │ }                                                                     │
+      └───────────────────────────────────────────────────────────────────────┘
+Explanation of fields:
+- id – nominal identifier, uniquely distinguishes each node.
+- group – nominal/categorical field used to assign colors (via the “color” ordinal scale).
+- size – quantitative metric that could be mapped to visual size (not directly used in the current mark but available for custom encoding).
+- name – textual label for the node, useful for tooltips or legends.
+- source – identifier of the source node in a link (references a node’s id).
+- target – identifier of the target node in a link (references a node’s id).
+- value – numeric value representing link strength; used to compute stroke width (via sqrt transform).
+- weight – numeric weight influencing the force‑directed layout (used in the force transform).
+
+The data contains two nested arrays: nodes (array of node objects) and links (array of link objects). After the force transform, each node will also have generated x and y fields (quantitative coordinates) that are used by the “links” and “nodes” layers for positioning.

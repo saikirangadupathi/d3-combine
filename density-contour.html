@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Density Contour Plot</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path, .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+</style>
+</head>
+<body>
+<svg id="density-contour" width="600" height="400"></svg>
+<script>
+// Configuration
+const config = {
+  "space": { "width": 600, "height": 400 },
+  "margin": { "top": 40, "right": 30, "bottom": 40, "left": 50 }
+};
+
+// Inline data
+const data = [
+  {"x":23.5,"y":67.2,"density":0.045},
+  {"x":45.8,"y":34.9,"density":0.089},
+  {"x":67.1,"y":89.4,"density":0.067},
+  {"x":12.9,"y":45.6,"density":0.078},
+  {"x":78.3,"y":23.1,"density":0.092},
+  {"x":34.7,"y":78.9,"density":0.054},
+  {"x":56.2,"y":56.7,"density":0.063},
+  {"x":89.6,"y":12.4,"density":0.087},
+  {"x":21.4,"y":91.8,"density":0.041},
+  {"x":65.9,"y":38.2,"density":0.076}
+];
+
+// Compute inner width/height
+const width = config.space.width - config.margin.left - config.margin.right;
+const height = config.space.height - config.margin.top - config.margin.bottom;
+
+// Create SVG
+const svg = d3.select("#density-contour")
+  .attr("width", config.space.width)
+  .attr("height", config.space.height);
+
+const g = svg.append("g")
+  .attr("transform", `translate(${config.margin.left},${config.margin.top})`);
+
+// Scales
+const xScale = d3.scaleLinear()
+  .domain(d3.extent(data, d => d.x)).nice()
+  .range([0, width]);
+
+const yScale = d3.scaleLinear()
+  .domain(d3.extent(data, d => d.y)).nice()
+  .range([height, 0]);
+
+// Color scale for density
+const colorScale = d3.scaleSequential()
+  .domain([0, 0.1]) // density values range around 0-0.1
+  .interpolator(d3.interpolateBlues);
+
+// Compute density contours
+const contours = d3.contourDensity()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .size([width, height])
+  .bandwidth(10)
+  .thresholds(10) // generate 10 thresholds
+  (data);
+
+// Draw contours
+g.append("g")
+  .selectAll("path")
+  .data(contours)
+  .enter()
+  .append("path")
+    .attr("d", d3.geoPath())
+    .attr("fill", d => colorScale(d.value))
+    .attr("stroke", "white")
+    .attr("stroke-width", 0.5);
+
+// Axes
+const xAxis = d3.axisBottom(xScale);
+const yAxis = d3.axisLeft(yScale);
+
+// X Axis
+svg.append("g")
+  .attr("transform", `translate(${config.margin.left},${config.space.height - config.margin.bottom})`)
+  .call(xAxis);
+
+// Y Axis
+svg.append("g")
+  .attr("transform", `translate(${config.margin.left},${config.margin.top})`)
+  .call(yAxis);
+
+// Title
+svg.append("text")
+  .attr("x", config.space.width / 2)
+  .attr("y", config.margin.top / 2)
+  .attr("text-anchor", "middle")
+  .attr("font-size", "18px")
+  .text("Density Contour Plot");
+
+</script>
+</body>
+</html>

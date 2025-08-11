@@ -1,0 +1,16 @@
+DATA
+│
+└── main: [                               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   date:   temporal (ISO‑8601 timestamp string)   │  ← timestamp for the x‑axis (time)   |
+      │   series1: quantitative (numeric)               │  ← first numeric series (y‑value) |
+      │   series2: quantitative (numeric)               │  ← second numeric series (y‑value) |
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation of fields:
+- date – temporal field representing the point in time for each observation; used as the x‑axis (time scale).
+- series1 – quantitative numeric value for the first series; plotted on the y‑axis.
+- series2 – numeric value for the second series; also plotted on the y‑axis.
+- No nested arrays (e.g., nodes or links) are present; each entry is a flat object with three fields.

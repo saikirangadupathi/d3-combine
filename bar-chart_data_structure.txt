@@ -1,0 +1,16 @@
+DATA
+│
+└── main: [               <-- array of data objects
+      ┌───────────────────────────────────────────────────────┐
+      │ {                                                     }│
+      │   category: string (nominal) – categorical identifier for each bar (e.g., "A", "B") │
+      │   value: number (quantitative) – the numeric value plotted on the y‑axis (e.g., 45.2) │
+      │   count: number (quantitative) – auxiliary count metric (not used in the chart) │
+      └───────────────────────────────────────────────────────┘
+] 
+
+Explanation:
+- category: a nominal (categorical) field that serves as the key for each bar; it determines the x‑position and the color.
+- value: a quantitative field representing the height of each bar; it drives the y‑scale.
+- count: an additional quantitative field present in the data but not mapped to any visual channel in this configuration.
+- The data is a flat array (no nested arrays such as nodes/links). The array is referenced as “main” in the scale definitions.

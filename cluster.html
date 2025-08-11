@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cluster Dendrogram</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
+  }
+  .axis text {
+    font-size: 10px;
+  }
+</style>
+</head>
+<body>
+<svg width="800" height="400"></svg>
+<script>
+// Dimensions and margins
+const width = 800;
+const height = 400;
+const margin = {top: 40, right: 20, bottom: 40, left: 120};
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+// Inline hierarchical data
+const data = {
+  "name": "root",
+  "children": [
+    {
+      "name": "Cluster A",
+      "children": [
+        {"name": "Item 1"},
+        {"name": "Item 2"},
+        {"name": "Item 3"}
+      ]
+    },
+    {
+      "name": "Cluster B",
+      "children": [
+        {"name": "Item 4"},
+        {"name": "Item 5"},
+        {"name": "Item 6"}
+      ]
+    }
+  ]
+};
+
+// Build hierarchy and compute cluster layout
+const root = d3.hierarchy(data).sum(() => 1);
+const cluster = d3.cluster()
+    .size([innerHeight, innerWidth]); // y (vertical), x (horizontal) swapped as per config
+cluster(root);
+
+// Color scale based on node depth
+const color = d3.scaleOrdinal()
+    .domain(root.descendants().map(d => d.depth))
+    .range(d3.schemeSet3);
+
+// Create SVG container
+const svg = d3.select("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`);
+
+const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Draw links (lines)
+g.selectAll(".link")
+  .data(root.links())
+  .enter()
+  .append("line")
+    .attr("class", "link")
+    .attr("x1", d => d.source.y)
+    .attr("y1", d => d.source.x)
+    .attr("x2", d => d.target.y)
+    .attr("y2", d => d.target.x)
+    .attr("stroke", "#555");
+
+// Draw nodes (circles)
+g.selectAll(".node")
+  .data(root.descendants())
+  .enter()
+  .append("circle")
+    .attr("class", "node")
+    .attr("cx", d => d.y)
+    .attr("cy", d => d.x)
+    .attr("r", 3)
+    .attr("fill", d => color(d.depth));
+
+// Axes
+// X axis (horizontal) corresponds to the `y` coordinate from layout
+const xScale = d3.scaleLinear()
+    .domain([0, innerWidth])
+    .range([0, innerWidth]);
+
+const xAxis = d3.axisBottom(xScale)
+    .ticks(5);
+
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margin.left},${height - margin.bottom})`)
+    .call(xAxis);
+
+// Y axis (vertical) corresponds to the `x` coordinate from layout
+const yScale = d3.scaleLinear()
+    .domain([0, innerHeight])
+    .range([0, innerHeight]);
+
+const yAxis = d3.axisLeft(yScale)
+    .ticks(5);
+
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margin.left},${margin.top})`)
+    .call(yAxis);
+
+// Title
+svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", margin.top / 2)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .attr("font-weight", "bold")
+    .text("Cluster Dendrogram");
+</script>
+</body>
+</html>

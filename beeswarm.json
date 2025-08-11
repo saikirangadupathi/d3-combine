@@ -1,0 +1,165 @@
+{
+  "id": "beeswarm",
+  "title": "Beeswarm Plot",
+  "data": {
+    "source": {
+      "type": "inline",
+      "data": [
+        {
+          "value": 23.5,
+          "category": "Group 1",
+          "id": 0,
+          "x": 23.5,
+          "y": 95
+        },
+        {
+          "value": 45.8,
+          "category": "Group 2",
+          "id": 1,
+          "x": 45.8,
+          "y": 105
+        },
+        {
+          "value": 67.1,
+          "category": "Group 3",
+          "id": 2,
+          "x": 67.1,
+          "y": 98
+        },
+        {
+          "value": 12.9,
+          "category": "Group 1",
+          "id": 3,
+          "x": 12.9,
+          "y": 102
+        },
+        {
+          "value": 78.3,
+          "category": "Group 2",
+          "id": 4,
+          "x": 78.3,
+          "y": 108
+        },
+        {
+          "value": 34.7,
+          "category": "Group 3",
+          "id": 5,
+          "x": 34.7,
+          "y": 92
+        },
+        {
+          "value": 56.2,
+          "category": "Group 1",
+          "id": 6,
+          "x": 56.2,
+          "y": 110
+        },
+        {
+          "value": 89.6,
+          "category": "Group 2",
+          "id": 7,
+          "x": 89.6,
+          "y": 88
+        },
+        {
+          "value": 21.4,
+          "category": "Group 3",
+          "id": 8,
+          "x": 21.4,
+          "y": 106
+        },
+        {
+          "value": 65.9,
+          "category": "Group 1",
+          "id": 9,
+          "x": 65.9,
+          "y": 94
+        }
+      ]
+    },
+    "transforms": [
+      {
+        "type": "dodge",
+        "params": {
+          "radius": 4,
+          "x": "value"
+        }
+      }
+    ],
+    "fields": [
+      {
+        "name": "value",
+        "type": "quantitative",
+        "accessor": "value"
+      },
+      {
+        "name": "category",
+        "type": "nominal",
+        "accessor": "category"
+      },
+      {
+        "name": "x",
+        "type": "quantitative",
+        "accessor": "x"
+      },
+      {
+        "name": "y",
+        "type": "quantitative",
+        "accessor": "y"
+      }
+    ]
+  },
+  "space": {
+    "width": 800,
+    "height": 200
+  },
+  "scales": {
+    "x": {
+      "type": "linear",
+      "domainFrom": {
+        "data": "main",
+        "field": "value",
+        "method": "extent"
+      },
+      "range": [
+        50,
+        750
+      ]
+    },
+    "color": {
+      "type": "ordinal",
+      "scheme": "Category10"
+    }
+  },
+  "layers": [
+    {
+      "id": "swarm",
+      "mark": {
+        "type": "circle"
+      },
+      "encoding": {
+        "x": {
+          "field": "x"
+        },
+        "y": {
+          "field": "y",
+          "transform": [
+            {
+              "type": "offset",
+              "params": {
+                "offset": 100
+              }
+            }
+          ]
+        },
+        "color": {
+          "field": "category",
+          "scale": "color"
+        },
+        "size": {
+          "value": 3
+        }
+      }
+    }
+  ]
+}

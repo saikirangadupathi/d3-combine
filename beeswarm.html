@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Beeswarm Plot</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { font-family: sans-serif; }
+  .axis path,
+  .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+</style>
+</head>
+<body>
+<div id="chart"></div>
+
+<script>
+// Configuration
+const config = {
+  "space": { "width": 800, "height": 200 },
+  "scales": {
+    "x": { "range": [50, 750] },
+    "color": { "scheme": "Category10" }
+  },
+  "layers": [{
+    "encoding": {
+      "x": { "field": "x" },
+      "y": { "field": "y", "transform": [{ "type": "offset", "params": { "offset": 100 } }] },
+      "color": { "field": "category", "scale": "color" },
+      "size": { "value": 3 }
+    }
+  }]
+};
+
+// Inline data
+const data = [
+  {"value":23.5,"category":"Group 1","id":0,"x":23.5,"y":95},
+  {"value":45.8,"category":"Group 2","id":1,"x":45.8,"y":105},
+  {"value":67.1,"category":"Group 3","id":2,"x":67.1,"y":98},
+  {"value":12.9,"category":"Group 1","id":3,"x":12.9,"y":102},
+  {"value":78.3,"category":"Group 2","id":4,"x":78.3,"y":108},
+  {"value":34.7,"category":"Group 3","id":5,"x":34.7,"y":92},
+  {"value":56.2,"category":"Group 1","id":6,"x":56.2,"y":110},
+  {"value":89.6,"category":"Group 2","id":7,"x":89.6,"y":88},
+  {"value":21.4,"category":"Group 3","id":8,"x":21.4,"y":106},
+  {"value":65.9,"category":"Group 1","id":9,"x":65.9,"y":94}
+];
+
+// Apply offset transform to y
+const offset = 100;
+data.forEach(d => { d.y_offset = d.y + offset; });
+
+// Dimensions and margins
+const margin = {top: 40, right: 20, bottom: 30, left: 50};
+const width = config.space.width - margin.left - margin.right;
+const height = config.space.height - margin.top - margin.bottom;
+
+// Create SVG
+const svg = d3.select("#chart")
+  .append("svg")
+  .attr("width", config.space.width)
+  .attr("height", config.space.height)
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// X scale: linear domain from extent of value (or x) fields
+const xExtent = d3.extent(data, d => d.x);
+const xScale = d3.scaleLinear()
+  .domain(xExtent)
+  .range(config.scales.x.range);
+
+// Y scale: based on offset y values
+const yExtent = d3.extent(data, d => d.y_offset);
+const yScale = d3.scaleLinear()
+  .domain(yExtent)
+  .range([height, 0]); // invert for SVG
+
+// Color scale
+const colorScale = d3.scaleOrdinal(d3[`scheme${config.scales.color.scheme}`]);
+
+// X Axis
+svg.append("g")
+  .attr("class", "axis x")
+  .attr("transform", `translate(0,${height})`)
+  .call(d3.axisBottom(xScale));
+
+// Title
+svg.append("text")
+  .attr("x", (width) / 2)
+  .attr("y", -margin.top/2)
+  .attr("text-anchor", "middle")
+  .style("font-size", "16px")
+  .text("Beeswarm Plot");
+
+// Draw circles (beeswarm)
+svg.selectAll("circle")
+  .data(data)
+  .enter()
+  .append("circle")
+  .attr("cx", d => xScale(d.x))
+  .attr("cy", d => yScale(d.y_offset))
+  .attr("r", 4) // radius from dodge transform
+  .attr("fill", d => colorScale(d.category))
+  .attr("stroke", "#333")
+  .attr("stroke-width", 0.5);
+
+// Optional: add y-axis for reference (not required by config but helpful)
+svg.append("g")
+  .attr("class", "axis y")
+  .call(d3.axisLeft(yScale).ticks(0)); // hide ticks
+
+</script>
+</body>
+</html>
