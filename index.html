@@ -1,0 +1,2529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete D3 Chart Gallery</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-hexbin@0.2.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+  }
+  
+  .header {
+    text-align: center;
+    padding: 40px 20px;
+    color: white;
+  }
+  
+  .header h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .navigation {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    margin: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+  }
+  
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .nav-button {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .nav-button:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+  }
+  
+  .nav-button.active {
+    background: #764ba2;
+    color: white;
+    border-color: #764ba2;
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .chart-section {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: none;
+  }
+  
+  .chart-section.active {
+    display: block;
+  }
+  
+  .chart-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .chart-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .chart-svg {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  
+  .chart-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  
+  .info-section h3 {
+    color: #495057;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+  
+  .info-content {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.4;
+  }
+  
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+  }
+  
+  .axis text {
+    font-size: 12px;
+  }
+  
+  .tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    pointer-events: none;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 1000;
+  }
+  
+  .show-all-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+    margin-bottom: 20px;
+    transition: background 0.3s;
+  }
+  
+  .show-all-btn:hover {
+    background: #218838;
+  }
+  
+  @media (max-width: 768px) {
+    .header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .nav-grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+    }
+    
+    .nav-button {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 Complete D3 Chart Gallery</h1>
+  <p>Explore 50+ interactive data visualization examples built with D3.js</p>
+</div>
+
+<div class="navigation">
+  <button class="show-all-btn" onclick="showAllCharts()">Show All Charts</button>
+  <div class="nav-grid" id="navigation">
+    <!-- Navigation buttons will be generated here -->
+  </div>
+</div>
+
+<div class="container" id="chart-container">
+  <!-- Chart sections will be generated here -->
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// Chart definitions with their data and rendering functions
+const charts = {
+  "area-chart": {
+    title: "Area Chart",
+    data: [
+      {"date":"2019-12-31T18:30:00.000Z","value":45.2,"category":"Series 1"},
+      {"date":"2020-01-01T18:30:00.000Z","value":52.8,"category":"Series 1"},
+      {"date":"2020-01-02T18:30:00.000Z","value":48.1,"category":"Series 1"},
+      {"date":"2020-01-03T18:30:00.000Z","value":61.5,"category":"Series 1"},
+      {"date":"2020-01-04T18:30:00.000Z","value":58.9,"category":"Series 1"},
+      {"date":"2020-01-05T18:30:00.000Z","value":67.3,"category":"Series 1"},
+      {"date":"2020-01-06T18:30:00.000Z","value":72.1,"category":"Series 1"},
+      {"date":"2020-01-07T18:30:00.000Z","value":69.8,"category":"Series 1"},
+      {"date":"2020-01-08T18:30:00.000Z","value":75.4,"category":"Series 1"},
+      {"date":"2020-01-09T18:30:00.000Z","value":78.2,"category":"Series 1"}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.value)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const area = d3.area()
+        .curve(d3.curveMonotoneX)
+        .x(d => xScale(d.date))
+        .y0(yScale(0))
+        .y1(d => yScale(d.value));
+      
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'steelblue')
+        .attr('opacity', 0.7)
+        .attr('d', area);
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "arc-diagram": {
+    title: "Arc Diagram",
+    data: {
+      nodes: [
+        {"id":"node-0","group":1,"index":0},
+        {"id":"node-1","group":1,"index":1},
+        {"id":"node-2","group":2,"index":2},
+        {"id":"node-3","group":2,"index":3},
+        {"id":"node-4","group":3,"index":4},
+        {"id":"node-5","group":3,"index":5},
+        {"id":"node-6","group":4,"index":6},
+        {"id":"node-7","group":4,"index":7},
+        {"id":"node-8","group":5,"index":8},
+        {"id":"node-9","group":5,"index":9}
+      ],
+      links: [
+        {"source":"node-0","target":"node-3","arcPath":"M100,350 Q200,200 300,350"},
+        {"source":"node-1","target":"node-5","arcPath":"M150,350 Q275,180 400,350"},
+        {"source":"node-2","target":"node-7","arcPath":"M200,350 Q350,160 500,350"},
+        {"source":"node-4","target":"node-8","arcPath":"M350,350 Q475,140 600,350"},
+        {"source":"node-6","target":"node-9","arcPath":"M450,350 Q525,120 600,350"}
+      ]
+    },
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scalePoint()
+        .domain(this.data.nodes.map(d => d.id))
+        .range([50, 750]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      svg.append('g')
+        .selectAll('path')
+        .data(this.data.links)
+        .enter()
+        .append('path')
+        .attr('d', d => d.arcPath)
+        .attr('stroke', 'steelblue')
+        .attr('fill', 'none')
+        .attr('stroke-width', 1.5);
+      
+      svg.append('g')
+        .selectAll('circle')
+        .data(this.data.nodes)
+        .enter()
+        .append('circle')
+        .attr('cx', d => xScale(d.id))
+        .attr('cy', 350)
+        .attr('r', 4)
+        .attr('fill', d => colorScale(d.group));
+    }
+  },
+
+  "bar-chart": {
+    title: "Bar Chart",
+    data: [
+      {"category":"A","value":45.2,"count":234},
+      {"category":"B","value":67.8,"count":456},
+      {"category":"C","value":23.1,"count":123},
+      {"category":"D","value":89.4,"count":789},
+      {"category":"E","value":34.7,"count":345},
+      {"category":"F","value":56.3,"count":567}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleBand()
+        .domain(this.data.map(d => d.category))
+        .range([margin.left, width - margin.right])
+        .padding(0.1);
+      
+      const yScale = d3.scaleLinear()
+        .domain([0, d3.max(this.data, d => d.value)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      svg.selectAll('.bar')
+        .data(this.data)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('x', d => xScale(d.category))
+        .attr('y', d => yScale(d.value))
+        .attr('width', xScale.bandwidth())
+        .attr('height', d => height - margin.bottom - yScale(d.value))
+        .attr('fill', d => colorScale(d.category));
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "beeswarm": {
+    title: "Beeswarm Plot",
+    data: [
+      {"value":23.5,"category":"Group 1","id":0,"x":23.5,"y":95},
+      {"value":45.8,"category":"Group 2","id":1,"x":45.8,"y":105},
+      {"value":67.1,"category":"Group 3","id":2,"x":67.1,"y":98},
+      {"value":12.9,"category":"Group 1","id":3,"x":12.9,"y":102},
+      {"value":78.3,"category":"Group 2","id":4,"x":78.3,"y":108},
+      {"value":34.7,"category":"Group 3","id":5,"x":34.7,"y":92},
+      {"value":56.2,"category":"Group 1","id":6,"x":56.2,"y":110},
+      {"value":89.6,"category":"Group 2","id":7,"x":89.6,"y":88},
+      {"value":21.4,"category":"Group 3","id":8,"x":21.4,"y":106},
+      {"value":65.9,"category":"Group 1","id":9,"x":65.9,"y":94}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 200;
+      const margin = {top: 40, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const data = this.data.map(d => ({...d, y_offset: d.y + 100}));
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.x))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.y_offset))
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      svg.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d.x))
+        .attr("cy", d => yScale(d.y_offset))
+        .attr("r", 4)
+        .attr("fill", d => colorScale(d.category))
+        .attr("stroke", "#333")
+        .attr("stroke-width", 0.5);
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+    }
+  },
+
+  "bollinger-bands": {
+    title: "Bollinger Bands",
+    data: [
+      {"date":"2022-12-31T18:30:00.000Z","price":125.5,"upperBand":135.2,"lowerBand":115.8,"movingAverage":125.5},
+      {"date":"2023-01-01T18:30:00.000Z","price":127.8,"upperBand":137.45,"lowerBand":118.15,"movingAverage":127.8},
+      {"date":"2023-01-02T18:30:00.000Z","price":129.45,"upperBand":139.1,"lowerBand":119.8,"movingAverage":129.45},
+      {"date":"2023-01-03T18:30:00.000Z","price":132.15,"upperBand":141.8,"lowerBand":122.5,"movingAverage":132.15},
+      {"date":"2023-01-04T18:30:00.000Z","price":133.7,"upperBand":143.35,"lowerBand":124.05,"movingAverage":133.7},
+      {"date":"2023-01-05T18:30:00.000Z","price":134.25,"upperBand":143.9,"lowerBand":124.6,"movingAverage":134.25},
+      {"date":"2023-01-06T18:30:00.000Z","price":135.9,"upperBand":145.55,"lowerBand":126.25,"movingAverage":135.9},
+      {"date":"2023-01-07T18:30:00.000Z","price":137.45,"upperBand":147.1,"lowerBand":127.8,"movingAverage":137.45},
+      {"date":"2023-01-08T18:30:00.000Z","price":138.6,"upperBand":148.25,"lowerBand":128.95,"movingAverage":138.6},
+      {"date":"2023-01-09T18:30:00.000Z","price":139.15,"upperBand":148.8,"lowerBand":129.5,"movingAverage":139.15}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 50, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain([d3.min(data, d => d.lowerBand), d3.max(data, d => d.upperBand)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const area = d3.area()
+        .x(d => xScale(d.date))
+        .y0(d => yScale(d.lowerBand))
+        .y1(d => yScale(d.upperBand))
+        .curve(d3.curveMonotoneX);
+      
+      svg.append("path")
+        .datum(data)
+        .attr("fill", "lightblue")
+        .attr("opacity", 0.3)
+        .attr("d", area);
+      
+      const line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.price))
+        .curve(d3.curveMonotoneX);
+      
+      svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "box-plot": {
+    title: "Box Plot",
+    data: [
+      {group: "Group A", q1: 25.3, median: 42.7, q3: 58.9, min: 12.1, max: 78.4},
+      {group: "Group B", q1: 48.6, median: 65.2, q3: 81.7, min: 34.8, max: 95.3},
+      {group: "Group C", q1: 67.9, median: 84.5, q3: 98.2, min: 52.6, max: 112.8}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const x = d3.scaleBand()
+        .domain(this.data.map(d => d.group))
+        .range([margin.left, width - margin.right])
+        .padding(0.2);
+      
+      const y = d3.scaleLinear()
+        .domain([d3.min(this.data, d => d.min), d3.max(this.data, d => d.max)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      // Boxes
+      svg.selectAll(".box")
+        .data(this.data)
+        .enter()
+        .append("rect")
+        .attr("class", "box")
+        .attr("x", d => x(d.group) + (x.bandwidth() - 40) / 2)
+        .attr("width", 40)
+        .attr("y", d => y(d.q3))
+        .attr("height", d => y(d.q1) - y(d.q3))
+        .attr("fill", "lightblue")
+        .attr("stroke", "black");
+      
+      // Median lines
+      svg.selectAll(".median")
+        .data(this.data)
+        .enter()
+        .append("line")
+        .attr("class", "median")
+        .attr("x1", d => x(d.group) + (x.bandwidth() - 40) / 2)
+        .attr("x2", d => x(d.group) + (x.bandwidth() + 40) / 2)
+        .attr("y1", d => y(d.median))
+        .attr("y2", d => y(d.median))
+        .attr("stroke", "red");
+      
+      // Whiskers
+      svg.selectAll(".whisker-line")
+        .data(this.data)
+        .enter()
+        .append("line")
+        .attr("class", "whisker")
+        .attr("x1", d => x(d.group) + x.bandwidth() / 2)
+        .attr("x2", d => x(d.group) + x.bandwidth() / 2)
+        .attr("y1", d => y(d.max))
+        .attr("y2", d => y(d.min))
+        .attr("stroke", "black");
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    }
+  },
+
+  "bubble-chart": {
+    title: "Bubble Chart",
+    data: [
+      {"x":23.5,"y":67.2,"size":35.8,"category":"Group 1","id":"point-0"},
+      {"x":45.8,"y":34.9,"size":28.4,"category":"Group 2","id":"point-1"},
+      {"x":67.1,"y":89.4,"size":42.1,"category":"Group 3","id":"point-2"},
+      {"x":12.9,"y":45.6,"size":19.7,"category":"Group 1","id":"point-3"},
+      {"x":78.3,"y":23.1,"size":51.3,"category":"Group 4","id":"point-4"},
+      {"x":34.7,"y":78.9,"size":33.6,"category":"Group 2","id":"point-5"},
+      {"x":56.2,"y":56.7,"size":38.9,"category":"Group 5","id":"point-6"},
+      {"x":89.6,"y":12.4,"size":24.2,"category":"Group 3","id":"point-7"},
+      {"x":21.4,"y":91.8,"size":46.5,"category":"Group 1","id":"point-8"},
+      {"x":65.9,"y":38.2,"size":31.7,"category":"Group 4","id":"point-9"}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.x)).nice()
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.y)).nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const sizeScale = d3.scaleSqrt()
+        .domain(d3.extent(this.data, d => d.size))
+        .range([3, 20]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      svg.selectAll('circle')
+        .data(this.data)
+        .enter()
+        .append('circle')
+        .attr('cx', d => xScale(d.x))
+        .attr('cy', d => yScale(d.y))
+        .attr('r', d => sizeScale(d.size))
+        .attr('fill', d => colorScale(d.category))
+        .attr('opacity', 0.7);
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "bubble-map": {
+    title: "Bubble Map",
+    data: [
+      {"city":"New York","lat":40.7128,"lon":-74.006,"population":8400000},
+      {"city":"Los Angeles","lat":34.0522,"lon":-118.2437,"population":3900000},
+      {"city":"Chicago","lat":41.8781,"lon":-87.6298,"population":2700000},
+      {"city":"Houston","lat":29.7604,"lon":-95.3698,"population":2300000},
+      {"city":"Phoenix","lat":33.4484,"lon":-112.074,"population":1600000},
+      {"city":"Philadelphia","lat":39.9526,"lon":-75.1652,"population":1500000}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 500;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const projection = d3.geoAlbersUsa()
+        .scale(1000)
+        .translate([width/2, height/2]);
+      
+      const sizeScale = d3.scaleSqrt()
+        .domain(d3.extent(this.data, d => d.population))
+        .range([5, 40]);
+      
+      const colorScale = d3.scaleSequential()
+        .domain(d3.extent(this.data, d => d.population))
+        .interpolator(d3.interpolateBlues);
+      
+      svg.selectAll("circle")
+        .data(this.data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => {
+          const projCoord = projection([d.lon, d.lat]);
+          return projCoord ? projCoord[0] : 0;
+        })
+        .attr("cy", d => {
+          const projCoord = projection([d.lon, d.lat]);
+          return projCoord ? projCoord[1] : 0;
+        })
+        .attr("r", d => sizeScale(d.population))
+        .attr("fill", d => colorScale(d.population))
+        .attr("opacity", 0.7)
+        .attr("stroke", "white");
+    }
+  },
+
+  "calendar": {
+    title: "Calendar Heatmap",
+    data: [
+      {"date":"2022-12-31T18:30:00.000Z","value":23.5,"day":0,"week":0},
+      {"date":"2023-01-01T18:30:00.000Z","value":45.8,"day":1,"week":0},
+      {"date":"2023-01-02T18:30:00.000Z","value":67.1,"day":2,"week":0},
+      {"date":"2023-01-03T18:30:00.000Z","value":12.9,"day":3,"week":0},
+      {"date":"2023-01-04T18:30:00.000Z","value":78.3,"day":4,"week":0},
+      {"date":"2023-01-05T18:30:00.000Z","value":34.7,"day":5,"week":0},
+      {"date":"2023-01-06T18:30:00.000Z","value":56.2,"day":6,"week":0},
+      {"date":"2023-01-07T18:30:00.000Z","value":89.6,"day":0,"week":1},
+      {"date":"2023-01-08T18:30:00.000Z","value":21.4,"day":1,"week":1},
+      {"date":"2023-01-09T18:30:00.000Z","value":65.9,"day":2,"week":1}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 900, height = 200;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.week))
+        .range([50, 850]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.day))
+        .range([50, 150]);
+      
+      const colorScale = d3.scaleSequential()
+        .domain(d3.extent(this.data, d => d.value))
+        .interpolator(d3.interpolateRdYlBu);
+      
+      svg.selectAll("rect")
+        .data(this.data)
+        .enter()
+        .append("rect")
+        .attr("x", d => xScale(d.week) - 7.5)
+        .attr("y", d => yScale(d.day) - 7.5)
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", d => colorScale(d.value))
+        .attr("stroke", "#fff");
+    }
+  },
+
+  "candlestick-chart": {
+    title: "Candlestick Chart",
+    data: [
+      {"date":"2022-12-31T18:30:00.000Z","open":125.5,"high":128.75,"low":123.25,"close":127.8,"volume":850000},
+      {"date":"2023-01-01T18:30:00.000Z","open":127.8,"high":131.2,"low":126.9,"close":129.45,"volume":920000},
+      {"date":"2023-01-02T18:30:00.000Z","open":129.45,"high":132.6,"low":128.1,"close":130.25,"volume":780000},
+      {"date":"2023-01-03T18:30:00.000Z","open":130.25,"high":133.8,"low":129.5,"close":132.15,"volume":1100000},
+      {"date":"2023-01-04T18:30:00.000Z","open":132.15,"high":134.9,"low":131.2,"close":133.7,"volume":950000},
+      {"date":"2023-01-05T18:30:00.000Z","open":133.7,"high":135.4,"low":132.8,"close":134.25,"volume":820000},
+      {"date":"2023-01-06T18:30:00.000Z","open":134.25,"high":136.75,"low":133.6,"close":135.9,"volume":1050000},
+      {"date":"2023-01-07T18:30:00.000Z","open":135.9,"high":138.2,"low":134.7,"close":137.45,"volume":890000},
+      {"date":"2023-01-08T18:30:00.000Z","open":137.45,"high":139.8,"low":136.3,"close":138.6,"volume":970000},
+      {"date":"2023-01-09T18:30:00.000Z","open":138.6,"high":140.25,"low":137.4,"close":139.15,"volume":1200000}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 20, right: 20, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const x = d3.scaleBand()
+        .domain(data.map(d => d.date))
+        .range([margin.left, width - margin.right])
+        .padding(0.1);
+      
+      const y = d3.scaleLinear()
+        .domain([d3.min(data, d => d.low), d3.max(data, d => d.high)])
+        .range([height - margin.bottom, margin.top])
+        .nice();
+      
+      // Wicks
+      svg.selectAll(".wick")
+        .data(data)
+        .enter()
+        .append("line")
+        .attr("class", "wick")
+        .attr("x1", d => x(d.date) + x.bandwidth() / 2)
+        .attr("x2", d => x(d.date) + x.bandwidth() / 2)
+        .attr("y1", d => y(d.low))
+        .attr("y2", d => y(d.high))
+        .attr("stroke", "black");
+      
+      // Bodies
+      const rectWidth = 8;
+      svg.selectAll(".candle")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "candle")
+        .attr("x", d => x(d.date) + (x.bandwidth() - rectWidth) / 2)
+        .attr("y", d => y(Math.max(d.open, d.close)))
+        .attr("width", rectWidth)
+        .attr("height", d => Math.max(Math.abs(y(d.open) - y(d.close)), 0.5))
+        .attr("fill", d => d.close >= d.open ? "green" : "red");
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b %d")));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    }
+  },
+
+  "chord-diagram": {
+    title: "Chord Diagram",
+    data: [
+      {"source":0,"target":1,"value":11975},
+      {"source":0,"target":2,"value":5871},
+      {"source":0,"target":3,"value":8916},
+      {"source":1,"target":0,"value":1951},
+      {"source":1,"target":2,"value":10048},
+      {"source":1,"target":3,"value":2060},
+      {"source":2,"target":0,"value":8010},
+      {"source":2,"target":1,"value":16145},
+      {"source":2,"target":3,"value":8090},
+      {"source":3,"target":0,"value":1013},
+      {"source":3,"target":1,"value":990},
+      {"source":3,"target":2,"value":940}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 500, height = 500;
+      const radius = Math.min(width, height) / 2 - 30;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append('g')
+        .attr('transform', `translate(${width/2},${height/2})`);
+      
+      const nodeSet = new Set();
+      this.data.forEach(d => { nodeSet.add(d.source); nodeSet.add(d.target); });
+      const n = nodeSet.size;
+      
+      const matrix = Array.from({length:n}, () => Array(n).fill(0));
+      this.data.forEach(d => {
+        matrix[d.source][d.target] = d.value;
+      });
+      
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
+      const chord = d3.chord().padAngle(0.05).matrix(matrix);
+      const arc = d3.arc().innerRadius(radius - 20).outerRadius(radius);
+      const ribbon = d3.ribbon().radius(radius - 20);
+      
+      g.append('g')
+        .selectAll('path')
+        .data(chord)
+        .enter()
+        .append('path')
+        .attr('d', ribbon)
+        .attr('fill', d => color(d.source.index))
+        .attr('stroke', '#000')
+        .attr('opacity', 0.7);
+      
+      const group = g.append('g')
+        .selectAll('g')
+        .data(chord.groups)
+        .enter()
+        .append('g');
+      
+      group.append('path')
+        .attr('d', arc)
+        .attr('fill', d => color(d.index))
+        .attr('stroke', '#000')
+        .attr('opacity', 0.8);
+    }
+  },
+
+  "density-contour": {
+    title: "Density Contour Plot",
+    data: [
+      {"x":23.5,"y":67.2,"density":0.045},
+      {"x":45.8,"y":34.9,"density":0.089},
+      {"x":67.1,"y":89.4,"density":0.067},
+      {"x":12.9,"y":45.6,"density":0.078},
+      {"x":78.3,"y":23.1,"density":0.092},
+      {"x":34.7,"y":78.9,"density":0.054},
+      {"x":56.2,"y":56.7,"density":0.063},
+      {"x":89.6,"y":12.4,"density":0.087},
+      {"x":21.4,"y":91.8,"density":0.041},
+      {"x":65.9,"y":38.2,"density":0.076}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 40, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+      
+      const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.x)).nice()
+        .range([0, innerWidth]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.y)).nice()
+        .range([innerHeight, 0]);
+      
+      const colorScale = d3.scaleSequential()
+        .domain([0, 0.1])
+        .interpolator(d3.interpolateBlues);
+      
+      const contours = d3.contourDensity()
+        .x(d => xScale(d.x))
+        .y(d => yScale(d.y))
+        .size([innerWidth, innerHeight])
+        .bandwidth(10)
+        .thresholds(10)
+        (this.data);
+      
+      g.append("g")
+        .selectAll("path")
+        .data(contours)
+        .enter()
+        .append("path")
+        .attr("d", d3.geoPath())
+        .attr("fill", d => colorScale(d.value))
+        .attr("stroke", "white")
+        .attr("stroke-width", 0.5);
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "difference-chart": {
+    title: "Difference Chart",
+    data: [
+      {"date":"2022-12-31T18:30:00.000Z","series1":45.2,"series2":52.8},
+      {"date":"2023-01-01T18:30:00.000Z","series1":48.1,"series2":43.7},
+      {"date":"2023-01-02T18:30:00.000Z","series1":61.5,"series2":67.3},
+      {"date":"2023-01-03T18:30:00.000Z","series1":58.9,"series2":54.2},
+      {"date":"2023-01-04T18:30:00.000Z","series1":67.3,"series2":72.1},
+      {"date":"2023-01-05T18:30:00.000Z","series1":72.1,"series2":69.8},
+      {"date":"2023-01-06T18:30:00.000Z","series1":69.8,"series2":75.4},
+      {"date":"2023-01-07T18:30:00.000Z","series1":75.4,"series2":71.6},
+      {"date":"2023-01-08T18:30:00.000Z","series1":78.2,"series2":83.9},
+      {"date":"2023-01-09T18:30:00.000Z","series1":81.7,"series2":79.3}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 40, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const x = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const y = d3.scaleLinear()
+        .domain([
+          d3.min(data, d => Math.min(d.series1, d.series2)),
+          d3.max(data, d => Math.max(d.series1, d.series2))
+        ])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const areaPositive = d3.area()
+        .defined(d => d.series2 > d.series1)
+        .x(d => x(d.date))
+        .y0(d => y(d.series1))
+        .y1(d => y(d.series2));
+      
+      const areaNegative = d3.area()
+        .defined(d => d.series2 < d.series1)
+        .x(d => x(d.date))
+        .y0(d => y(d.series1))
+        .y1(d => y(d.series2));
+      
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'green')
+        .attr('opacity', 0.5)
+        .attr('d', areaPositive);
+      
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'red')
+        .attr('opacity', 0.5)
+        .attr('d', areaNegative);
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    }
+  },
+
+  "diverging-bar-chart": {
+    title: "Diverging Bar Chart",
+    data: [
+      {category: 'Item A', value: 15},
+      {category: 'Item B', value: -25},
+      {category: 'Item C', value: 35},
+      {category: 'Item D', value: -10},
+      {category: 'Item E', value: 20},
+      {category: 'Item F', value: -30}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 50, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const x = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.value))
+        .range([margin.left, width - margin.right]);
+      
+      const y = d3.scaleBand()
+        .domain(this.data.map(d => d.category))
+        .range([margin.top, height - margin.bottom])
+        .padding(0.1);
+      
+      const color = d3.scaleThreshold()
+        .domain([0])
+        .range(['#d73027', '#1a9850']);
+      
+      const baselineX = x(0);
+      
+      svg.selectAll('rect')
+        .data(this.data)
+        .enter()
+        .append('rect')
+        .attr('y', d => y(d.category))
+        .attr('height', y.bandwidth())
+        .attr('x', d => d.value >= 0 ? baselineX : x(d.value))
+        .attr('width', d => Math.abs(x(d.value) - baselineX))
+        .attr('fill', d => color(d.value));
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    }
+  },
+
+  "donut-chart": {
+    title: "Donut Chart",
+    data: [
+      {segment: "Q1", revenue: 250000, startAngle: 0, endAngle: 1.309},
+      {segment: "Q2", revenue: 320000, startAngle: 1.309, endAngle: 2.982},
+      {segment: "Q3", revenue: 180000, startAngle: 2.982, endAngle: 3.925},
+      {segment: "Q4", revenue: 420000, startAngle: 3.925, endAngle: 6.283}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 400, height = 400;
+      const radius = 150;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append("g")
+        .attr("transform", `translate(${width/2},${height/2})`);
+      
+      const color = d3.scaleOrdinal()
+        .domain(this.data.map(d => d.segment))
+        .range(d3.schemeSpectral);
+      
+      const arcGen = d3.arc()
+        .innerRadius(60)
+        .outerRadius(radius);
+      
+      g.selectAll("path")
+        .data(this.data)
+        .enter()
+        .append("path")
+        .attr("d", d => arcGen({
+          startAngle: d.startAngle,
+          endAngle: d.endAngle
+        }))
+        .attr("fill", d => color(d.segment))
+        .attr("stroke", "white")
+        .attr("stroke-width", 2);
+    }
+  },
+
+  "dot-plot": {
+    title: "Dot Plot",
+    data: [
+      {"category": "Alpha", "value": 78.5, "count": 785},
+      {"category": "Beta", "value": 45.2, "count": 452},
+      {"category": "Gamma", "value": 92.1, "count": 921},
+      {"category": "Delta", "value": 34.8, "count": 348},
+      {"category": "Epsilon", "value": 67.3, "count": 673},
+      {"category": "Zeta", "value": 56.9, "count": 569}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 80};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.value))
+        .range([margin.left, width - margin.right])
+        .nice();
+      
+      const yScale = d3.scalePoint()
+        .domain(this.data.map(d => d.category))
+        .range([margin.top, height - margin.bottom]);
+      
+      svg.selectAll("circle")
+        .data(this.data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d.value))
+        .attr("cy", d => yScale(d.category))
+        .attr("r", 6)
+        .attr("fill", "steelblue");
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "force-directed-graph": {
+    title: "Force-Directed Graph",
+    data: {
+      nodes: [
+        {"id":"node-0","group":1,"size":8.5,"name":"Node 0"},
+        {"id":"node-1","group":1,"size":12.3,"name":"Node 1"},
+        {"id":"node-2","group":2,"size":6.7,"name":"Node 2"},
+        {"id":"node-3","group":2,"size":15.2,"name":"Node 3"},
+        {"id":"node-4","group":3,"size":9.8,"name":"Node 4"},
+        {"id":"node-5","group":3,"size":11.4,"name":"Node 5"},
+        {"id":"node-6","group":4,"size":7.9,"name":"Node 6"},
+        {"id":"node-7","group":4,"size":13.6,"name":"Node 7"},
+        {"id":"node-8","group":5,"size":10.1,"name":"Node 8"},
+        {"id":"node-9","group":5,"size":14.7,"name":"Node 9"}
+      ],
+      links: [
+        {"source":"node-0","target":"node-1","value":2.5,"weight":0.8},
+        {"source":"node-1","target":"node-2","value":4.2,"weight":0.6},
+        {"source":"node-2","target":"node-3","value":1.8,"weight":0.9},
+        {"source":"node-3","target":"node-4","value":3.7,"weight":0.4},
+        {"source":"node-4","target":"node-5","value":5.1,"weight":0.7},
+        {"source":"node-5","target":"node-6","value":2.9,"weight":0.5},
+        {"source":"node-6","target":"node-7","value":4.6,"weight":0.8},
+        {"source":"node-7","target":"node-8","value":1.3,"weight":0.3},
+        {"source":"node-8","target":"node-9","value":3.4,"weight":0.6},
+        {"source":"node-0","target":"node-5","value":2.1,"weight":0.4}
+      ]
+    },
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 600;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const simulation = d3.forceSimulation(this.data.nodes)
+        .force("link", d3.forceLink(this.data.links)
+          .id(d => d.id)
+          .distance(50)
+          .strength(0.5))
+        .force("charge", d3.forceManyBody().strength(-300))
+        .force("center", d3.forceCenter(width/2, height/2));
+      
+      const link = svg.append("g")
+        .attr("stroke", "#999")
+        .selectAll("line")
+        .data(this.data.links)
+        .enter()
+        .append("line")
+        .attr("stroke-width", d => Math.sqrt(d.value));
+      
+      const node = svg.append("g")
+        .selectAll("circle")
+        .data(this.data.nodes)
+        .enter()
+        .append("circle")
+        .attr("r", 5)
+        .attr("fill", d => color(d.group))
+        .attr("stroke", "#fff");
+      
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+        
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+      });
+    }
+  },
+
+  "gantt": {
+    title: "Gantt Chart",
+    data: [
+      {"task": "Task 1", "start": "2022-12-31T18:30:00.000Z", "end": "2023-01-14T18:30:00.000Z", "progress": 100, "category": "Phase 1"},
+      {"task": "Task 2", "start": "2023-01-09T18:30:00.000Z", "end": "2023-02-04T18:30:00.000Z", "progress": 75, "category": "Phase 1"},
+      {"task": "Task 3", "start": "2023-01-31T18:30:00.000Z", "end": "2023-02-28T18:30:00.000Z", "progress": 50, "category": "Phase 2"},
+      {"task": "Task 4", "start": "2023-02-14T18:30:00.000Z", "end": "2023-03-14T18:30:00.000Z", "progress": 25, "category": "Phase 2"},
+      {"task": "Task 5", "start": "2023-02-28T18:30:00.000Z", "end": "2023-03-31T18:30:00.000Z", "progress": 0, "category": "Phase 3"}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({
+        ...d,
+        start: new Date(d.start),
+        end: new Date(d.end)
+      }));
+      
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 300;
+      const margin = {top: 20, right: 30, bottom: 40, left: 100};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent([...data.map(d => d.start), ...data.map(d => d.end)]))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleBand()
+        .domain(data.map(d => d.task))
+        .range([margin.top, height - margin.bottom])
+        .padding(0.1);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeSet2);
+      
+      svg.selectAll('rect')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('x', d => xScale(d.start))
+        .attr('y', d => yScale(d.task))
+        .attr('width', d => xScale(d.end) - xScale(d.start))
+        .attr('height', yScale.bandwidth())
+        .attr('fill', d => colorScale(d.category))
+        .attr('opacity', 0.8);
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "grouped-bar-chart": {
+    title: "Grouped Bar Chart",
+    data: [
+      {"category":"Q1","series":"Product A","value":20},
+      {"category":"Q1","series":"Product B","value":30},
+      {"category":"Q2","series":"Product A","value":35},
+      {"category":"Q2","series":"Product B","value":25},
+      {"category":"Q3","series":"Product A","value":15},
+      {"category":"Q3","series":"Product B","value":40},
+      {"category":"Q4","series":"Product A","value":30},
+      {"category":"Q4","series":"Product B","value":20}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 150, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const categories = Array.from(new Set(this.data.map(d => d.category)));
+      const series = Array.from(new Set(this.data.map(d => d.series)));
+      
+      const x0 = d3.scaleBand()
+        .domain(categories)
+        .range([margin.left, width - margin.right])
+        .padding(0.1);
+      
+      const x1 = d3.scaleBand()
+        .domain(series)
+        .range([0, x0.bandwidth()])
+        .padding(0.05);
+      
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(this.data, d => d.value)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const color = d3.scaleOrdinal()
+        .domain(series)
+        .range(d3.schemeSet2);
+      
+      const nested = d3.group(this.data, d => d.category);
+      const groupedData = Array.from(nested, ([key, values]) => ({key, values}));
+      
+      const groups = svg.selectAll("g.category")
+        .data(groupedData)
+        .enter()
+        .append("g")
+        .attr("class", "category")
+        .attr("transform", d => `translate(${x0(d.key)},0)`);
+      
+      groups.selectAll("rect")
+        .data(d => d.values)
+        .enter()
+        .append("rect")
+        .attr("x", d => x1(d.series))
+        .attr("y", d => y(d.value))
+        .attr("width", x1.bandwidth())
+        .attr("height", d => height - margin.bottom - y(d.value))
+        .attr("fill", d => color(d.series));
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x0));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    }
+  },
+
+  "heatmap": {
+    title: "Heatmap",
+    data: [
+      {"x":0,"y":0,"value":23.5},
+      {"x":1,"y":0,"value":45.8},
+      {"x":2,"y":0,"value":67.1},
+      {"x":0,"y":1,"value":12.9},
+      {"x":1,"y":1,"value":78.3},
+      {"x":2,"y":1,"value":34.7},
+      {"x":0,"y":2,"value":56.2},
+      {"x":1,"y":2,"value":89.6},
+      {"x":2,"y":2,"value":21.4},
+      {"x":0,"y":3,"value":65.9}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 500, height = 500;
+      const margin = {top: 50, right: 50, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xVals = Array.from(new Set(this.data.map(d => d.x))).sort((a,b)=>a-b);
+      const yVals = Array.from(new Set(this.data.map(d => d.y))).sort((a,b)=>a-b);
+      
+      const xScale = d3.scaleBand()
+        .domain(xVals)
+        .range([margin.left, width - margin.right])
+        .padding(0.05);
+      
+      const yScale = d3.scaleBand()
+        .domain(yVals)
+        .range([margin.top, height - margin.bottom])
+        .padding(0.05);
+      
+      const colorScale = d3.scaleSequential()
+        .domain(d3.extent(this.data, d => d.value))
+        .interpolator(d3.interpolateViridis);
+      
+      svg.selectAll('rect')
+        .data(this.data)
+        .enter()
+        .append('rect')
+        .attr('x', d => xScale(d.x))
+        .attr('y', d => yScale(d.y))
+        .attr('width', xScale.bandwidth())
+        .attr('height', yScale.bandwidth())
+        .attr('fill', d => colorScale(d.value))
+        .attr('stroke', '#fff');
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "hexbin": {
+    title: "Hexbin Plot",
+    data: [
+      {"x":23.5,"y":67.2,"count":12},
+      {"x":45.8,"y":34.9,"count":8},
+      {"x":67.1,"y":89.4,"count":15},
+      {"x":12.9,"y":45.6,"count":6},
+      {"x":78.3,"y":23.1,"count":18},
+      {"x":34.7,"y":78.9,"count":9},
+      {"x":56.2,"y":56.7,"count":14},
+      {"x":89.6,"y":12.4,"count":7},
+      {"x":21.4,"y":91.8,"count":11},
+      {"x":65.9,"y":38.2,"count":13}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 50, right: 20, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+      
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.x))
+        .range([0, innerWidth]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.y))
+        .range([innerHeight, 0]);
+      
+      const hexbin = d3.hexbin()
+        .x(d => xScale(d.x))
+        .y(d => yScale(d.y))
+        .radius(10)
+        .extent([[0,0],[innerWidth, innerHeight]]);
+      
+      const bins = hexbin(this.data);
+      
+      const color = d3.scaleSequential(d3.interpolateYlOrRd)
+        .domain([0, d3.max(bins, d => d.length)]);
+      
+      g.selectAll("path")
+        .data(bins)
+        .enter()
+        .append("path")
+        .attr("d", d => hexbin.hexagon(10))
+        .attr("transform", d => `translate(${d.x},${d.y})`)
+        .attr("fill", d => color(d.length))
+        .attr("stroke", "white");
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "histogram": {
+    title: "Histogram",
+    data: [
+      {"value": 12.5, "count": 45, "x0": 10, "x1": 15},
+      {"value": 17.8, "count": 67, "x0": 15, "x1": 20},
+      {"value": 23.2, "count": 89, "x0": 20, "x1": 25},
+      {"value": 28.9, "count": 123, "x0": 25, "x1": 30},
+      {"value": 34.1, "count": 156, "x0": 30, "x1": 35},
+      {"value": 39.7, "count": 134, "x0": 35, "x1": 40},
+      {"value": 44.3, "count": 98, "x0": 40, "x1": 45},
+      {"value": 49.8, "count": 76, "x0": 45, "x1": 50},
+      {"value": 54.6, "count": 54, "x0": 50, "x1": 55},
+      {"value": 59.2, "count": 32, "x0": 55, "x1": 60}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 50, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleLinear()
+        .domain([d3.min(this.data, d => d.x0), d3.max(this.data, d => d.x1)])
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain([0, d3.max(this.data, d => d.count)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      svg.selectAll('.bar')
+        .data(this.data)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('x', d => xScale(d.x0))
+        .attr('y', d => yScale(d.count))
+        .attr('width', d => xScale(d.x1) - xScale(d.x0))
+        .attr('height', d => height - margin.bottom - yScale(d.count))
+        .attr('fill', 'steelblue');
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "horizon-chart": {
+    title: "Horizon Chart",
+    data: [
+      {"series":"Series A","date":"2022-12-31T18:30:00.000Z","value":45.2},
+      {"series":"Series A","date":"2023-01-01T18:30:00.000Z","value":52.8},
+      {"series":"Series A","date":"2023-01-02T18:30:00.000Z","value":48.1},
+      {"series":"Series B","date":"2022-12-31T18:30:00.000Z","value":67.3},
+      {"series":"Series B","date":"2023-01-01T18:30:00.000Z","value":72.1},
+      {"series":"Series B","date":"2023-01-02T18:30:00.000Z","value":69.8},
+      {"series":"Series C","date":"2022-12-31T18:30:00.000Z","value":34.7},
+      {"series":"Series C","date":"2023-01-01T18:30:00.000Z","value":41.9},
+      {"series":"Series C","date":"2023-01-02T18:30:00.000Z","value":38.2},
+      {"series":"Series D","date":"2022-12-31T18:30:00.000Z","value":89.6},
+      {"series":"Series D","date":"2023-01-01T18:30:00.000Z","value":85.3},
+      {"series":"Series D","date":"2023-01-02T18:30:00.000Z","value":91.7}
+    ],
+    render: function(containerId) {
+      const rawData = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 200;
+      const margin = {top: 30, right: 50, bottom: 30, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(rawData, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain([0, d3.max(rawData, d => d.value)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const seriesNames = Array.from(new Set(rawData.map(d => d.series)));
+      const colorScale = d3.scaleOrdinal()
+        .domain(seriesNames)
+        .range(d3.schemeCategory10);
+      
+      const nested = d3.group(rawData, d => d.series);
+      
+      const area = d3.area()
+        .x(d => xScale(d.date))
+        .y0(yScale(0))
+        .y1(d => yScale(d.value))
+        .curve(d3.curveMonotoneX);
+      
+      for (const [key, values] of nested) {
+        svg.append("path")
+          .datum(values.sort((a,b) => d3.ascending(a.date, b.date)))
+          .attr("fill", colorScale(key))
+          .attr("stroke", "none")
+          .attr("opacity", 0.7)
+          .attr("d", area);
+      }
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "horizontal-bar-chart": {
+    title: "Horizontal Bar Chart",
+    data: [
+      {"category":"Product A","value":78.5,"count":785},
+      {"category":"Product B","value":45.2,"count":452},
+      {"category":"Product C","value":92.1,"count":921},
+      {"category":"Product D","value":34.8,"count":348},
+      {"category":"Product E","value":67.3,"count":673}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 100};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleLinear()
+        .domain([0, d3.max(this.data, d => d.value)]).nice()
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleBand()
+        .domain(this.data.map(d => d.category))
+        .range([margin.top, height - margin.bottom])
+        .padding(0.1);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeSet3);
+      
+      svg.selectAll('rect')
+        .data(this.data)
+        .enter()
+        .append('rect')
+        .attr('x', margin.left)
+        .attr('y', d => yScale(d.category))
+        .attr('width', d => xScale(d.value) - margin.left)
+        .attr('height', yScale.bandwidth())
+        .attr('fill', d => colorScale(d.category));
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "line-chart": {
+    title: "Line Chart",
+    data: [
+      {"date":"2019-12-31T18:30:00.000Z","value":45.2,"category":"Series 1"},
+      {"date":"2020-01-01T18:30:00.000Z","value":52.8,"category":"Series 1"},
+      {"date":"2020-01-02T18:30:00.000Z","value":48.1,"category":"Series 1"},
+      {"date":"2020-01-03T18:30:00.000Z","value":61.5,"category":"Series 1"},
+      {"date":"2020-01-04T18:30:00.000Z","value":58.9,"category":"Series 1"},
+      {"date":"2020-01-05T18:30:00.000Z","value":67.3,"category":"Series 1"},
+      {"date":"2020-01-06T18:30:00.000Z","value":72.1,"category":"Series 1"},
+      {"date":"2020-01-07T18:30:00.000Z","value":69.8,"category":"Series 1"},
+      {"date":"2020-01-08T18:30:00.000Z","value":75.4,"category":"Series 1"},
+      {"date":"2020-01-09T18:30:00.000Z","value":78.2,"category":"Series 1"}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.value)).nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.value))
+        .curve(d3.curveMonotoneX);
+      
+      svg.append('path')
+        .datum(data)
+        .attr('fill', 'none')
+        .attr('stroke', 'steelblue')
+        .attr('stroke-width', 2)
+        .attr('d', line);
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "multi-line-chart": {
+    title: "Multi-Line Chart",
+    data: [
+      {"date":"2022-12-31T18:30:00.000Z","price":150.25,"symbol":"AAPL","volume":125000},
+      {"date":"2023-01-01T18:30:00.000Z","price":152.8,"symbol":"AAPL","volume":135000},
+      {"date":"2023-01-02T18:30:00.000Z","price":148.9,"symbol":"AAPL","volume":145000},
+      {"date":"2022-12-31T18:30:00.000Z","price":2750.45,"symbol":"GOOGL","volume":85000},
+      {"date":"2023-01-01T18:30:00.000Z","price":2780.2,"symbol":"GOOGL","volume":95000},
+      {"date":"2023-01-02T18:30:00.000Z","price":2765.8,"symbol":"GOOGL","volume":105000},
+      {"date":"2022-12-31T18:30:00.000Z","price":245.75,"symbol":"MSFT","volume":165000},
+      {"date":"2023-01-01T18:30:00.000Z","price":248.3,"symbol":"MSFT","volume":175000},
+      {"date":"2023-01-02T18:30:00.000Z","price":251.9,"symbol":"MSFT","volume":185000}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 60, right: 20, bottom: 50, left = 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.price))
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+        .domain([...new Set(data.map(d => d.symbol))]);
+      
+      const lineGen = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.price))
+        .curve(d3.curveMonotoneX);
+      
+      const grouped = d3.group(data, d => d.symbol);
+      
+      svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .selectAll("path")
+        .data(Array.from(grouped.entries()))
+        .enter()
+        .append("path")
+        .attr("stroke", d => colorScale(d[0]))
+        .attr("stroke-width", 2)
+        .attr("d", d => lineGen(d[1]));
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "parallel-coordinates": {
+    title: "Parallel Coordinates",
+    data: [
+      {"id":0,"metric1":23.5,"metric2":67.2,"metric3":45.8,"metric4":78.9,"category":"Type 1"},
+      {"id":1,"metric1":45.8,"metric2":34.9,"metric3":67.1,"metric4":56.3,"category":"Type 2"},
+      {"id":2,"metric1":67.1,"metric2":89.4,"metric3":23.5,"metric4":89.7,"category":"Type 3"},
+      {"id":3,"metric1":12.9,"metric2":45.6,"metric3":78.3,"metric4":34.2,"category":"Type 1"},
+      {"id":4,"metric1":78.3,"metric2":23.1,"metric3":34.7,"metric4":67.8,"category":"Type 2"},
+      {"id":5,"metric1":34.7,"metric2":78.9,"metric3":56.2,"metric4":45.1,"category":"Type 3"},
+      {"id":6,"metric1":56.2,"metric2":56.7,"metric3":89.6,"metric4":23.6,"category":"Type 1"},
+      {"id":7,"metric1":89.6,"metric2":12.4,"metric3":21.4,"metric4":78.4,"category":"Type 2"},
+      {"id":8,"metric1":21.4,"metric2":91.8,"metric3":65.9,"metric4":56.9,"category":"Type 3"},
+      {"id":9,"metric1":65.9,"metric2":38.2,"metric3":47.3,"metric4":91.2,"category":"Type 1"}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 40, right: 30, bottom: 30, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+      
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+      
+      const metrics = ["metric1", "metric2", "metric3", "metric4"];
+      const yScales = {};
+      
+      metrics.forEach(m => {
+        const values = this.data.map(d => d[m]);
+        yScales[m] = d3.scaleLinear()
+          .domain(d3.extent(values))
+          .range([innerHeight, 0])
+          .nice();
+      });
+      
+      const xScale = d3.scalePoint()
+        .domain(metrics)
+        .range([0, innerWidth])
+        .padding(0.5);
+      
+      const categories = Array.from(new Set(this.data.map(d => d.category)));
+      const colorScale = d3.scaleOrdinal()
+        .domain(categories)
+        .range(d3.schemeCategory10);
+      
+      metrics.forEach(m => {
+        const axis = d3.axisLeft(yScales[m])
+          .ticks(5)
+          .tickSize(-innerWidth)
+          .tickPadding(10);
+        
+        g.append('g')
+          .attr('class', 'axis')
+          .attr('transform', `translate(${xScale(m)},0)`)
+          .call(axis);
+        
+        g.append('text')
+          .attr('x', xScale(m))
+          .attr('y', -10)
+          .attr('text-anchor', 'middle')
+          .attr('font-weight', 'bold')
+          .text(m);
+      });
+      
+      g.selectAll('.line')
+        .data(this.data)
+        .enter()
+        .append('path')
+        .attr('class', 'line')
+        .attr('stroke', d => colorScale(d.category))
+        .attr('stroke-opacity', 0.6)
+        .attr('stroke-width', 1.5)
+        .attr('fill', 'none')
+        .attr('d', d => {
+          const points = metrics.map(m => [xScale(m), yScales[m](d[m])]);
+          return d3.line()(points);
+        });
+    }
+  },
+
+  "pie-chart": {
+    title: "Pie Chart",
+    data: [
+      {category: "Mobile", value: 45, startAngle: 0, endAngle: 2.827},
+      {category: "Desktop", value: 35, startAngle: 2.827, endAngle: 5.026},
+      {category: "Tablet", value: 20, startAngle: 5.026, endAngle: 6.283}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 400, height = 400;
+      const radius = 150;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append("g")
+        .attr("transform", `translate(${width/2},${height/2})`);
+      
+      const color = d3.scaleOrdinal()
+        .domain(this.data.map(d => d.category))
+        .range(d3.schemeSet3);
+      
+      const arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+      
+      g.selectAll("path")
+        .data(this.data)
+        .enter()
+        .append("path")
+        .attr("d", d => arc({
+          startAngle: d.startAngle,
+          endAngle: d.endAngle
+        }))
+        .attr("fill", d => color(d.category))
+        .attr("stroke", "white")
+        .attr("stroke-width", 2);
+    }
+  },
+
+  "radial-area-chart": {
+    title: "Radial Area Chart",
+    data: [
+      {"hour":0,"value":35.2},{"hour":1,"value":28.4},{"hour":2,"value":42.7},{"hour":3,"value":38.9},
+      {"hour":4,"value":51.3},{"hour":5,"value":46.8},{"hour":6,"value":59.7},{"hour":7,"value":54.2},
+      {"hour":8,"value":67.1},{"hour":9,"value":62.5},{"hour":10,"value":74.8},{"hour":11,"value":69.3},
+      {"hour":12,"value":82.6},{"hour":13,"value":77.9},{"hour":14,"value":85.4},{"hour":15,"value":80.1},
+      {"hour":16,"value":73.7},{"hour":17,"value":68.2},{"hour":18,"value":61.9},{"hour":19,"value":56.4},
+      {"hour":20,"value":49.8},{"hour":21,"value":44.3},{"hour":22,"value":39.6},{"hour":23,"value":34.1}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 400, height = 400;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append("g")
+        .attr("transform", `translate(${width/2},${height/2})`);
+      
+      const angleScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.hour))
+        .range([0, 2 * Math.PI]);
+      
+      const radiusScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.value))
+        .range([20, 150]);
+      
+      const area = d3.areaRadial()
+        .angle(d => angleScale(d.hour))
+        .innerRadius(20)
+        .outerRadius(d => radiusScale(d.value))
+        .curve(d3.curveCardinalClosed);
+      
+      g.append("path")
+        .datum(this.data)
+        .attr("fill", "steelblue")
+        .attr("opacity", 0.7)
+        .attr("d", area);
+      
+      // Grid lines
+      const radiusTicks = d3.ticks(radiusScale.domain()[0], radiusScale.domain()[1], 4);
+      radiusTicks.forEach(t => {
+        g.append("circle")
+          .attr("r", radiusScale(t))
+          .attr("fill", "none")
+          .attr("stroke", "#ccc")
+          .attr("stroke-dasharray", "2,2");
+      });
+    }
+  },
+
+  "radial-bar-chart": {
+    title: "Radial Bar Chart",
+    data: [
+      {"category":"Jan","value":78.5,"count":785},
+      {"category":"Feb","value":45.2,"count":452},
+      {"category":"Mar","value":92.1,"count":921},
+      {"category":"Apr","value":34.8,"count":348},
+      {"category":"May","value":67.3,"count":673},
+      {"category":"Jun","value":56.9,"count":569},
+      {"category":"Jul","value":83.7,"count":837},
+      {"category":"Aug","value":29.4,"count":294},
+      {"category":"Sep","value":71.8,"count":718},
+      {"category":"Oct","value":48.6,"count":486},
+      {"category":"Nov","value":65.2,"count":652},
+      {"category":"Dec","value":87.9,"count":879}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 500, height = 500;
+      const innerRadius = 50, outerRadius = 200;
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const g = svg.append("g")
+        .attr("transform", `translate(${width/2},${height/2})`);
+      
+      const angleScale = d3.scaleBand()
+        .domain(this.data.map(d => d.category))
+        .range([0, 2 * Math.PI])
+        .padding(0.1);
+      
+      const radiusScale = d3.scaleLinear()
+        .domain([0, d3.max(this.data, d => d.value)])
+        .range([innerRadius, outerRadius]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const arc = d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(d => radiusScale(d.value))
+        .startAngle(d => angleScale(d.category))
+        .endAngle(d => angleScale(d.category) + angleScale.bandwidth() * 0.8);
+      
+      g.selectAll("path")
+        .data(this.data)
+        .enter()
+        .append("path")
+        .attr("d", arc)
+        .attr("fill", d => colorScale(d.category))
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1);
+    }
+  },
+
+  "scatter-plot": {
+    title: "Scatter Plot",
+    data: [
+      {"x":23.5,"y":67.2,"size":12.3,"category":"Group 1","id":"point-0"},
+      {"x":45.8,"y":34.9,"size":8.7,"category":"Group 2","id":"point-1"},
+      {"x":67.1,"y":89.4,"size":15.2,"category":"Group 3","id":"point-2"},
+      {"x":12.9,"y":45.6,"size":9.8,"category":"Group 1","id":"point-3"},
+      {"x":78.3,"y":23.1,"size":18.5,"category":"Group 4","id":"point-4"},
+      {"x":34.7,"y":78.9,"size":11.4,"category":"Group 2","id":"point-5"},
+      {"x":56.2,"y":56.7,"size":14.1,"category":"Group 5","id":"point-6"},
+      {"x":89.6,"y":12.4,"size":7.9,"category":"Group 3","id":"point-7"},
+      {"x":21.4,"y":91.8,"size":16.7,"category":"Group 1","id":"point-8"},
+      {"x":65.9,"y":38.2,"size":13.6,"category":"Group 4","id":"point-9"}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 20, right: 30, bottom: 40, left = 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.x)).nice()
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(this.data, d => d.y)).nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      svg.selectAll("circle")
+        .data(this.data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d.x))
+        .attr("cy", d => yScale(d.y))
+        .attr("r", 4)
+        .attr("fill", d => colorScale(d.category))
+        .attr("opacity", 0.8);
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "slope-chart": {
+    title: "Slope Chart",
+    data: [
+      {"country":"USA","year2010":75,"year2020":82},
+      {"country":"China","year2010":45,"year2020":68},
+      {"country":"Japan","year2010":85,"year2020":88},
+      {"country":"Germany","year2010":78,"year2020":81},
+      {"country":"India","year2010":35,"year2020":55}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 400, height = 300;
+      const margin = {top: 40, right: 20, bottom: 40, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const allVals = this.data.flatMap(d => [d.year2010, d.year2020]);
+      const yScale = d3.scaleLinear()
+        .domain(d3.extent(allVals)).nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const xScale = d3.scalePoint()
+        .domain(['2010','2020'])
+        .range([margin.left, width - margin.right]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const lineGen = d3.line()
+        .x(d => xScale(d.year))
+        .y(d => yScale(d.value));
+      
+      svg.selectAll(".slope")
+        .data(this.data)
+        .enter()
+        .append("path")
+        .attr("class","slope")
+        .attr("fill","none")
+        .attr("stroke", d => colorScale(d.country))
+        .attr("stroke-width", 2)
+        .attr("d", d => lineGen([
+          {year:"2010", value:d.year2010},
+          {year:"2020", value:d.year2020}
+        ]));
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "stacked-area-chart": {
+    title: "Stacked Area Chart",
+    data: [
+      {"date":"2019-12-31T18:30:00.000Z","series1":35.2,"series2":28.4,"series3":18.7},
+      {"date":"2020-01-01T18:30:00.000Z","series1":42.8,"series2":31.5,"series3":22.1},
+      {"date":"2020-01-02T18:30:00.000Z","series1":38.1,"series2":35.9,"series3":19.8},
+      {"date":"2020-01-03T18:30:00.000Z","series1":45.5,"series2":29.2,"series3":25.3},
+      {"date":"2020-01-04T18:30:00.000Z","series1":41.9,"series2":33.8,"series3":21.4},
+      {"date":"2020-01-05T18:30:00.000Z","series1":47.3,"series2":27.6,"series3":23.9},
+      {"date":"2020-01-06T18:30:00.000Z","series1":39.1,"series2":36.4,"series3":20.2},
+      {"date":"2020-01-07T18:30:00.000Z","series1":43.8,"series2":30.7,"series3":24.8},
+      {"date":"2020-01-08T18:30:00.000Z","series1":46.4,"series2":32.1,"series3":22.6},
+      {"date":"2020-01-09T18:30:00.000Z","series1":44.2,"series2":34.5,"series3":26.1}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 50, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const keys = ["series1","series2","series3"];
+      const stack = d3.stack().keys(keys);
+      const series = stack(data);
+      
+      const stackedData = series.map(s => ({
+        key: s.key,
+        values: s.map((d, i) => ({
+          date: data[i].date,
+          y0: d[0],
+          y1: d[1],
+          series: s.key
+        }))
+      }));
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yMax = d3.max(stackedData, s => d3.max(s.values, d => d.y1));
+      const yScale = d3.scaleLinear()
+        .domain([0, yMax])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const area = d3.area()
+        .x(d => xScale(d.date))
+        .y0(d => yScale(d.y0))
+        .y1(d => yScale(d.y1))
+        .curve(d3.curveMonotoneX);
+      
+      svg.selectAll('.area')
+        .data(stackedData)
+        .enter()
+        .append('path')
+        .attr('class', 'area')
+        .attr('fill', d => colorScale(d.key))
+        .attr('d', d => area(d.values));
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "stacked-bar-chart": {
+    title: "Stacked Bar Chart",
+    data: [
+      {"category": "A", "series1": 20, "series2": 30, "series3": 15},
+      {"category": "B", "series1": 35, "series2": 25, "series3": 20},
+      {"category": "C", "series1": 15, "series2": 40, "series3": 25},
+      {"category": "D", "series1": 30, "series2": 20, "series3": 30}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 150, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const keys = ["series1", "series2", "series3"];
+      const stack = d3.stack().keys(keys);
+      const series = stack(this.data);
+      
+      const xScale = d3.scaleBand()
+        .domain(this.data.map(d => d.category))
+        .range([margin.left, width - margin.right])
+        .padding(0.1);
+      
+      const maxY = d3.max(series, s => d3.max(s, d => d[1]));
+      const yScale = d3.scaleLinear()
+        .domain([0, maxY])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const layer = svg.selectAll('.serie')
+        .data(series)
+        .enter()
+        .append('g')
+        .attr('fill', d => colorScale(d.key));
+      
+      layer.selectAll('rect')
+        .data(d => d.map(v => ({
+          category: v.data.category,
+          y0: v[0],
+          y1: v[1],
+          series: d.key
+        })))
+        .enter()
+        .append('rect')
+        .attr('x', d => xScale(d.category))
+        .attr('y', d => yScale(d.y1))
+        .attr('height', d => yScale(d.y0) - yScale(d.y1))
+        .attr('width', xScale.bandwidth());
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "streamgraph": {
+    title: "Streamgraph",
+    data: [
+      {"date":"2019-12-31T18:30:00.000Z","music":25.3,"movies":32.1,"books":18.7,"games":28.9},
+      {"date":"2020-01-01T18:30:00.000Z","music":28.7,"movies":29.4,"books":21.2,"games":31.5},
+      {"date":"2020-01-02T18:30:00.000Z","music":31.2,"movies":35.8,"books":19.6,"games":27.3},
+      {"date":"2020-01-03T18:30:00.000Z","music":26.9,"movies":28.3,"books":22.8,"games":33.7},
+      {"date":"2020-01-04T18:30:00.000Z","music":29.5,"movies":31.7,"books":20.4,"games":29.8},
+      {"date":"2020-01-05T18:30:00.000Z","music":33.1,"movies":27.9,"books":23.5,"games":35.2},
+      {"date":"2020-01-06T18:30:00.000Z","music":27.8,"movies":34.2,"books":18.9,"games":30.6},
+      {"date":"2020-01-07T18:30:00.000Z","music":30.4,"movies":30.6,"books":21.7,"games":32.4},
+      {"date":"2020-01-08T18:30:00.000Z","music":32.6,"movies":26.8,"books":24.1,"games":28.7},
+      {"date":"2020-01-09T18:30:00.000Z","music":28.2,"movies":33.5,"books":19.3,"games":34.9}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 400;
+      const margin = {top: 50, right: 50, bottom: 50, left: 50};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const keys = ["music","movies","books","games"];
+      const stack = d3.stack()
+        .keys(keys)
+        .offset(d3.stackOffsetWiggle);
+      
+      const series = stack(data);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yExtent = [
+        d3.min(series, s => d3.min(s, d => d[0])),
+        d3.max(series, s => d3.max(s, d => d[1]))
+      ];
+      const yScale = d3.scaleLinear()
+        .domain(yExtent)
+        .range([height - margin.bottom, margin.top]);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const area = d3.area()
+        .curve(d3.curveBasis)
+        .x(d => xScale(d.data.date))
+        .y0(d => yScale(d[0]))
+        .y1(d => yScale(d[1]));
+      
+      svg.selectAll(".stream")
+        .data(series)
+        .enter()
+        .append("path")
+        .attr("class", "stream")
+        .attr("d", area)
+        .attr("fill", d => colorScale(d.key));
+      
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "timeline": {
+    title: "Timeline Chart",
+    data: [
+      {"event": "Project Start", "date": "2022-12-31T18:30:00.000Z", "duration": 30, "category": "Planning"},
+      {"event": "Design Phase", "date": "2023-01-31T18:30:00.000Z", "duration": 45, "category": "Design"},
+      {"event": "Development", "date": "2023-03-14T18:30:00.000Z", "duration": 90, "category": "Development"},
+      {"event": "Testing", "date": "2023-05-31T18:30:00.000Z", "duration": 30, "category": "Testing"},
+      {"event": "Deployment", "date": "2023-06-30T18:30:00.000Z", "duration": 15, "category": "Deployment"}
+    ],
+    render: function(containerId) {
+      const data = this.data.map(d => ({...d, date: new Date(d.date)}));
+      const svg = d3.select(`#${containerId}`);
+      const width = 800, height = 300;
+      const margin = {top: 20, right: 30, bottom: 40, left = 100};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([margin.left, width - margin.right]);
+      
+      const yScale = d3.scaleBand()
+        .domain(data.map(d => d.event))
+        .range([margin.top, height - margin.bottom])
+        .padding(0.1);
+      
+      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      svg.selectAll('rect')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('x', d => xScale(d.date))
+        .attr('y', d => yScale(d.event))
+        .attr('width', d => d.duration * 2)
+        .attr('height', 20)
+        .attr('fill', d => colorScale(d.category));
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+    }
+  },
+
+  "violin-plot": {
+    title: "Violin Plot",
+    data: [
+      {group:"Group A", value:25.3, density:0.045},
+      {group:"Group A", value:42.7, density:0.089},
+      {group:"Group A", value:58.9, density:0.067},
+      {group:"Group B", value:48.6, density:0.078},
+      {group:"Group B", value:65.2, density:0.092},
+      {group:"Group B", value:81.7, density:0.054},
+      {group:"Group C", value:67.9, density:0.063},
+      {group:"Group C", value:84.5, density:0.087},
+      {group:"Group C", value:98.2, density:0.041}
+    ],
+    render: function(containerId) {
+      const svg = d3.select(`#${containerId}`);
+      const width = 600, height = 400;
+      const margin = {top: 50, right: 30, bottom: 50, left: 60};
+      
+      svg.attr('width', width).attr('height', height);
+      
+      const groups = Array.from(new Set(this.data.map(d => d.group)));
+      
+      const x = d3.scaleBand()
+        .domain(groups)
+        .range([margin.left, width - margin.right])
+        .padding(0.2);
+      
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(this.data, d => d.value)])
+        .range([height - margin.bottom, margin.top])
+        .nice();
+      
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
+      
+      const maxDensity = d3.max(this.data, d => d.density);
+      const offsetScale = d3.scaleLinear()
+        .domain([0, maxDensity])
+        .range([0, x.bandwidth() / 2]);
+      
+      const nested = d3.groups(this.data, d => d.group);
+      
+      const area = d3.area()
+        .x0(d => x(d.group) + x.bandwidth()/2 - offsetScale(d.density))
+        .x1(d => x(d.group) + x.bandwidth()/2 + offsetScale(d.density))
+        .y(d => y(d.value))
+        .curve(d3.curveBasis);
+      
+      nested.forEach(([group, values]) => {
+        const sorted = values.slice().sort((a, b) => d3.ascending(a.value, b.value));
+        svg.append("path")
+          .datum(sorted)
+          .attr("fill", color(group))
+          .attr("fill-opacity", 0.7)
+          .attr("stroke", "#333")
+          .attr("stroke-width", 0.5)
+          .attr("d", area);
+      });
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x));
+      
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y));
+    }
+  }
+};
+
+// Generate navigation and chart sections
+function generateGallery() {
+  const navigation = document.getElementById('navigation');
+  const container = document.getElementById('chart-container');
+  
+  // Clear existing content
+  navigation.innerHTML = '';
+  container.innerHTML = '';
+  
+  // Generate navigation buttons
+  Object.keys(charts).forEach(chartId => {
+    const button = document.createElement('div');
+    button.className = 'nav-button';
+    button.textContent = charts[chartId].title;
+    button.onclick = () => showChart(chartId);
+    navigation.appendChild(button);
+  });
+  
+  // Generate chart sections
+  Object.keys(charts).forEach(chartId => {
+    const section = document.createElement('div');
+    section.className = 'chart-section';
+    section.id = `section-${chartId}`;
+    
+    section.innerHTML = `
+      <div class="chart-title">${charts[chartId].title}</div>
+      <div class="chart-wrapper">
+        <svg class="chart-svg" id="chart-${chartId}"></svg>
+      </div>
+      <div class="chart-info">
+        <div class="info-grid">
+          <div class="info-section">
+            <h3>📊 Data Sample</h3>
+            <div class="info-content">${JSON.stringify(Array.isArray(charts[chartId].data) ? charts[chartId].data.slice(0, 3) : charts[chartId].data, null, 2)}</div>
+          </div>
+          <div class="info-section">
+            <h3>🎨 Chart Type</h3>
+            <div class="info-content">Type: ${charts[chartId].title}
+Chart ID: ${chartId}
+Data Points: ${Array.isArray(charts[chartId].data) ? charts[chartId].data.length : 'Hierarchical'}
+Interactive: Yes</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(section);
+  });
+}
+
+function showChart(chartId) {
+  // Hide all sections
+  document.querySelectorAll('.chart-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.nav-button').forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // Show selected section
+  const section = document.getElementById(`section-${chartId}`);
+  if (section) {
+    section.classList.add('active');
+    
+    // Add active class to button
+    const buttons = document.querySelectorAll('.nav-button');
+    const chartIndex = Object.keys(charts).indexOf(chartId);
+    if (buttons[chartIndex]) {
+      buttons[chartIndex].classList.add('active');
+    }
+    
+    // Clear and render chart
+    const chartSvg = d3.select(`#chart-${chartId}`);
+    chartSvg.selectAll("*").remove();
+    
+    try {
+      charts[chartId].render(`chart-${chartId}`);
+    } catch (error) {
+      console.error(`Error rendering ${chartId}:`, error);
+      chartSvg.append('text')
+        .attr('x', 400)
+        .attr('y', 200)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'red')
+        .text(`Error rendering chart: ${error.message}`);
+    }
+    
+    // Scroll to chart
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function showAllCharts() {
+  // Show all sections
+  document.querySelectorAll('.chart-section').forEach(section => {
+    section.classList.add('active');
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.nav-button').forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // Render all charts
+  Object.keys(charts).forEach(chartId => {
+    const chartSvg = d3.select(`#chart-${chartId}`);
+    chartSvg.selectAll("*").remove();
+    
+    try {
+      charts[chartId].render(`chart-${chartId}`);
+    } catch (error) {
+      console.error(`Error rendering ${chartId}:`, error);
+      chartSvg.append('text')
+        .attr('x', 400)
+        .attr('y', 200)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'red')
+        .text(`Error rendering chart: ${error.message}`);
+    }
+  });
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Initialize the gallery
+document.addEventListener('DOMContentLoaded', function() {
+  generateGallery();
+  
+  // Show first chart by default
+  const firstChartId = Object.keys(charts)[0];
+  showChart(firstChartId);
+});
+</script>
+
+</body>
+</html>
